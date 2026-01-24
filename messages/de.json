@@ -1,0 +1,20 @@
+{
+    "HomePage": {
+        "nav": {
+            "about": "Über Uns",
+            "manufactory": "Manufaktur",
+            "offer": "Angebot",
+            "workshops": "Workshops",
+            "studio3d": "3D-Studio",
+            "shop": "Shop",
+            "b2b": "B2B-Bereich",
+            "contact": "Kontakt"
+        },
+        "title": "Bolglass - Die Magie der Glasornamente",
+        "hero": {
+            "headline": "Wir erschaffen Weihnachtszauber seit 78 Jahren",
+            "subheadline": "Mundgeblasene Kugeln, die durch Präzision begeistern.",
+            "cta": "Kollektion Entdecken"
+        }
+    }
+}
