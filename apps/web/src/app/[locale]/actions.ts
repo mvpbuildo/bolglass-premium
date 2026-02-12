@@ -5,11 +5,15 @@ import { revalidatePath } from 'next/cache';
 
 export async function getAvailableSlots() {
     try {
+        // 1. Get Global Blocks
+        const globalBlocks = await prisma.globalBlock.findMany();
+
         const slots = await prisma.slot.findMany({
             where: {
                 date: {
-                    gte: new Date(), // Only future slots
+                    gte: new Date(),
                 },
+                isBlocked: false, // Don't show blocked slots
             },
             include: {
                 bookings: {
@@ -21,15 +25,27 @@ export async function getAvailableSlots() {
             },
         });
 
-        // Filter slots with available capacity by summing people
+        // 2. Filter by Global Blocks
         return slots.map(slot => {
             const bookedCount = slot.bookings.reduce((sum, b) => sum + b.people, 0);
             const { bookings, ...slotData } = slot;
+
+            // Check if date or month is blocked
+            const dateStr = slot.date.toISOString().split('T')[0];
+            const monthStr = dateStr.substring(0, 7);
+
+            const isGloballyBlocked = globalBlocks.some(block =>
+                (block.type === 'DATE' && block.value === dateStr) ||
+                (block.type === 'MONTH' && block.value === monthStr)
+            );
+
+            if (isGloballyBlocked) return null;
+
             return {
                 ...slotData,
                 remainingCapacity: slot.capacity - bookedCount
             };
-        }).filter(slot => slot.remainingCapacity > 0);
+        }).filter(slot => slot !== null && slot.remainingCapacity > 0);
     } catch (error) {
         console.error('Error fetching slots:', error);
         return [];
@@ -41,10 +57,9 @@ export async function createBooking(formData: {
     name: string;
     email: string;
     people: number;
-}) {
+}, isAdminOverride = false) {
     console.log('--- START createBooking ---', formData);
     try {
-        // 1. Check if slot exists and has capacity
         const slot = await prisma.slot.findUnique({
             where: { id: formData.slotId },
             include: {
@@ -57,13 +72,12 @@ export async function createBooking(formData: {
         if (!slot) throw new Error('Slot not found');
 
         const currentPeople = slot.bookings.reduce((sum, b) => sum + b.people, 0);
-        console.log('Slot found:', slot.id, 'Current people:', currentPeople, 'Requested:', formData.people, 'Max capacity:', slot.capacity);
 
-        if (currentPeople + formData.people > slot.capacity) {
+        // Admin can override capacity
+        if (!isAdminOverride && (currentPeople + formData.people > slot.capacity)) {
             throw new Error(`Brak wolnych miejsc. Pozostało: ${slot.capacity - currentPeople}`);
         }
 
-        // 2. Create booking
         const booking = await prisma.booking.create({
             data: {
                 name: formData.name,
@@ -74,8 +88,6 @@ export async function createBooking(formData: {
                 status: 'CONFIRMED',
             },
         });
-
-        console.log('Booking created successfully:', booking.id);
 
         revalidatePath('/', 'layout');
         return { success: true, booking };
@@ -102,6 +114,22 @@ export async function getAllBookings() {
     }
 }
 
+export async function updateBookingAdmin(id: string, data: { status?: string, adminNotes?: string }) {
+    try {
+        const booking = await prisma.booking.update({
+            where: { id },
+            data: {
+                status: data.status,
+                adminNotes: data.adminNotes
+            }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true, booking };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
 export async function deleteBooking(id: string) {
     try {
         await prisma.booking.delete({
@@ -111,6 +139,33 @@ export async function deleteBooking(id: string) {
         return { success: true };
     } catch (error: any) {
         console.error('Error deleting booking:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Global Blocks API
+export async function getGlobalBlocks() {
+    return prisma.globalBlock.findMany({ orderBy: { value: 'asc' } });
+}
+
+export async function setGlobalBlock(type: 'DATE' | 'MONTH', value: string, reason?: string) {
+    try {
+        const block = await prisma.globalBlock.create({
+            data: { type, value, reason }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true, block };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function removeGlobalBlock(id: string) {
+    try {
+        await prisma.globalBlock.delete({ where: { id } });
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
         return { success: false, error: error.message };
     }
 }

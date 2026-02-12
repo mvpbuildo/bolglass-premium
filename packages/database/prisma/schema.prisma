@@ -21,21 +21,31 @@ model Slot {
   id        String   @id @default(cuid())
   date      DateTime @unique
   capacity  Int      @default(10)
+  isBlocked Boolean  @default(false)
   bookings  Booking[]
   createdAt DateTime @default(now())
 }
 
 model Booking {
+  id         String   @id @default(cuid())
+  date       DateTime
+  email      String
+  name       String
+  people     Int      @default(1)
+  status     String   @default("CONFIRMED")
+  adminNotes String?
+  
+  slotId     String?
+  slot       Slot?    @relation(fields: [slotId], references: [id])
+  
+  createdAt  DateTime @default(now())
+}
+
+model GlobalBlock {
   id        String   @id @default(cuid())
-  date      DateTime
-  email     String
-  name      String
-  people    Int      @default(1)
-  status    String   @default("CONFIRMED") // Auto-confirmed as per user request
-  
-  slotId    String?
-  slot      Slot?    @relation(fields: [slotId], references: [id])
-  
+  type      String   // DATE or MONTH
+  value     String   // YYYY-MM-DD or YYYY-MM
+  reason    String?
   createdAt DateTime @default(now())
 }
 

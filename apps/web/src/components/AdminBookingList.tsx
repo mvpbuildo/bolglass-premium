@@ -2,16 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAllBookings, deleteBooking } from '../app/[locale]/actions';
+import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAvailableSlots } from '../app/[locale]/actions';
 
 export default function AdminBookingList() {
     const [bookings, setBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isAdding, setIsAdding] = useState(false);
+
+    // Manual Form States
+    const [slots, setSlots] = useState<any[]>([]);
+    const [formData, setFormData] = useState({ slotId: '', name: '', email: '', people: '1' });
 
     const fetchBookings = async () => {
         setLoading(true);
-        const data = await getAllBookings();
-        setBookings(data);
+        const [bData, sData] = await Promise.all([getAllBookings(), getAvailableSlots()]);
+        setBookings(bData);
+        setSlots(sData);
         setLoading(false);
     };
 
@@ -19,15 +25,27 @@ export default function AdminBookingList() {
         fetchBookings();
     }, []);
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Czy na pewno chcesz usunąć tę rezerwację?')) return;
-
-        const result = await deleteBooking(id);
-        if (result.success) {
+    const handleAddManual = async () => {
+        if (!formData.slotId || !formData.name || !formData.email) return alert('Wypełnij pola!');
+        const res = await createBooking({ ...formData, people: parseInt(formData.people) }, true);
+        if (res.success) {
+            setIsAdding(false);
+            setFormData({ slotId: '', name: '', email: '', people: '1' });
             fetchBookings();
         } else {
-            alert('Błąd: ' + result.error);
+            alert('Błąd: ' + res.error);
         }
+    };
+
+    const handleUpdate = async (id: string, notes: string) => {
+        await updateBookingAdmin(id, { adminNotes: notes });
+        fetchBookings();
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Czy na pewno chcesz usunąć tę rezerwację?')) return;
+        const result = await deleteBooking(id);
+        if (result.success) fetchBookings();
     };
 
     if (loading) return <div className="p-8 text-center text-gray-500">Ładowanie rezerwacji...</div>;
@@ -36,18 +54,63 @@ export default function AdminBookingList() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Lista Rezerwacji</h2>
-                <Button variant="outline" size="sm" onClick={fetchBookings}>Odśwież</Button>
+                <div className="flex gap-2">
+                    <Button variant="primary" size="sm" onClick={() => setIsAdding(!isAdding)}>
+                        {isAdding ? 'Anuluj Dodawanie' : '+ Dodaj Ręcznie'}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={fetchBookings}>Odśwież</Button>
+                </div>
             </div>
+
+            {isAdding && (
+                <Card className="p-6 bg-red-50 border-red-100 animate-in fade-in slide-in-from-top-4">
+                    <h3 className="font-bold mb-4 text-red-900">Nowa Rezerwacja (Tryb Admin)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select
+                            className="p-2 border rounded bg-white text-sm"
+                            value={formData.slotId}
+                            onChange={(e) => setFormData({ ...formData, slotId: e.target.value })}
+                        >
+                            <option value="">Wybierz Slot</option>
+                            {slots.map(s => (
+                                <option key={s.id} value={s.id}>
+                                    {new Date(s.date).toLocaleString('pl-PL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                </option>
+                            ))}
+                        </select>
+                        <input
+                            placeholder="Imię i Nazwisko"
+                            className="p-2 border rounded bg-white text-sm"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        />
+                        <input
+                            placeholder="Email"
+                            className="p-2 border rounded bg-white text-sm"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Osób"
+                            className="p-2 border rounded bg-white text-sm"
+                            value={formData.people}
+                            onChange={(e) => setFormData({ ...formData, people: e.target.value })}
+                        />
+                    </div>
+                    <Button className="mt-4" onClick={handleAddManual}>Zapisz Rezerwację</Button>
+                </Card>
+            )}
 
             <Card className="overflow-hidden border-none shadow-lg">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left bg-white">
                         <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
                             <tr>
-                                <th className="px-6 py-4">Data i Godzina</th>
-                                <th className="px-6 py-4">Imię i Nazwisko</th>
-                                <th className="px-6 py-4">Kontakt</th>
+                                <th className="px-6 py-4">Termin</th>
+                                <th className="px-6 py-4">Dane Klienta</th>
                                 <th className="px-6 py-4 text-center">Osób</th>
+                                <th className="px-6 py-4">Notatki Admina</th>
                                 <th className="px-6 py-4 text-right">Akcje</th>
                             </tr>
                         </thead>
@@ -69,21 +132,30 @@ export default function AdminBookingList() {
                                                 {new Date(booking.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-700 not-italic">
-                                            {booking.name}
+                                        <td className="px-6 py-4 not-italic">
+                                            <div className="font-medium">{booking.name}</div>
+                                            <div className="text-xs text-gray-400">{booking.email}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500 text-sm not-italic">
-                                            {booking.email}
-                                        </td>
-                                        <td className="px-6 py-4 text-center not-italic font-semibold">
+                                        <td className="px-6 py-4 text-center not-italic font-bold text-red-600">
                                             {booking.people}
+                                        </td>
+                                        <td className="px-6 py-4 not-italic">
+                                            <input
+                                                defaultValue={booking.adminNotes || ''}
+                                                onBlur={(e) => handleUpdate(booking.id, e.target.value)}
+                                                placeholder="Dodaj notatkę..."
+                                                className="text-xs p-1 border border-transparent hover:border-gray-200 rounded w-full focus:bg-white"
+                                            />
                                         </td>
                                         <td className="px-6 py-4 text-right not-italic">
                                             <button
+                                                title="Usuń rezerwację"
                                                 onClick={() => handleDelete(booking.id)}
-                                                className="text-red-500 hover:text-red-700 text-sm font-medium underline px-2 py-1"
+                                                className="text-gray-400 hover:text-red-600 transition-colors"
                                             >
-                                                Usuń
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
                                             </button>
                                         </td>
                                     </tr>
