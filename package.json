@@ -10,7 +10,8 @@
     "clean": "turbo run clean",
     "db:generate": "turbo run generate --filter=@bolglass/database",
     "db:push": "turbo run push --filter=@bolglass/database",
-    "db:studio": "turbo run studio --filter=@bolglass/database"
+    "db:studio": "turbo run studio --filter=@bolglass/database",
+    "db:seed": "turbo run seed --filter=@bolglass/database"
   },
   "devDependencies": {
     "turbo": "latest"
