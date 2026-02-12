@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button, Input, Select, Card } from '@bolglass/ui';
 import { getAvailableSlots, createBooking } from '../app/[locale]/actions';
 
@@ -9,6 +9,7 @@ export default function BookingCalendar() {
     const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // Form States
     const [name, setName] = useState('');
@@ -25,6 +26,13 @@ export default function BookingCalendar() {
         }
         fetchSlots();
     }, []);
+
+    // Scroll to top of calendar when step changes
+    useEffect(() => {
+        if (step > 1 && containerRef.current) {
+            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [step]);
 
     const handleNextStep = () => {
         console.log('Client: Moving to Step 2. Selected Slot ID:', selectedSlotId);
@@ -72,7 +80,7 @@ export default function BookingCalendar() {
     const selectedSlot = slots.find(s => s.id === selectedSlotId);
 
     return (
-        <section className="py-24 bg-white text-black">
+        <section ref={containerRef} className="py-24 bg-white text-black scroll-mt-20">
             <div className="max-w-4xl mx-auto px-4">
                 <h2 className="text-3xl font-bold mb-12 text-center text-red-600">
                     Rezerwacja Warsztatów
