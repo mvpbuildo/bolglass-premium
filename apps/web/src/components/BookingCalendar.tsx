@@ -17,11 +17,8 @@ export default function BookingCalendar() {
     const [people, setPeople] = useState('1');
 
     useEffect(() => {
-        console.log('Client: BookingCalendar Mounted');
         async function fetchSlots() {
-            console.log('Client: Fetching slots...');
             const availableSlots = await getAvailableSlots();
-            console.log('Client: Slots fetched:', availableSlots);
             setSlots(availableSlots);
         }
         fetchSlots();
@@ -35,35 +32,20 @@ export default function BookingCalendar() {
     }, [step]);
 
     const handleNextStep = () => {
-        console.log('Client: Moving to Step 2. Selected Slot ID:', selectedSlotId);
         setStep(2);
     };
 
     const handleBooking = async () => {
-        console.log('Client: handleBooking CLICKED', { selectedSlotId, name, email, people });
-
-        if (!selectedSlotId) {
-            console.error('Client: No slot selected!');
-            alert('Wybierz termin!');
-            return;
-        }
-
-        if (!name || !email) {
-            console.error('Client: Missing name or email');
-            alert('Wypełnij wszystkie pola!');
-            return;
-        }
+        if (!selectedSlotId || !name || !email) return;
 
         setLoading(true);
         try {
-            console.log('Client: Calling createBooking Server Action...');
             const result = await createBooking({
                 slotId: selectedSlotId,
                 name,
                 email,
                 people: parseInt(people) || 1
             });
-            console.log('Client: Server Action result:', result);
             setLoading(false);
             if (result.success) {
                 setStep(3);
@@ -71,9 +53,8 @@ export default function BookingCalendar() {
                 alert('Błąd rezerwacji: ' + result.error);
             }
         } catch (err) {
-            console.error('Client: CRITICAL ERROR calling server action:', err);
             setLoading(false);
-            alert('Wystąpił błąd techniczny. Sprawdź konsolę.');
+            alert('Wystąpił błąd techniczny. Spróbuj ponownie.');
         }
     };
 
@@ -114,11 +95,8 @@ export default function BookingCalendar() {
                                         {slots.map(slot => (
                                             <button
                                                 key={slot.id}
-                                                onClick={() => {
-                                                    console.log('Client: Selected Slot:', slot.id);
-                                                    setSelectedSlotId(slot.id);
-                                                }}
-                                                className={`p-5 rounded-xl border-2 text-left transition-all ${selectedSlotId === slot.id ? 'border-red-500 bg-red-50' : 'border-transparent bg-white hover:border-red-100'}`}
+                                                onClick={() => setSelectedSlotId(slot.id)}
+                                                className={`p-5 rounded-xl border-2 text-left transition-all ${selectedSlotId === slot.id ? 'border-red-500 bg-red-50 border-solid' : 'border-transparent bg-white hover:border-red-100 hover:border-solid'}`}
                                             >
                                                 <div className="font-bold text-lg">
                                                     {new Date(slot.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -131,24 +109,15 @@ export default function BookingCalendar() {
                                     </div>
                                 )}
                                 <div className="mt-8 pt-4 border-t border-gray-200 text-center">
-                                    <button
+                                    <Button
+                                        fullWidth
+                                        variant="primary"
+                                        size="lg"
                                         disabled={!selectedSlotId}
                                         onClick={handleNextStep}
-                                        style={{
-                                            width: '100%',
-                                            backgroundColor: selectedSlotId ? '#dc2626' : '#f3f4f6',
-                                            color: selectedSlotId ? 'white' : '#9ca3af',
-                                            padding: '16px',
-                                            borderRadius: '12px',
-                                            fontWeight: 'bold',
-                                            fontSize: '18px',
-                                            cursor: selectedSlotId ? 'pointer' : 'not-allowed',
-                                            border: 'none',
-                                            boxShadow: selectedSlotId ? '0 10px 15px -3px rgba(220, 38, 38, 0.2)' : 'none'
-                                        }}
                                     >
                                         Przejdź do formularza
-                                    </button>
+                                    </Button>
                                     {!selectedSlotId && (
                                         <p className="text-xs text-center text-gray-400 mt-2 italic">
                                             Wybierz termin powyżej, aby kontynuować
@@ -164,20 +133,14 @@ export default function BookingCalendar() {
                                     label="Imię i Nazwisko"
                                     className="text-black bg-white border-gray-300"
                                     value={name}
-                                    onChange={(e) => {
-                                        console.log('Client: Name updated:', e.target.value);
-                                        setName(e.target.value);
-                                    }}
+                                    onChange={(e) => setName(e.target.value)}
                                 />
                                 <Input
                                     label="Email"
                                     type="email"
                                     className="text-black bg-white border-gray-300"
                                     value={email}
-                                    onChange={(e) => {
-                                        console.log('Client: Email updated:', e.target.value);
-                                        setEmail(e.target.value);
-                                    }}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                                 <Select
                                     label="Liczba osób"
@@ -191,36 +154,17 @@ export default function BookingCalendar() {
                                         { label: '4 osoby', value: '4' }
                                     ]}
                                 />
-                                <button
+                                <Button
+                                    fullWidth
+                                    variant="primary"
                                     onClick={handleBooking}
-                                    disabled={loading}
-                                    style={{
-                                        width: '100%',
-                                        backgroundColor: !loading ? '#dc2626' : '#f3f4f6',
-                                        color: !loading ? 'white' : '#9ca3af',
-                                        padding: '16px',
-                                        borderRadius: '12px',
-                                        fontWeight: 'bold',
-                                        fontSize: '18px',
-                                        cursor: !loading ? 'pointer' : 'not-allowed',
-                                        border: 'none',
-                                        boxShadow: !loading ? '0 10px 15px -3px rgba(220, 38, 38, 0.2)' : 'none'
-                                    }}
+                                    disabled={loading || !name || !email}
                                 >
                                     {loading ? 'Rezerwowanie...' : 'Zarezerwuj teraz'}
-                                </button>
+                                </Button>
                                 <button
                                     onClick={() => setStep(1)}
-                                    style={{
-                                        width: '100%',
-                                        background: 'none',
-                                        border: 'none',
-                                        color: '#6b7280',
-                                        fontSize: '14px',
-                                        textDecoration: 'underline',
-                                        marginTop: '8px',
-                                        cursor: 'pointer'
-                                    }}
+                                    className="w-full text-sm text-gray-500 underline text-center block hover:text-black mt-2"
                                 >
                                     Wróć do wyboru daty
                                 </button>
@@ -236,25 +180,17 @@ export default function BookingCalendar() {
                                     Dziękujemy za rezerwację. Wszystkie szczegóły wysłaliśmy na email: <strong>{email}</strong>
                                 </p>
                                 <div className="mt-6">
-                                    <button
+                                    <Button
+                                        variant="outline"
                                         onClick={() => {
                                             setStep(1);
                                             setSelectedSlotId(null);
                                             setName('');
                                             setEmail('');
                                         }}
-                                        style={{
-                                            padding: '8px 16px',
-                                            backgroundColor: 'transparent',
-                                            border: '2px solid #e5e7eb',
-                                            borderRadius: '8px',
-                                            fontSize: '14px',
-                                            fontWeight: '500',
-                                            cursor: 'pointer'
-                                        }}
                                     >
                                         Wróć do strony głównej
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         )}
