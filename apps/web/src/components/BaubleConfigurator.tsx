@@ -54,6 +54,10 @@ function Bauble({ color, text }: { color: string, text: string }) {
     );
 }
 
+import { Button, Input, Card } from '@bolglass/ui';
+
+// ... (keep Bauble component as is)
+
 export default function BaubleConfigurator() {
     const [color, setColor] = useState('#D91A1A'); // Bolglass Red
     const [text, setText] = useState('');
@@ -73,7 +77,7 @@ export default function BaubleConfigurator() {
             </div>
 
             {/* Configuration Controls */}
-            <div className="absolute top-1/2 right-10 -translate-y-1/2 bg-white/10 backdrop-blur-md p-6 rounded-2xl z-10 w-80 border border-white/20">
+            <Card variant="glass" className="absolute top-1/2 right-10 -translate-y-1/2 z-10 w-96">
                 <h3 className="text-xl font-bold mb-6">Konfiguracja</h3>
 
                 <div className="mb-8">
@@ -84,7 +88,7 @@ export default function BaubleConfigurator() {
                                 key={c}
                                 aria-label={`Wybierz kolor ${c}`}
                                 onClick={() => setColor(c)}
-                                className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 ${color === c ? 'border-white scale-110' : 'border-transparent'}`}
+                                className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer ${color === c ? 'border-white scale-110' : 'border-transparent'}`}
                                 style={{ backgroundColor: c }}
                             />
                         ))}
@@ -92,21 +96,19 @@ export default function BaubleConfigurator() {
                 </div>
 
                 <div className="mb-8">
-                    <label className="text-sm text-gray-400 block mb-3">Twój Napis</label>
-                    <input
-                        type="text"
-                        maxLength={20}
+                    <Input
+                        label="Twój Napis"
                         placeholder="Np. Wesołych Świąt"
+                        maxLength={20}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        className="w-full p-3 bg-black/50 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-red-500 focus:outline-none"
                     />
                 </div>
 
-                <button className="w-full py-4 bg-red-600 rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-900/50">
+                <Button variant="primary" fullWidth size="lg">
                     Dodaj do Koszyka (120 PLN)
-                </button>
-            </div>
+                </Button>
+            </Card>
 
             {/* 3D Canvas */}
             <div className="w-full h-[800px] cursor-grab active:cursor-grabbing">

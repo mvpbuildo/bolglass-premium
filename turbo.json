@@ -18,6 +18,16 @@
             "dependsOn": [
                 "^lint"
             ]
+        },
+        "generate": {
+            "cache": false
+        },
+        "push": {
+            "cache": false
+        },
+        "studio": {
+            "cache": false,
+            "persistent": true
         }
     }
 }

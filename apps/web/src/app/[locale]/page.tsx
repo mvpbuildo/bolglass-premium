@@ -3,6 +3,7 @@ import ProductionProcess from '@/components/ProductionProcess';
 import BookingCalendar from '@/components/BookingCalendar';
 import BaubleConfigurator from '@/components/BaubleConfigurator';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { Button } from '@bolglass/ui';
 
 import Image from "next/image";
 
@@ -54,9 +55,11 @@ export default function HomePage() {
                     <div className="mt-8 max-w-2xl">
                         <h2 className="text-3xl font-semibold text-white drop-shadow-lg">{t('hero.headline')}</h2>
                         <p className="mt-6 text-lg text-gray-100 drop-shadow-md leading-relaxed">{t('hero.subheadline')}</p>
-                        <button className="mt-6 px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
-                            {t('hero.cta')}
-                        </button>
+                        <div className="mt-6">
+                            <Button size="lg" variant="primary" className="rounded-full">
+                                {t('hero.cta')}
+                            </Button>
+                        </div>
                     </div>
                 </div>
 

@@ -19,8 +19,12 @@ services:
       - "traefik.docker.network=traefik_default"
     networks:
       - traefik-net
+      - db-net
 
 networks:
   traefik-net:
     external: true
     name: traefik_default
+  db-net:
+    external: true
+    name: postrges16_internal # Typo from user's screenshot

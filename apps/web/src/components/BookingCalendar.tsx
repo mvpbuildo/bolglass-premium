@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-// import { useTranslations } from 'next-intl';
+import { Button, Input, Select, Card } from '@bolglass/ui';
 
 export default function BookingCalendar() {
     // Mock translations for now since we haven't added them to JSON yet
@@ -38,7 +38,7 @@ export default function BookingCalendar() {
                     </div>
 
                     {/* Interactive Area */}
-                    <div className="bg-gray-50 p-8 rounded-2xl shadow-lg h-96 overflow-y-auto">
+                    <Card className="h-96 overflow-y-auto bg-gray-50 dark:bg-gray-50 border-none shadow-lg">
                         {step === 1 && (
                             <div className="grid grid-cols-2 gap-4">
                                 {dates.map(date => (
@@ -50,32 +50,37 @@ export default function BookingCalendar() {
                                         {date}
                                     </button>
                                 ))}
-                                <button
-                                    disabled={!selectedDate}
-                                    onClick={() => setStep(2)}
-                                    className="col-span-2 mt-4 w-full py-3 bg-black text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-800"
-                                >
-                                    Dalej
-                                </button>
+                                <div className="col-span-2 mt-4">
+                                    <Button
+                                        fullWidth
+                                        variant="secondary"
+                                        disabled={!selectedDate}
+                                        onClick={() => setStep(2)}
+                                    >
+                                        Dalej
+                                    </Button>
+                                </div>
                             </div>
                         )}
 
                         {step === 2 && (
                             <div className="space-y-4">
-                                <input type="text" placeholder="Imię i Nazwisko" className="w-full p-3 border rounded-lg" />
-                                <input type="email" placeholder="Email" className="w-full p-3 border rounded-lg" />
-                                <select aria-label="Liczba osób" className="w-full p-3 border rounded-lg">
-                                    <option>1 osoba</option>
-                                    <option>2 osoby</option>
-                                    <option>Grupa (3-10)</option>
-                                </select>
-                                <button
-                                    onClick={() => setStep(3)}
-                                    className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-800"
-                                >
+                                <Input placeholder="Imię i Nazwisko" className="text-black bg-white border-gray-300" />
+                                <Input placeholder="Email" type="email" className="text-black bg-white border-gray-300" />
+                                <Select
+                                    className="text-black bg-white border-gray-300"
+                                    options={[
+                                        { label: '1 osoba', value: '1' },
+                                        { label: '2 osoby', value: '2' },
+                                        { label: 'Grupa (3-10)', value: 'group' }
+                                    ]}
+                                />
+                                <Button fullWidth variant="secondary" onClick={() => setStep(3)}>
                                     Podsumowanie
+                                </Button>
+                                <button onClick={() => setStep(1)} className="w-full text-sm text-gray-500 underline text-center block hover:text-black">
+                                    Wróć
                                 </button>
-                                <button onClick={() => setStep(1)} className="w-full text-sm text-gray-500 underline">Wróć</button>
                             </div>
                         )}
 
@@ -85,10 +90,14 @@ export default function BookingCalendar() {
                                 <h3 className="text-xl font-bold">Gotowe!</h3>
                                 <p>Wybrany termin: <strong>{selectedDate}</strong></p>
                                 <p>Na Twój email wysłaliśmy link do płatności.</p>
-                                <button onClick={() => setStep(1)} className="mt-4 px-6 py-2 bg-red-600 text-white rounded-full">Zarezerwuj kolejny</button>
+                                <div className="mt-6">
+                                    <Button variant="primary" onClick={() => setStep(1)} size="sm" className="rounded-full">
+                                        Zarezerwuj kolejny
+                                    </Button>
+                                </div>
                             </div>
                         )}
-                    </div>
+                    </Card>
                 </div>
             </div>
         </section>
