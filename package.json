@@ -10,6 +10,7 @@
     "clean": "turbo run clean",
     "db:generate": "npm run generate -w packages/database",
     "db:push": "npm run push -w packages/database",
+    "db:migrate": "npm run migrate -w packages/database",
     "db:studio": "npm run studio -w packages/database",
     "db:seed": "npm run seed -w packages/database"
   },
