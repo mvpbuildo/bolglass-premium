@@ -130,17 +130,25 @@ export default function BookingCalendar() {
                                         ))}
                                     </div>
                                 )}
-                                <div className="mt-8 pt-4 border-t border-gray-200">
-                                    <Button
-                                        fullWidth
-                                        variant="primary"
-                                        size="lg"
+                                <div className="mt-8 pt-4 border-t border-gray-200 text-center">
+                                    <button
                                         disabled={!selectedSlotId}
                                         onClick={handleNextStep}
-                                        className="shadow-xl"
+                                        style={{
+                                            width: '100%',
+                                            backgroundColor: selectedSlotId ? '#dc2626' : '#f3f4f6',
+                                            color: selectedSlotId ? 'white' : '#9ca3af',
+                                            padding: '16px',
+                                            borderRadius: '12px',
+                                            fontWeight: 'bold',
+                                            fontSize: '18px',
+                                            cursor: selectedSlotId ? 'pointer' : 'not-allowed',
+                                            border: 'none',
+                                            boxShadow: selectedSlotId ? '0 10px 15px -3px rgba(220, 38, 38, 0.2)' : 'none'
+                                        }}
                                     >
                                         Przejdź do formularza
-                                    </Button>
+                                    </button>
                                     {!selectedSlotId && (
                                         <p className="text-xs text-center text-gray-400 mt-2 italic">
                                             Wybierz termin powyżej, aby kontynuować
