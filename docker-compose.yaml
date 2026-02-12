@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-      # Add other env vars here as needed
+      - DATABASE_URL=${DATABASE_URL}
     labels:
       - "traefik.enable=true"
       # Phase 1: Test subdomain
