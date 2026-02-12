@@ -16,28 +16,46 @@ export default function BookingCalendar() {
     const [people, setPeople] = useState('1');
 
     useEffect(() => {
+        console.log('Client: BookingCalendar Mounted');
         async function fetchSlots() {
+            console.log('Client: Fetching slots...');
             const availableSlots = await getAvailableSlots();
+            console.log('Client: Slots fetched:', availableSlots);
             setSlots(availableSlots);
         }
         fetchSlots();
     }, []);
 
+    const handleNextStep = () => {
+        console.log('Client: Moving to Step 2. Selected Slot ID:', selectedSlotId);
+        setStep(2);
+    };
+
     const handleBooking = async () => {
-        console.log('Client: Attemping booking...', { selectedSlotId, name, email, people });
+        console.log('Client: handleBooking CLICKED', { selectedSlotId, name, email, people });
+
         if (!selectedSlotId) {
-            console.error('Client: No slot selected');
+            console.error('Client: No slot selected!');
+            alert('Wybierz termin!');
             return;
         }
+
+        if (!name || !email) {
+            console.error('Client: Missing name or email');
+            alert('Wypełnij wszystkie pola!');
+            return;
+        }
+
         setLoading(true);
         try {
+            console.log('Client: Calling createBooking Server Action...');
             const result = await createBooking({
                 slotId: selectedSlotId,
                 name,
                 email,
                 people: parseInt(people) || 1
             });
-            console.log('Client: Booking result:', result);
+            console.log('Client: Server Action result:', result);
             setLoading(false);
             if (result.success) {
                 setStep(3);
@@ -45,7 +63,7 @@ export default function BookingCalendar() {
                 alert('Błąd rezerwacji: ' + result.error);
             }
         } catch (err) {
-            console.error('Client: Error during server action call:', err);
+            console.error('Client: CRITICAL ERROR calling server action:', err);
             setLoading(false);
             alert('Wystąpił błąd techniczny. Sprawdź konsolę.');
         }
