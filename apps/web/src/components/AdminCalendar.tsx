@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice } from '../app/[locale]/actions';
+import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice, generateMonthSlots } from '../app/[locale]/actions';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
@@ -84,6 +84,20 @@ export default function AdminCalendar() {
     const nextMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
     const prevMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
 
+    const handleGenerateSlots = async () => {
+        if (confirm(`Czy na pewno chcesz wygenerować sloty (8:00-17:00) dla miesiąca ${currentMonthStr}?`)) {
+            setLoading(true);
+            const res = await generateMonthSlots(viewDate.getFullYear(), viewDate.getMonth());
+            if (res.success) {
+                alert('Sloty zostały wygenerowane pomyślnie!');
+                fetchData();
+            } else {
+                alert('Błąd podczas generowania slotów: ' + res.error);
+                setLoading(false);
+            }
+        }
+    };
+
     return (
         <Card className="p-6 bg-white shadow-xl border-none">
             <div className="flex justify-between items-center mb-8">
@@ -96,6 +110,9 @@ export default function AdminCalendar() {
                 <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={prevMonth}>←</Button>
                     <Button variant="outline" size="sm" onClick={nextMonth}>→</Button>
+                    <Button variant="outline" size="sm" onClick={handleGenerateSlots} disabled={loading}>
+                        Generuj Terminy
+                    </Button>
                     <Button
                         variant={isMonthBlocked ? 'primary' : 'outline'}
                         size="sm"

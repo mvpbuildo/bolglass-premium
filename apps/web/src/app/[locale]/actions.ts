@@ -249,3 +249,38 @@ export async function removeGlobalBlock(id: string) {
         return { success: false, error: error.message };
     }
 }
+
+export async function generateMonthSlots(year: number, month: number) {
+    try {
+        const startHour = 8;
+        const endHour = 17;
+        const capacity = 30;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+
+            // Skip past days? Maybe not needed for admin generation, but good practice.
+            // if (date < new Date()) continue; 
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                const slotDate = new Date(date);
+                slotDate.setHours(hour, 0, 0, 0);
+
+                await prisma.slot.upsert({
+                    where: { date: slotDate },
+                    update: { capacity }, // Ensure capacity is set/updated
+                    create: {
+                        date: slotDate,
+                        capacity,
+                    },
+                });
+            }
+        }
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error generating slots:', error);
+        return { success: false, error: error.message };
+    }
+}
