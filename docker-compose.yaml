@@ -16,11 +16,11 @@ services:
       - "traefik.http.routers.bolglass-web.entrypoints=websecure"
       - "traefik.http.routers.bolglass-web.tls.certresolver=le"
       - "traefik.http.services.bolglass-web.loadbalancer.server.port=3000"
-      - "traefik.docker.network=root_default"
+      - "traefik.docker.network=traefik_default"
     networks:
       - traefik-net
 
 networks:
   traefik-net:
     external: true
-    name: root_default
+    name: traefik_default
