@@ -96,38 +96,48 @@ export default function BookingCalendar() {
                     </div>
 
                     {/* Interactive Area */}
-                    <Card className="min-h-[300px] overflow-y-auto bg-gray-50 border-none shadow-lg">
+                    <Card className="bg-gray-50 border-2 border-gray-100 shadow-xl p-8">
                         {step === 1 && (
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {slots.length === 0 ? (
                                     <p className="text-center text-gray-500 py-8">Brak dostępnych terminów.</p>
                                 ) : (
-                                    <div className="grid grid-cols-1 gap-3">
+                                    <div className="grid grid-cols-1 gap-4">
                                         {slots.map(slot => (
                                             <button
                                                 key={slot.id}
-                                                onClick={() => setSelectedSlotId(slot.id)}
-                                                className={`p-4 rounded-lg border-2 text-left transition-all ${selectedSlotId === slot.id ? 'border-red-500 bg-red-100' : 'border-transparent bg-white hover:border-red-200'}`}
+                                                onClick={() => {
+                                                    console.log('Client: Selected Slot:', slot.id);
+                                                    setSelectedSlotId(slot.id);
+                                                }}
+                                                className={`p-5 rounded-xl border-2 text-left transition-all ${selectedSlotId === slot.id ? 'border-red-500 bg-red-50' : 'border-transparent bg-white hover:border-red-100'}`}
                                             >
-                                                <div className="font-bold">
+                                                <div className="font-bold text-lg">
                                                     {new Date(slot.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
                                                 </div>
-                                                <div className="text-sm text-gray-500">
-                                                    Dostępne miejsca: {slot.capacity - slot._count.bookings}
+                                                <div className="text-sm text-gray-600">
+                                                    Dostępne miejsca: <span className="font-bold text-black">{slot.capacity - slot._count.bookings}</span>
                                                 </div>
                                             </button>
                                         ))}
                                     </div>
                                 )}
-                                <div className="mt-4">
+                                <div className="mt-8 pt-4 border-t border-gray-200">
                                     <Button
                                         fullWidth
-                                        variant="secondary"
+                                        variant="primary"
+                                        size="lg"
                                         disabled={!selectedSlotId}
                                         onClick={handleNextStep}
+                                        className="shadow-xl"
                                     >
-                                        Dalej
+                                        Przejdź do formularza
                                     </Button>
+                                    {!selectedSlotId && (
+                                        <p className="text-xs text-center text-gray-400 mt-2 italic">
+                                            Wybierz termin powyżej, aby kontynuować
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
