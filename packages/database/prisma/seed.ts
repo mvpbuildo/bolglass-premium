@@ -3,23 +3,33 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    const dates = [
-        new Date('2026-02-20T10:00:00Z'),
-        new Date('2026-02-22T10:00:00Z'),
-        new Date('2026-02-25T14:00:00Z'),
-    ];
+    console.log('Seed: Creating hourly slots for the next 7 days...');
 
-    console.log('Seed: Creating slots...');
+    const startHour = 8;
+    const endHour = 17;
+    const capacity = 30;
 
-    for (const date of dates) {
-        await prisma.slot.upsert({
-            where: { date },
-            update: {},
-            create: {
-                date,
-                capacity: 10,
-            },
-        });
+    const now = new Date();
+    // Start from tomorrow
+    const baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    for (let day = 0; day < 7; day++) {
+        const currentDay = new Date(baseDate);
+        currentDay.setDate(baseDate.getDate() + day);
+
+        for (let hour = startHour; hour <= endHour; hour++) {
+            const slotDate = new Date(currentDay);
+            slotDate.setHours(hour, 0, 0, 0);
+
+            await prisma.slot.upsert({
+                where: { date: slotDate },
+                update: { capacity },
+                create: {
+                    date: slotDate,
+                    capacity,
+                },
+            });
+        }
     }
 
     console.log('Seed: Done!');

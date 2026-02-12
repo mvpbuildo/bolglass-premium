@@ -12,17 +12,24 @@ export async function getAvailableSlots() {
                 },
             },
             include: {
-                _count: {
-                    select: { bookings: true },
-                },
+                bookings: {
+                    select: { people: true }
+                }
             },
             orderBy: {
                 date: 'asc',
             },
         });
 
-        // Filter slots with available capacity
-        return slots.filter(slot => slot.capacity > slot._count.bookings);
+        // Filter slots with available capacity by summing people
+        return slots.map(slot => {
+            const bookedCount = slot.bookings.reduce((sum, b) => sum + b.people, 0);
+            const { bookings, ...slotData } = slot;
+            return {
+                ...slotData,
+                remainingCapacity: slot.capacity - bookedCount
+            };
+        }).filter(slot => slot.remainingCapacity > 0);
     } catch (error) {
         console.error('Error fetching slots:', error);
         return [];
@@ -41,17 +48,19 @@ export async function createBooking(formData: {
         const slot = await prisma.slot.findUnique({
             where: { id: formData.slotId },
             include: {
-                _count: {
-                    select: { bookings: true },
-                },
+                bookings: {
+                    select: { people: true }
+                }
             },
         });
 
-        console.log('Slot found:', slot?.id, 'Current bookings:', slot?._count.bookings);
-
         if (!slot) throw new Error('Slot not found');
-        if (slot.capacity <= slot._count.bookings) {
-            throw new Error('Slot is full');
+
+        const currentPeople = slot.bookings.reduce((sum, b) => sum + b.people, 0);
+        console.log('Slot found:', slot.id, 'Current people:', currentPeople, 'Requested:', formData.people, 'Max capacity:', slot.capacity);
+
+        if (currentPeople + formData.people > slot.capacity) {
+            throw new Error(`Brak wolnych miejsc. Pozostało: ${slot.capacity - currentPeople}`);
         }
 
         // 2. Create booking
@@ -62,7 +71,7 @@ export async function createBooking(formData: {
                 people: formData.people,
                 date: slot.date,
                 slotId: slot.id,
-                status: 'CONFIRMED', // Based on user request
+                status: 'CONFIRMED',
             },
         });
 
