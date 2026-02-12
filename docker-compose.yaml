@@ -8,6 +8,8 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       # Phase 1: Test subdomain
