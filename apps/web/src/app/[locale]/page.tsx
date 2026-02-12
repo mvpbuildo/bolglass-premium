@@ -17,10 +17,10 @@ export default function HomePage() {
                 <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-6">
                     <div className="w-32 h-auto flex items-center justify-center">
                         <Image
-                            src="/bolglass-logo-white.png"
+                            src="/bolglass-logo-final.png"
                             alt="Bolglass Logo"
                             width={120}
-                            height={40}
+                            height={120}
                             className="object-contain"
                         />
                     </div>
@@ -47,13 +47,13 @@ export default function HomePage() {
 
                 <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
                     <div className="flex flex-col items-start gap-4">
-                        <div className="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center shadow-2xl">
+                        <div className="w-40 h-40 flex items-center justify-center filter drop-shadow-2xl">
                             <Image
-                                src="/bolglass-logo-color.png"
+                                src="/bolglass-logo-final.png"
                                 alt="Bolglass Logo"
                                 width={160}
                                 height={160}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain"
                             />
                         </div>
                         <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-amber-500">
