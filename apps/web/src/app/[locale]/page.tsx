@@ -15,13 +15,13 @@ export default function HomePage() {
             <main className="flex min-h-screen flex-col items-center justify-between p-24 relative overflow-hidden">
                 {/* Top Navigation */}
                 <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-6">
-                    <div className="w-32 h-auto flex items-center justify-center">
+                    <div className="relative w-24 h-24 flex items-center justify-center bg-white rounded-full shadow-xl ring-4 ring-white/10 overflow-hidden transform hover:scale-105 transition-transform duration-300">
                         <Image
                             src="/bolglass-logo-blue.png"
                             alt="Bolglass Logo"
-                            width={120}
-                            height={120}
-                            className="object-contain"
+                            width={100}
+                            height={100}
+                            className="object-contain p-2"
                         />
                     </div>
                     <div className="hidden xl:flex gap-6 text-xs font-medium text-white/90 uppercase tracking-widest">
