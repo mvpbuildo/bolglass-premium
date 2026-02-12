@@ -256,9 +256,5 @@ export default function BookingCalendar() {
                 </div>
             </div>
         </section>
-                    </Card >
-                </div >
-            </div >
-        </section >
     );
 }
