@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAvailableSlots, sendBookingReminder } from '../app/[locale]/actions';
+import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAdminSlots, sendBookingReminder } from '../app/[locale]/actions';
 
 export default function AdminBookingList() {
     const [bookings, setBookings] = useState<any[]>([]);
@@ -15,7 +15,7 @@ export default function AdminBookingList() {
 
     const fetchBookings = async () => {
         setLoading(true);
-        const [bData, sData] = await Promise.all([getAllBookings(), getAvailableSlots()]);
+        const [bData, sData] = await Promise.all([getAllBookings(), getAdminSlots()]);
         setBookings(bData);
         setSlots(sData);
         setLoading(false);

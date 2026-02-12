@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAvailableSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice } from '../app/[locale]/actions';
+import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice } from '../app/[locale]/actions';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
@@ -13,7 +13,7 @@ export default function AdminCalendar() {
 
     const fetchData = async () => {
         setLoading(true);
-        const [s, b] = await Promise.all([getAvailableSlots(), getGlobalBlocks()]);
+        const [s, b] = await Promise.all([getAdminSlots(), getGlobalBlocks()]);
         setSlots(s);
         setBlocks(b);
         setLoading(false);

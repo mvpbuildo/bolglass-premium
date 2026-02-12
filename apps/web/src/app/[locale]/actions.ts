@@ -5,33 +5,26 @@ import { revalidatePath } from 'next/cache';
 
 export async function getAvailableSlots() {
     try {
-        // 1. Get Global Blocks
         const globalBlocks = await prisma.globalBlock.findMany();
 
         const slots = await prisma.slot.findMany({
             where: {
-                date: {
-                    gte: new Date(),
-                },
-                isBlocked: false, // Don't show blocked slots
+                date: { gte: new Date() },
+                isBlocked: false,
             },
             include: {
-                bookings: {
-                    select: { people: true }
-                }
+                bookings: { select: { people: true } }
             },
-            orderBy: {
-                date: 'asc',
-            },
+            orderBy: { date: 'asc' },
         });
 
-        // 2. Filter by Global Blocks
         return slots.map(slot => {
             const bookedCount = slot.bookings.reduce((sum, b) => sum + b.people, 0);
             const { bookings, ...slotData } = slot;
 
-            // Check if date or month is blocked
-            const dateStr = slot.date.toISOString().split('T')[0];
+            // Fix timezone issue: use YYYY-MM-DD from local-like perspective
+            const d = new Date(slot.date);
+            const dateStr = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
             const monthStr = dateStr.substring(0, 7);
 
             const isGloballyBlocked = globalBlocks.some(block =>
@@ -48,6 +41,29 @@ export async function getAvailableSlots() {
         }).filter(slot => slot !== null && slot.remainingCapacity > 0);
     } catch (error) {
         console.error('Error fetching slots:', error);
+        return [];
+    }
+}
+
+export async function getAdminSlots() {
+    try {
+        const slots = await prisma.slot.findMany({
+            include: {
+                bookings: { select: { people: true } }
+            },
+            orderBy: { date: 'asc' },
+        });
+
+        return slots.map(slot => {
+            const bookedCount = slot.bookings.reduce((sum, b) => sum + b.people, 0);
+            const { bookings, ...slotData } = slot;
+            return {
+                ...slotData,
+                remainingCapacity: slot.capacity - bookedCount
+            };
+        });
+    } catch (error) {
+        console.error('Error fetching admin slots:', error);
         return [];
     }
 }
