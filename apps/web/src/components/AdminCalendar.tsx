@@ -100,27 +100,34 @@ export default function AdminCalendar() {
 
     return (
         <Card className="p-6 bg-white shadow-xl border-none">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">
-                        {viewDate.toLocaleString('pl-PL', { month: 'long', year: 'numeric' })}
-                    </h3>
-                    <p className="text-xs text-gray-500 font-medium">Kliknij dzień, aby go zablokować/odblokować</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={prevMonth}>←</Button>
-                    <Button variant="outline" size="sm" onClick={nextMonth}>→</Button>
-                    <Button variant="outline" size="sm" onClick={handleGenerateSlots} disabled={loading}>
-                        Generuj Terminy
-                    </Button>
-                    <Button
-                        variant={isMonthBlocked ? 'primary' : 'outline'}
-                        size="sm"
-                        onClick={handleBlockMonth}
-                        className={isMonthBlocked ? 'bg-black border-black' : ''}
-                    >
-                        {isMonthBlocked ? 'Odblokuj Miesiąc' : 'Zablokuj Miesiąc'}
-                    </Button>
+            <div className="flex flex-col gap-6 mb-8">
+                <div className="flex flex-wrap justify-between items-center gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="flex gap-1">
+                            <Button variant="outline" size="sm" onClick={prevMonth} className="h-8 w-8 p-0">←</Button>
+                            <Button variant="outline" size="sm" onClick={nextMonth} className="h-8 w-8 p-0">→</Button>
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight leading-none">
+                                {viewDate.toLocaleString('pl-PL', { month: 'long', year: 'numeric' })}
+                            </h3>
+                            <p className="text-[10px] text-gray-400 font-medium mt-1">Zarządzanie dostępnością</p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={handleGenerateSlots} disabled={loading} className="text-xs h-8">
+                            Generuj Terminy
+                        </Button>
+                        <Button
+                            variant={isMonthBlocked ? 'primary' : 'outline'}
+                            size="sm"
+                            onClick={handleBlockMonth}
+                            className={`text-xs h-8 ${isMonthBlocked ? 'bg-black border-black' : ''}`}
+                        >
+                            {isMonthBlocked ? 'Odblokuj' : 'Zablokuj Miesiąc'}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
