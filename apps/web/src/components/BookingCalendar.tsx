@@ -24,19 +24,30 @@ export default function BookingCalendar() {
     }, []);
 
     const handleBooking = async () => {
-        if (!selectedSlotId) return;
+        console.log('Client: Attemping booking...', { selectedSlotId, name, email, people });
+        if (!selectedSlotId) {
+            console.error('Client: No slot selected');
+            return;
+        }
         setLoading(true);
-        const result = await createBooking({
-            slotId: selectedSlotId,
-            name,
-            email,
-            people: parseInt(people) || 1
-        });
-        setLoading(false);
-        if (result.success) {
-            setStep(3);
-        } else {
-            alert('Błąd rezerwacji: ' + result.error);
+        try {
+            const result = await createBooking({
+                slotId: selectedSlotId,
+                name,
+                email,
+                people: parseInt(people) || 1
+            });
+            console.log('Client: Booking result:', result);
+            setLoading(false);
+            if (result.success) {
+                setStep(3);
+            } else {
+                alert('Błąd rezerwacji: ' + result.error);
+            }
+        } catch (err) {
+            console.error('Client: Error during server action call:', err);
+            setLoading(false);
+            alert('Wystąpił błąd techniczny. Sprawdź konsolę.');
         }
     };
 
