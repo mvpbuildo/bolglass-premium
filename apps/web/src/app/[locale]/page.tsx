@@ -17,10 +17,10 @@ export default function HomePage() {
                 <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-6">
                     <div className="w-32 h-auto flex items-center justify-center">
                         <Image
-                            src="/bolglass-logo-final.png"
+                            src="/bolglass-logo-white.png"
                             alt="Bolglass Logo"
                             width={120}
-                            height={120}
+                            height={40}
                             className="object-contain"
                         />
                     </div>
@@ -49,7 +49,7 @@ export default function HomePage() {
                     <div className="flex flex-col items-start gap-4">
                         <div className="w-40 h-40 flex items-center justify-center filter drop-shadow-2xl">
                             <Image
-                                src="/bolglass-logo-final.png"
+                                src="/bolglass-logo-circle.png"
                                 alt="Bolglass Logo"
                                 width={160}
                                 height={160}
