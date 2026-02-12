@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAvailableSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock } from '../app/[locale]/actions';
+import { getAvailableSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice } from '../app/[locale]/actions';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
     const [slots, setSlots] = useState<any[]>([]);
     const [blocks, setBlocks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -56,6 +57,14 @@ export default function AdminCalendar() {
                 await setGlobalBlock('DATE', dateStr, 'Blokada dnia');
             }
         }
+        fetchData();
+    };
+
+    const handlePriceUpdate = async (slotId: string, currentPrice: number | null) => {
+        const newPrice = prompt('Podaj nową cenę (lub zostaw puste dla domyślnej 150 zł):', currentPrice?.toString() || '');
+        if (newPrice === null) return;
+        const price = newPrice === '' ? null : parseInt(newPrice);
+        await updateSlotPrice(slotId, price);
         fetchData();
     };
 
@@ -107,13 +116,49 @@ export default function AdminCalendar() {
                 {days.map(day => (
                     <div
                         key={day}
-                        onClick={() => handleBlockDay(day)}
-                        className={`aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all p-1 text-sm font-bold ${getDayStatus(day)} ${isMonthBlocked ? 'opacity-20 pointer-events-none' : ''}`}
+                        onClick={() => setSelectedDay(selectedDay === day ? null : day)}
+                        className={`aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all p-1 text-sm font-bold relative group ${getDayStatus(day)} ${isMonthBlocked ? 'opacity-20 pointer-events-none' : ''} ${selectedDay === day ? 'ring-2 ring-red-500 ring-offset-2 scale-105 z-10' : ''}`}
                     >
                         {day}
+                        {slots.some(s => s.date.toISOString().startsWith(`${currentMonthStr}-${day.toString().padStart(2, '0')}`) && s.price) && (
+                            <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                        )}
                     </div>
                 ))}
             </div>
+
+            {selectedDay && (
+                <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100 animate-in fade-in slide-in-from-bottom-2">
+                    <div className="flex justify-between items-center mb-4">
+                        <h4 className="font-bold text-gray-900">
+                            Zarządzanie: {selectedDay} {viewDate.toLocaleString('pl-PL', { month: 'long' })}
+                        </h4>
+                        <Button variant="outline" size="sm" onClick={() => handleBlockDay(selectedDay)}>
+                            {blocks.some(b => b.type === 'DATE' && b.value === `${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`) ? 'Odblokuj Dzień' : 'Zablokuj Dzień'}
+                        </Button>
+                    </div>
+
+                    <div className="space-y-2">
+                        {slots
+                            .filter(s => s.date.toISOString().startsWith(`${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`))
+                            .map(slot => (
+                                <div key={slot.id} className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                                    <div className="text-sm">
+                                        <span className="font-bold">{new Date(slot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span className="ml-2 text-gray-400">{slot.remainingCapacity} / {slot.capacity} miejsc</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handlePriceUpdate(slot.id, slot.price)}
+                                        className="text-xs font-bold px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full hover:bg-yellow-100 transition-colors"
+                                    >
+                                        Price: {slot.price || 150} zł
+                                    </button>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            )}
 
             <div className="mt-8 flex flex-wrap gap-4 text-xs font-medium text-gray-600">
                 <div className="flex items-center gap-2">

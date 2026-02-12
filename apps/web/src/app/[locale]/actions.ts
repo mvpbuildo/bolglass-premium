@@ -78,6 +78,8 @@ export async function createBooking(formData: {
             throw new Error(`Brak wolnych miejsc. Pozostało: ${slot.capacity - currentPeople}`);
         }
 
+        const bookingPrice = slot.price || 150; // Use slot price or default
+
         const booking = await prisma.booking.create({
             data: {
                 name: formData.name,
@@ -86,6 +88,7 @@ export async function createBooking(formData: {
                 date: slot.date,
                 slotId: slot.id,
                 status: 'CONFIRMED',
+                priceBase: bookingPrice
             },
         });
 
@@ -140,6 +143,67 @@ export async function deleteBooking(id: string) {
     } catch (error: any) {
         console.error('Error deleting booking:', error);
         return { success: false, error: error.message };
+    }
+}
+
+export async function sendBookingReminder(id: string) {
+    try {
+        const booking = await prisma.booking.findUnique({ where: { id } });
+        if (!booking) throw new Error('Booking not found');
+
+        console.log(`[EMAIL SIMULATION] Sending reminder to ${booking.email} for booking on ${booking.date}`);
+
+        await prisma.booking.update({
+            where: { id },
+            data: { reminderSentAt: new Date() }
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateSlotPrice(slotId: string, price: number | null) {
+    try {
+        await prisma.slot.update({
+            where: { id: slotId },
+            data: { price }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function getAdminStats() {
+    try {
+        const bookings = await prisma.booking.findMany({
+            select: {
+                date: true,
+                people: true
+            }
+        });
+
+        const dayStats: Record<string, number> = { 'Pn': 0, 'Wt': 0, 'Śr': 0, 'Cz': 0, 'Pt': 0, 'So': 0, 'Nd': 0 };
+        const hourStats: Record<string, number> = {};
+
+        const dayNames = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So'];
+
+        bookings.forEach(b => {
+            const date = new Date(b.date);
+            const dayName = dayNames[date.getDay()];
+            const hour = date.getHours().toString().padStart(2, '0') + ':00';
+
+            dayStats[dayName] += b.people;
+            hourStats[hour] = (hourStats[hour] || 0) + b.people;
+        });
+
+        return { dayStats, hourStats };
+    } catch (error) {
+        console.error('Error fetching admin stats:', error);
+        return { dayStats: {}, hourStats: {} };
     }
 }
 

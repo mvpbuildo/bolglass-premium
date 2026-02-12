@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAvailableSlots } from '../app/[locale]/actions';
+import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAvailableSlots, sendBookingReminder } from '../app/[locale]/actions';
 
 export default function AdminBookingList() {
     const [bookings, setBookings] = useState<any[]>([]);
@@ -24,6 +24,14 @@ export default function AdminBookingList() {
     useEffect(() => {
         fetchBookings();
     }, []);
+
+    const handleSendReminder = async (id: string) => {
+        const res = await sendBookingReminder(id);
+        if (res.success) {
+            alert('Przypomnienie wysłane (symulacja)!');
+            fetchBookings();
+        }
+    };
 
     const handleAddManual = async () => {
         if (!formData.slotId || !formData.name || !formData.email) return alert('Wypełnij pola!');
@@ -109,7 +117,7 @@ export default function AdminBookingList() {
                             <tr>
                                 <th className="px-6 py-4">Termin</th>
                                 <th className="px-6 py-4">Dane Klienta</th>
-                                <th className="px-6 py-4 text-center">Osób</th>
+                                <th className="px-6 py-4 text-center">Osób/Cena</th>
                                 <th className="px-6 py-4">Notatki Admina</th>
                                 <th className="px-6 py-4 text-right">Akcje</th>
                             </tr>
@@ -136,8 +144,9 @@ export default function AdminBookingList() {
                                             <div className="font-medium">{booking.name}</div>
                                             <div className="text-xs text-gray-400">{booking.email}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-center not-italic font-bold text-red-600">
-                                            {booking.people}
+                                        <td className="px-6 py-4 text-center not-italic">
+                                            <div className="font-bold text-red-600">{booking.people} os.</div>
+                                            <div className="text-[10px] text-gray-400 font-bold">{booking.priceBase} zł/os.</div>
                                         </td>
                                         <td className="px-6 py-4 not-italic">
                                             <input
@@ -147,11 +156,20 @@ export default function AdminBookingList() {
                                                 className="text-xs p-1 border border-transparent hover:border-gray-200 rounded w-full focus:bg-white"
                                             />
                                         </td>
-                                        <td className="px-6 py-4 text-right not-italic">
+                                        <td className="px-6 py-4 text-right not-italic space-x-2">
+                                            <button
+                                                title={booking.reminderSentAt ? `Przypomnienie wysłane: ${new Date(booking.reminderSentAt).toLocaleTimeString()}` : "Wyślij przypomnienie"}
+                                                onClick={() => handleSendReminder(booking.id)}
+                                                className={`transition-colors ${booking.reminderSentAt ? 'text-green-500' : 'text-blue-400 hover:text-blue-600'}`}
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                            </button>
                                             <button
                                                 title="Usuń rezerwację"
                                                 onClick={() => handleDelete(booking.id)}
-                                                className="text-gray-400 hover:text-red-600 transition-colors"
+                                                className="text-gray-300 hover:text-red-600 transition-colors"
                                             >
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

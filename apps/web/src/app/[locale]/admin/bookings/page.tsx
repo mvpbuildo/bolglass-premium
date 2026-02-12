@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import AdminBookingList from '../../../../components/AdminBookingList';
 import AdminCalendar from '../../../../components/AdminCalendar';
+import AdminStats from '../../../../components/AdminStats';
 
 export default function AdminBookingsPage() {
     return (
@@ -11,7 +12,11 @@ export default function AdminBookingsPage() {
                 </div>
 
                 <h1 className="text-4xl font-black text-gray-900 mb-2">Panel Administratora</h1>
-                <p className="text-gray-500 mb-12">Zarządzanie rezerwacjami na warsztaty dmuchania szkła.</p>
+                <p className="text-gray-500 mb-8 font-medium">Zarządzanie warsztatami i rezerwacjami</p>
+
+                <div className="mb-12">
+                    <AdminStats />
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-1">

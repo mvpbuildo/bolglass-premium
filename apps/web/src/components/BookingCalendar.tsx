@@ -145,12 +145,15 @@ export default function BookingCalendar() {
                                                         <button
                                                             key={slot.id}
                                                             onClick={() => setSelectedSlotId(slot.id)}
-                                                            className={`p-2 rounded-lg border-2 text-center transition-all text-sm ${selectedSlotId === slot.id ? 'border-red-500 bg-red-600 text-white' : 'border-gray-200 bg-white hover:border-red-300'}`}
+                                                            className={`p-2 rounded-lg border-2 text-center transition-all text-sm relative overflow-hidden ${selectedSlotId === slot.id ? 'border-red-500 bg-red-600 text-white' : 'border-gray-200 bg-white hover:border-red-300'}`}
                                                         >
                                                             <div className="font-bold">
                                                                 {new Date(slot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                                                             </div>
-                                                            <div className={`text-[10px] ${selectedSlotId === slot.id ? 'text-red-100' : 'text-gray-500'}`}>
+                                                            <div className={`text-[10px] font-black ${selectedSlotId === slot.id ? 'text-red-100' : 'text-red-600'}`}>
+                                                                {slot.price || 150} zł
+                                                            </div>
+                                                            <div className={`text-[9px] ${selectedSlotId === slot.id ? 'text-red-200' : 'text-gray-400'}`}>
                                                                 {slot.remainingCapacity} miejsc
                                                             </div>
                                                         </button>
@@ -181,11 +184,17 @@ export default function BookingCalendar() {
 
                         {step === 2 && (
                             <div className="space-y-4">
-                                <div className="p-3 bg-red-50 border border-red-100 rounded-lg mb-4">
-                                    <p className="text-xs text-red-700 font-bold">Wybrany termin:</p>
-                                    <p className="text-sm text-red-900">
-                                        {selectedDate} o {new Date(selectedSlot?.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
+                                <div className="p-3 bg-red-50 border border-red-100 rounded-lg mb-4 flex justify-between items-center">
+                                    <div>
+                                        <p className="text-xs text-red-700 font-bold">Wybrany termin:</p>
+                                        <p className="text-sm text-red-900">
+                                            {selectedDate} o {new Date(selectedSlot?.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-red-700 font-bold">Cena:</p>
+                                        <p className="text-sm text-red-900 font-black">{selectedSlot?.price || 150} zł / os.</p>
+                                    </div>
                                 </div>
                                 <Input
                                     label="Imię i Nazwisko"
@@ -230,7 +239,7 @@ export default function BookingCalendar() {
                                 <h3 className="text-xl font-bold text-red-600">Rezerwacja Potwierdzona!</h3>
                                 <p>Termin: <strong>{selectedDate}</strong> o <strong>{new Date(selectedSlot?.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</strong></p>
                                 <p className="text-sm text-gray-600">
-                                    Liczba osób: <strong>{people}</strong>
+                                    Liczba osób: <strong>{people}</strong> — Razem: <strong>{(selectedSlot?.price || 150) * parseInt(people)} zł</strong>
                                 </p>
                                 <p className="text-sm text-gray-600">
                                     Dziękujemy za rezerwację. Wszystkie szczegóły wysłaliśmy na email: <strong>{email}</strong>

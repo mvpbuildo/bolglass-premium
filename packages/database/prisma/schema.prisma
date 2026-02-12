@@ -22,23 +22,26 @@ model Slot {
   date      DateTime @unique
   capacity  Int      @default(10)
   isBlocked Boolean  @default(false)
+  price     Int?     // Special price for this slot (in PLN)
   bookings  Booking[]
   createdAt DateTime @default(now())
 }
 
 model Booking {
-  id         String   @id @default(cuid())
-  date       DateTime
-  email      String
-  name       String
-  people     Int      @default(1)
-  status     String   @default("CONFIRMED")
-  adminNotes String?
+  id             String    @id @default(cuid())
+  date           DateTime
+  email          String
+  name           String
+  people         Int       @default(1)
+  status         String    @default("CONFIRMED")
+  adminNotes     String?
+  priceBase      Int       @default(150) // Price at the time of booking
+  reminderSentAt DateTime?
   
-  slotId     String?
-  slot       Slot?    @relation(fields: [slotId], references: [id])
+  slotId         String?
+  slot           Slot?     @relation(fields: [slotId], references: [id])
   
-  createdAt  DateTime @default(now())
+  createdAt      DateTime  @default(now())
 }
 
 model GlobalBlock {
