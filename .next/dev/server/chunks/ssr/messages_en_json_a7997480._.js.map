@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/messages/en.json"],"sourcesContent":["{\"HomePage\":{\"nav\":{\"about\":\"About Us\",\"manufactory\":\"Manufactory\",\"offer\":\"Offer\",\"workshops\":\"Workshops\",\"studio3d\":\"3D Studio\",\"shop\":\"Shop\",\"b2b\":\"B2B Zone\",\"contact\":\"Contact\"},\"title\":\"Bolglass - The Magic of Glass Ornaments\",\"hero\":{\"headline\":\"Creating Holiday Magic for 78 Years\",\"subheadline\":\"Hand-blown baubles that delight with precision.\",\"cta\":\"Discover Collection\"}}}"],"names":[],"mappings":"AAAA"}},
+    {"offset": {"line": 3, "column": 409}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}

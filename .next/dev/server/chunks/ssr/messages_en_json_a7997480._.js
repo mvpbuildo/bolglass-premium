@@ -1,0 +1,7 @@
+module.exports = [
+"[project]/messages/en.json (json)", ((__turbopack_context__) => {
+
+__turbopack_context__.v({"HomePage":{"nav":{"about":"About Us","manufactory":"Manufactory","offer":"Offer","workshops":"Workshops","studio3d":"3D Studio","shop":"Shop","b2b":"B2B Zone","contact":"Contact"},"title":"Bolglass - The Magic of Glass Ornaments","hero":{"headline":"Creating Holiday Magic for 78 Years","subheadline":"Hand-blown baubles that delight with precision.","cta":"Discover Collection"}}});}),
+];
+
+//# sourceMappingURL=messages_en_json_a7997480._.js.map

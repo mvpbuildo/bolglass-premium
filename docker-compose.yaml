@@ -1,0 +1,26 @@
+services:
+  bolglass-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bolglass-web
+    restart: always
+    environment:
+      - NODE_ENV=production
+      # Add other env vars here as needed
+    labels:
+      - "traefik.enable=true"
+      # Phase 1: Test subdomain
+      - "traefik.http.routers.bolglass-web.rule=Host(`test.bolann.cloud`)"
+      - "traefik.http.routers.bolglass-web.tls=true"
+      - "traefik.http.routers.bolglass-web.entrypoints=websecure"
+      - "traefik.http.routers.bolglass-web.tls.certresolver=le"
+      - "traefik.http.services.bolglass-web.loadbalancer.server.port=3000"
+      - "traefik.docker.network=root_default"
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true
+    name: root_default

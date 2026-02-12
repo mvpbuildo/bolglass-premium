@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/src/middleware.ts"],"sourcesContent":["import createMiddleware from 'next-intl/middleware';\r\n \r\nexport default createMiddleware({\r\n  // A list of all locales that are supported\r\n  locales: ['pl', 'en', 'de'],\r\n \r\n  // Used when no locale matches\r\n  defaultLocale: 'pl'\r\n});\r\n \r\nexport const config = {\r\n  // Match only internationalized pathnames\r\n  matcher: ['/', '/(pl|en|de)/:path*']\r\n};\r\n"],"names":[],"mappings":";;;;;;AAAA;;uCAEe,IAAA,yMAAgB,EAAC;IAC9B,2CAA2C;IAC3C,SAAS;QAAC;QAAM;QAAM;KAAK;IAE3B,8BAA8B;IAC9B,eAAe;AACjB;AAEO,MAAM,SAAS;IACpB,yCAAyC;IACzC,SAAS;QAAC;QAAK;KAAqB;AACtC"}}]
+}
