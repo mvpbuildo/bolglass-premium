@@ -84,3 +84,33 @@ export async function createBooking(formData: {
         return { success: false, error: error.message };
     }
 }
+
+export async function getAllBookings() {
+    try {
+        const bookings = await prisma.booking.findMany({
+            include: {
+                slot: true
+            },
+            orderBy: {
+                date: 'desc'
+            }
+        });
+        return bookings;
+    } catch (error) {
+        console.error('Error fetching all bookings:', error);
+        return [];
+    }
+}
+
+export async function deleteBooking(id: string) {
+    try {
+        await prisma.booking.delete({
+            where: { id }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error deleting booking:', error);
+        return { success: false, error: error.message };
+    }
+}
