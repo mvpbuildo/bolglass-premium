@@ -35,6 +35,7 @@ export async function createBooking(formData: {
     email: string;
     people: number;
 }) {
+    console.log('--- START createBooking ---', formData);
     try {
         // 1. Check if slot exists and has capacity
         const slot = await prisma.slot.findUnique({
@@ -45,6 +46,8 @@ export async function createBooking(formData: {
                 },
             },
         });
+
+        console.log('Slot found:', slot?.id, 'Current bookings:', slot?._count.bookings);
 
         if (!slot) throw new Error('Slot not found');
         if (slot.capacity <= slot._count.bookings) {
@@ -63,10 +66,12 @@ export async function createBooking(formData: {
             },
         });
 
-        revalidatePath('/[locale]', 'layout');
+        console.log('Booking created successfully:', booking.id);
+
+        revalidatePath('/', 'layout');
         return { success: true, booking };
     } catch (error: any) {
-        console.error('Error creating booking:', error);
+        console.error('CRITICAL ERROR in createBooking:', error);
         return { success: false, error: error.message };
     }
 }
