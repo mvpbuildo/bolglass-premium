@@ -55,8 +55,8 @@ export async function getAdminSlots() {
         });
 
         return slots.map(slot => {
-            const bookedCount = slot.bookings.reduce((sum, b) => sum + b.people, 0);
-            const { bookings, ...slotData } = slot;
+            const bookedCount = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
+            const { bookings: _bookings, ...slotData } = slot;
             return {
                 ...slotData,
                 remainingCapacity: slot.capacity - bookedCount
@@ -87,7 +87,7 @@ export async function createBooking(formData: {
 
         if (!slot) throw new Error('Slot not found');
 
-        const currentPeople = slot.bookings.reduce((sum, b) => sum + b.people, 0);
+        const currentPeople = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
 
         // Admin can override capacity
         if (!isAdminOverride && (currentPeople + formData.people > slot.capacity)) {
@@ -207,7 +207,7 @@ export async function getAdminStats() {
 
         const dayNames = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So'];
 
-        bookings.forEach(b => {
+        bookings.forEach((b: any) => {
             const date = new Date(b.date);
             const dayName = dayNames[date.getDay()];
             const hour = date.getHours().toString().padStart(2, '0') + ':00';

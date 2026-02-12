@@ -70,7 +70,7 @@ export default function AdminCalendar() {
 
     const getDayStatus = (day: number) => {
         const dateStr = `${currentMonthStr}-${day.toString().padStart(2, '0')}`;
-        const daySlots = slots.filter(s => s.date.toISOString().startsWith(dateStr));
+        const daySlots = slots.filter(s => new Date(s.date).toISOString().startsWith(dateStr));
         const isBlocked = blocks.some(b => b.type === 'DATE' && b.value === dateStr);
 
         if (isBlocked) return 'bg-gray-800 text-white';
@@ -120,7 +120,7 @@ export default function AdminCalendar() {
                         className={`aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all p-1 text-sm font-bold relative group ${getDayStatus(day)} ${isMonthBlocked ? 'opacity-20 pointer-events-none' : ''} ${selectedDay === day ? 'ring-2 ring-red-500 ring-offset-2 scale-105 z-10' : ''}`}
                     >
                         {day}
-                        {slots.some(s => s.date.toISOString().startsWith(`${currentMonthStr}-${day.toString().padStart(2, '0')}`) && s.price) && (
+                        {slots.some(s => new Date(s.date).toISOString().startsWith(`${currentMonthStr}-${day.toString().padStart(2, '0')}`) && s.price) && (
                             <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
                         )}
                     </div>
@@ -140,7 +140,7 @@ export default function AdminCalendar() {
 
                     <div className="space-y-2">
                         {slots
-                            .filter(s => s.date.toISOString().startsWith(`${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`))
+                            .filter(s => new Date(s.date).toISOString().startsWith(`${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`))
                             .map(slot => (
                                 <div key={slot.id} className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
                                     <div className="text-sm">
