@@ -124,7 +124,7 @@ export default function BookingCalendar() {
                                         fullWidth
                                         variant="secondary"
                                         disabled={!selectedSlotId}
-                                        onClick={() => setStep(2)}
+                                        onClick={handleNextStep}
                                     >
                                         Dalej
                                     </Button>
@@ -138,14 +138,20 @@ export default function BookingCalendar() {
                                     label="Imię i Nazwisko"
                                     className="text-black bg-white border-gray-300"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => {
+                                        console.log('Client: Name updated:', e.target.value);
+                                        setName(e.target.value);
+                                    }}
                                 />
                                 <Input
                                     label="Email"
                                     type="email"
                                     className="text-black bg-white border-gray-300"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => {
+                                        console.log('Client: Email updated:', e.target.value);
+                                        setEmail(e.target.value);
+                                    }}
                                 />
                                 <Select
                                     label="Liczba osób"
@@ -163,7 +169,7 @@ export default function BookingCalendar() {
                                     fullWidth
                                     variant="primary"
                                     onClick={handleBooking}
-                                    disabled={loading || !name || !email}
+                                    disabled={loading}
                                 >
                                     {loading ? 'Rezerwowanie...' : 'Zarezerwuj teraz'}
                                 </Button>
