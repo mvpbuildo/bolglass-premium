@@ -191,15 +191,37 @@ export default function BookingCalendar() {
                                         { label: '4 osoby', value: '4' }
                                     ]}
                                 />
-                                <Button
-                                    fullWidth
-                                    variant="primary"
+                                <button
                                     onClick={handleBooking}
                                     disabled={loading}
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: !loading ? '#dc2626' : '#f3f4f6',
+                                        color: !loading ? 'white' : '#9ca3af',
+                                        padding: '16px',
+                                        borderRadius: '12px',
+                                        fontWeight: 'bold',
+                                        fontSize: '18px',
+                                        cursor: !loading ? 'pointer' : 'not-allowed',
+                                        border: 'none',
+                                        boxShadow: !loading ? '0 10px 15px -3px rgba(220, 38, 38, 0.2)' : 'none'
+                                    }}
                                 >
                                     {loading ? 'Rezerwowanie...' : 'Zarezerwuj teraz'}
-                                </Button>
-                                <button onClick={() => setStep(1)} className="w-full text-sm text-gray-500 underline text-center block hover:text-black">
+                                </button>
+                                <button
+                                    onClick={() => setStep(1)}
+                                    style={{
+                                        width: '100%',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: '#6b7280',
+                                        fontSize: '14px',
+                                        textDecoration: 'underline',
+                                        marginTop: '8px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
                                     Wróć do wyboru daty
                                 </button>
                             </div>
@@ -214,14 +236,25 @@ export default function BookingCalendar() {
                                     Dziękujemy za rezerwację. Wszystkie szczegóły wysłaliśmy na email: <strong>{email}</strong>
                                 </p>
                                 <div className="mt-6">
-                                    <Button variant="outline" onClick={() => {
-                                        setStep(1);
-                                        setSelectedSlotId(null);
-                                        setName('');
-                                        setEmail('');
-                                    }} size="sm">
+                                    <button
+                                        onClick={() => {
+                                            setStep(1);
+                                            setSelectedSlotId(null);
+                                            setName('');
+                                            setEmail('');
+                                        }}
+                                        style={{
+                                            padding: '8px 16px',
+                                            backgroundColor: 'transparent',
+                                            border: '2px solid #e5e7eb',
+                                            borderRadius: '8px',
+                                            fontSize: '14px',
+                                            fontWeight: '500',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
                                         Wróć do strony głównej
-                                    </Button>
+                                    </button>
                                 </div>
                             </div>
                         )}
