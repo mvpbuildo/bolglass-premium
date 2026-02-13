@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice, generateMonthSlots } from '../app/[locale]/actions';
+import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice, generateMonthSlots, updateSlotCapacity } from '../app/[locale]/actions';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
@@ -65,6 +65,15 @@ export default function AdminCalendar() {
         if (newPrice === null) return;
         const price = newPrice === '' ? null : parseInt(newPrice);
         await updateSlotPrice(slotId, price);
+        fetchData();
+    };
+
+    const handleCapacityUpdate = async (slotId: string, currentCapacity: number) => {
+        const newCap = prompt('Podaj nową pojemność (ilość osób):', currentCapacity.toString());
+        if (newCap === null || newCap === '') return;
+        const capacity = parseInt(newCap);
+        if (isNaN(capacity)) return;
+        await updateSlotCapacity(slotId, capacity);
         fetchData();
     };
 
@@ -171,8 +180,16 @@ export default function AdminCalendar() {
                                         <span className="font-bold">{new Date(slot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
                                         <span className="ml-2 text-gray-400">{slot.remainingCapacity} / {slot.capacity} miejsc</span>
                                     </div>
-                                    <div className="text-xs font-bold px-3 py-1 bg-gray-50 text-gray-400 rounded-full">
-                                        Slot aktywny
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handleCapacityUpdate(slot.id, slot.capacity)}
+                                            className="text-xs font-bold px-3 py-1 bg-red-50 text-red-700 rounded-full hover:bg-red-100 transition-colors"
+                                        >
+                                            Limit: {slot.capacity} os.
+                                        </button>
+                                        <div className="text-xs font-bold px-3 py-1 bg-gray-50 text-gray-400 rounded-full">
+                                            Slot aktywny
+                                        </div>
                                     </div>
                                 </div>
                             ))

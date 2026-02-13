@@ -15,9 +15,10 @@ docker compose up -d --build
 echo "🔄 Syncing database schema..."
 docker compose exec -T bolglass-web npx prisma db push --schema=packages/database/prisma/schema.prisma
 
-# 4. Initialize settings (prices)
-echo "⚙️ Initializing system settings..."
+# 4. Initialize settings and update slot capacity
+echo "⚙️ Initializing system settings and capacities..."
 docker compose exec -T bolglass-web node initialize-settings.js
+docker compose exec -T bolglass-web node update-capacity.js
 
 echo "--- ✅ UPDATE COMPLETE ---"
 echo "Aplikacja jest już dostępna na test.bolann.cloud"

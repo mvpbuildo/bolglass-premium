@@ -20,7 +20,7 @@ model Message {
 model Slot {
   id        String   @id @default(cuid())
   date      DateTime @unique
-  capacity  Int      @default(10)
+  capacity  Int      @default(50)
   isBlocked Boolean  @default(false)
   price     Int?     // Special price for this slot (in PLN)
   bookings  Booking[]

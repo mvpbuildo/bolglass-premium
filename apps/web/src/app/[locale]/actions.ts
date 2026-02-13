@@ -311,6 +311,19 @@ export async function deleteBooking(id: string) {
     }
 }
 
+export async function updateSlotCapacity(id: string, capacity: number) {
+    try {
+        await prisma.slot.update({
+            where: { id },
+            data: { capacity }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
 export async function sendBookingReminder(id: string) {
     try {
         const booking = await prisma.booking.findUnique({ where: { id } });
@@ -403,7 +416,7 @@ export async function generateMonthSlots(year: number, month: number) {
     try {
         const startHour = 8;
         const endHour = 17;
-        const capacity = 30;
+        const capacity = 50;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         for (let day = 1; day <= daysInMonth; day++) {
