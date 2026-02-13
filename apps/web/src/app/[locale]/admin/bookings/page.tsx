@@ -12,7 +12,12 @@ export default function AdminBookingsPage() {
                 </div>
 
                 <h1 className="text-4xl font-black text-gray-900 mb-2">Panel Administratora</h1>
-                <p className="text-gray-500 mb-8 font-medium">Zarządzanie warsztatami i rezerwacjami</p>
+                <div className="flex justify-between items-end mb-8">
+                    <p className="text-gray-500 font-medium">Zarządzanie warsztatami i rezerwacjami</p>
+                    <Link href="/admin/settings" className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 shadow-sm transition-all">
+                        ⚙️ Ustawienia
+                    </Link>
+                </div>
 
                 <div className="mb-12">
                     <AdminStats />

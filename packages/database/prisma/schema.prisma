@@ -33,6 +33,7 @@ model Booking {
   email          String
   name           String
   people         Int       @default(1)
+  type           String    @default("SIGHTSEEING") // SIGHTSEEING or WORKSHOP
   status         String    @default("CONFIRMED")
   adminNotes     String?
   priceBase      Int       @default(150) // Price at the time of booking
@@ -59,6 +60,11 @@ model Order {
   email     String
   items     OrderItem[]
   createdAt DateTime    @default(now())
+}
+
+model SystemSetting {
+  key   String @id
+  value String
 }
 
 model OrderItem {
