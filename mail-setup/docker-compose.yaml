@@ -49,6 +49,8 @@ services:
       - "993:993"
     volumes:
       - ./data:/data
+      - ./data/certs:/certs # Explicitly map certs
+      - ./data/overrides:/overrides # Explicitly map overrides
     networks:
       - mailu-net
       - traefik-net
