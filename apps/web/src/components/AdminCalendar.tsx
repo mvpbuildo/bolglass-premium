@@ -153,9 +153,6 @@ export default function AdminCalendar() {
                         className={`aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all p-1 text-sm font-bold relative group ${getDayStatus(day)} ${isMonthBlocked ? 'opacity-20 pointer-events-none' : ''} ${selectedDay === day ? 'ring-2 ring-red-500 ring-offset-2 scale-105 z-10' : ''}`}
                     >
                         {day}
-                        {slots.some(s => new Date(s.date).toISOString().startsWith(`${currentMonthStr}-${day.toString().padStart(2, '0')}`) && s.price) && (
-                            <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
-                        )}
                     </div>
                 ))}
             </div>

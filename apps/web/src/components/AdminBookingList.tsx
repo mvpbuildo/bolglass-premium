@@ -158,6 +158,9 @@ export default function AdminBookingList() {
                                         <td className="px-6 py-4 text-center not-italic">
                                             <div className="font-bold text-red-600">{booking.people} os.</div>
                                             <div className="text-[10px] text-gray-400 font-bold">{booking.priceBase} zł/os.</div>
+                                            <div className="mt-1 text-xs font-black text-gray-900 border-t pt-1 border-gray-100">
+                                                Suma: {booking.people * booking.priceBase} zł
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 not-italic">
                                             <input
