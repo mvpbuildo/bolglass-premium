@@ -78,9 +78,10 @@ export default function BookingCalendar() {
             } else {
                 alert('Błąd rezerwacji: ' + result.error);
             }
-        } catch (err) {
+        } catch (err: any) {
             setLoading(false);
-            alert('Wystąpił błąd techniczny. Spróbuj ponownie.');
+            console.error('Client booking error:', err);
+            alert('Wystąpił błąd techniczny: ' + (err.message || 'Nieznany błąd'));
         }
     };
 

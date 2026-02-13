@@ -184,6 +184,7 @@ export async function createBooking(formData: {
     people: number;
     type: string; // 'SIGHTSEEING' | 'WORKSHOP'
 }, isAdminOverride = false) {
+    console.log('--- SERVER ACTION: createBooking ---', { formData, isAdminOverride });
     console.log('--- START createBooking ---', formData);
     try {
         const slot = await prisma.slot.findUnique({
