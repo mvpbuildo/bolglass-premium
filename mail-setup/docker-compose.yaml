@@ -1,9 +1,7 @@
-version: '2.2'
-
 services:
   # Internal DNS resolver
   resolver:
-    image: mailu/unbound:2.0
+    image: mailu/unbound:master
     container_name: mailu-resolver
     restart: always
     networks:
@@ -12,7 +10,7 @@ services:
 
   # Mailu administration and API
   admin:
-    image: mailu/admin:2.0
+    image: mailu/admin:master
     container_name: mailu-admin
     restart: always
     env_file: mailu.env
@@ -32,7 +30,7 @@ services:
 
   # Webmail (Roundcube)
   webmail:
-    image: mailu/webmail:2.0
+    image: mailu/webmail:master
     container_name: mailu-webmail
     restart: always
     env_file: mailu.env
@@ -51,7 +49,7 @@ services:
 
   # SMTP/IMAP services
   front:
-    image: mailu/nginx:2.0
+    image: mailu/nginx:master
     container_name: mailu-front
     restart: always
     env_file: mailu.env
@@ -67,7 +65,7 @@ services:
       - mailu-net
 
   imap:
-    image: mailu/dovecot:2.0
+    image: mailu/dovecot:master
     container_name: mailu-imap
     restart: always
     env_file: mailu.env
@@ -78,7 +76,7 @@ services:
       - mailu-net
 
   smtp:
-    image: mailu/postfix:2.0
+    image: mailu/postfix:master
     container_name: mailu-smtp
     restart: always
     env_file: mailu.env
@@ -88,7 +86,7 @@ services:
       - mailu-net
 
   antispam:
-    image: mailu/rspamd:2.0
+    image: mailu/rspamd:master
     container_name: mailu-antispam
     restart: always
     env_file: mailu.env
