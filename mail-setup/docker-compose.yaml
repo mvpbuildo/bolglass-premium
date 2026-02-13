@@ -15,6 +15,8 @@ services:
     container_name: mailu-admin
     restart: always
     env_file: mailu.env
+    environment:
+      - WEB_ADMIN=/
     volumes:
       - ./data:/data
     networks:
@@ -28,6 +30,8 @@ services:
     container_name: mailu-webmail
     restart: always
     env_file: mailu.env
+    environment:
+      - WEB_WEBMAIL=/
     volumes:
       - ./data/webmail:/data
     networks:
@@ -64,6 +68,8 @@ services:
       - "traefik.http.routers.mailu-admin.entrypoints=websecure"
       - "traefik.http.routers.mailu-admin.tls.certresolver=le"
       - "traefik.http.routers.mailu-admin.service=mailu-front-service"
+      - "traefik.http.routers.mailu-admin.middlewares=mailu-admin-prefix"
+      - "traefik.http.middlewares.mailu-admin-prefix.addprefix.prefix=/admin"
 
       # Webmail
       - "traefik.http.routers.mailu-webmail.rule=Host(`webmail.bolann.cloud`)"
@@ -71,6 +77,8 @@ services:
       - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
       - "traefik.http.routers.mailu-webmail.tls.certresolver=le"
       - "traefik.http.routers.mailu-webmail.service=mailu-front-service"
+      - "traefik.http.routers.mailu-webmail.middlewares=mailu-webmail-prefix"
+      - "traefik.http.middlewares.mailu-webmail-prefix.addprefix.prefix=/webmail"
 
       - "traefik.http.services.mailu-front-service.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik_default"
