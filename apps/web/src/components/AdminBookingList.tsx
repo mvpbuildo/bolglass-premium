@@ -117,6 +117,7 @@ export default function AdminBookingList() {
                             <tr>
                                 <th className="px-6 py-4">Termin</th>
                                 <th className="px-6 py-4">Dane Klienta</th>
+                                <th className="px-6 py-4">Pakiet</th>
                                 <th className="px-6 py-4 text-center">Osób/Cena</th>
                                 <th className="px-6 py-4">Notatki Admina</th>
                                 <th className="px-6 py-4 text-right">Akcje</th>
@@ -143,6 +144,14 @@ export default function AdminBookingList() {
                                         <td className="px-6 py-4 not-italic">
                                             <div className="font-medium">{booking.name}</div>
                                             <div className="text-xs text-gray-400">{booking.email}</div>
+                                        </td>
+                                        <td className="px-6 py-4 not-italic">
+                                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${booking.type === 'WORKSHOP'
+                                                    ? 'bg-red-100 text-red-600 border border-red-200'
+                                                    : 'bg-blue-50 text-blue-600 border border-blue-100'
+                                                }`}>
+                                                {booking.type === 'WORKSHOP' ? '🎨 Warsztaty' : '👀 Zwiedzanie'}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 text-center not-italic">
                                             <div className="font-bold text-red-600">{booking.people} os.</div>
