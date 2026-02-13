@@ -17,7 +17,6 @@ services:
     env_file: mailu.env
     volumes:
       - ./data:/data
-      - ./data/dkim:/dkim
     networks:
       - mailu-net
     dns:
@@ -49,9 +48,7 @@ services:
       - "143:143"
       - "993:993"
     volumes:
-      - ./data/certs:/certs
-      - ./data/overrides:/overrides
-      - ./data:/data # Shared data for config generation
+      - ./data:/data
     networks:
       - mailu-net
       - traefik-net
@@ -79,8 +76,6 @@ services:
     restart: always
     env_file: mailu.env
     volumes:
-      - ./data/mail:/var/mail
-      - ./data/overrides/dovecot:/overrides
       - ./data:/data
     networks:
       - mailu-net
@@ -93,7 +88,6 @@ services:
     restart: always
     env_file: mailu.env
     volumes:
-      - ./data/overrides/postfix:/overrides
       - ./data:/data
     networks:
       - mailu-net
@@ -106,7 +100,6 @@ services:
     restart: always
     env_file: mailu.env
     volumes:
-      - ./data/filter:/var/lib/rspamd
       - ./data:/data
     networks:
       - mailu-net
