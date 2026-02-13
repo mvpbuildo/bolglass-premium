@@ -11,7 +11,7 @@ export default function AdminBookingList() {
 
     // Manual Form States
     const [slots, setSlots] = useState<any[]>([]);
-    const [formData, setFormData] = useState({ slotId: '', name: '', email: '', people: '1' });
+    const [formData, setFormData] = useState({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING' });
 
     const fetchBookings = async () => {
         setLoading(true);
@@ -38,7 +38,7 @@ export default function AdminBookingList() {
         const res = await createBooking({ ...formData, people: parseInt(formData.people) }, true);
         if (res.success) {
             setIsAdding(false);
-            setFormData({ slotId: '', name: '', email: '', people: '1' });
+            setFormData({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING' });
             fetchBookings();
         } else {
             alert('Błąd: ' + res.error);
@@ -98,13 +98,14 @@ export default function AdminBookingList() {
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
-                        <input
-                            type="number"
-                            placeholder="Osób"
+                        <select
                             className="p-2 border rounded bg-white text-sm"
-                            value={formData.people}
-                            onChange={(e) => setFormData({ ...formData, people: e.target.value })}
-                        />
+                            value={formData.type}
+                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                        >
+                            <option value="SIGHTSEEING">👀 Zwiedzanie</option>
+                            <option value="WORKSHOP">🎨 Warsztaty</option>
+                        </select>
                     </div>
                     <Button className="mt-4" onClick={handleAddManual}>Zapisz Rezerwację</Button>
                 </Card>
@@ -147,8 +148,8 @@ export default function AdminBookingList() {
                                         </td>
                                         <td className="px-6 py-4 not-italic">
                                             <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${booking.type === 'WORKSHOP'
-                                                    ? 'bg-red-100 text-red-600 border border-red-200'
-                                                    : 'bg-blue-50 text-blue-600 border border-blue-100'
+                                                ? 'bg-red-100 text-red-600 border border-red-200'
+                                                : 'bg-blue-50 text-blue-600 border border-blue-100'
                                                 }`}>
                                                 {booking.type === 'WORKSHOP' ? '🎨 Warsztaty' : '👀 Zwiedzanie'}
                                             </span>

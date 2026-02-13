@@ -45,6 +45,7 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/turbo.json ./turbo.json
 COPY --from=builder /app/package-lock.json ./package-lock.json
+COPY --from=builder /app/initialize-settings.js ./initialize-settings.js
 
 EXPOSE 3000
 
