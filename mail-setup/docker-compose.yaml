@@ -20,17 +20,8 @@ services:
       - ./data/dkim:/dkim
     networks:
       - mailu-net
-      - traefik-net
     dns:
       - 192.168.203.254
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mailu-admin.rule=Host(`admin.bolann.cloud`)"
-      - "traefik.http.routers.mailu-admin.tls=true"
-      - "traefik.http.routers.mailu-admin.entrypoints=websecure"
-      - "traefik.http.routers.mailu-admin.tls.certresolver=le"
-      - "traefik.http.services.mailu-admin.loadbalancer.server.port=8080"
-      - "traefik.docker.network=traefik_default"
 
   # Webmail (Roundcube)
   webmail:
@@ -42,19 +33,10 @@ services:
       - ./data/webmail:/data
     networks:
       - mailu-net
-      - traefik-net
     dns:
       - 192.168.203.254
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mailu-webmail.rule=Host(`webmail.bolann.cloud`)"
-      - "traefik.http.routers.mailu-webmail.tls=true"
-      - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
-      - "traefik.http.routers.mailu-webmail.tls.certresolver=le"
-      - "traefik.http.services.mailu-webmail.loadbalancer.server.port=80"
-      - "traefik.docker.network=traefik_default"
 
-  # SMTP/IMAP services
+  # SMTP/IMAP services and Web Entry point
   front:
     image: ghcr.io/mailu/nginx:master
     container_name: mailu-front
@@ -68,11 +50,28 @@ services:
       - "993:993"
     volumes:
       - ./data/certs:/certs
-      - ./data/overrides/nginx:/overrides
+      - ./data/overrides:/overrides
+      - ./data:/data # Shared data for config generation
     networks:
       - mailu-net
+      - traefik-net
     dns:
       - 192.168.203.254
+    labels:
+      - "traefik.enable=true"
+      # Admin UI
+      - "traefik.http.routers.mailu-admin.rule=Host(`admin.bolann.cloud`)"
+      - "traefik.http.routers.mailu-admin.tls=true"
+      - "traefik.http.routers.mailu-admin.entrypoints=websecure"
+      - "traefik.http.routers.mailu-admin.tls.certresolver=le"
+      - "traefik.http.services.mailu-admin.loadbalancer.server.port=80"
+      # Webmail
+      - "traefik.http.routers.mailu-webmail.rule=Host(`webmail.bolann.cloud`)"
+      - "traefik.http.routers.mailu-webmail.tls=true"
+      - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
+      - "traefik.http.routers.mailu-webmail.tls.certresolver=le"
+      - "traefik.http.services.mailu-webmail.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik_default"
 
   imap:
     image: ghcr.io/mailu/dovecot:master
@@ -82,6 +81,7 @@ services:
     volumes:
       - ./data/mail:/var/mail
       - ./data/overrides/dovecot:/overrides
+      - ./data:/data
     networks:
       - mailu-net
     dns:
@@ -94,6 +94,7 @@ services:
     env_file: mailu.env
     volumes:
       - ./data/overrides/postfix:/overrides
+      - ./data:/data
     networks:
       - mailu-net
     dns:
@@ -106,12 +107,13 @@ services:
     env_file: mailu.env
     volumes:
       - ./data/filter:/var/lib/rspamd
+      - ./data:/data
     networks:
       - mailu-net
     dns:
       - 192.168.203.254
 
-  # Redis for session storage (required in master)
+  # Redis for session storage
   redis:
     image: redis:alpine
     container_name: mailu-redis
