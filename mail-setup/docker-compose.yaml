@@ -110,6 +110,14 @@ services:
     dns:
       - 192.168.203.254
 
+  # Redis for session storage (required in master)
+  redis:
+    image: redis:alpine
+    container_name: mailu-redis
+    restart: always
+    networks:
+      - mailu-net
+
 networks:
   mailu-net:
     driver: bridge
