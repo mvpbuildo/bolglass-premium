@@ -171,12 +171,9 @@ export default function AdminCalendar() {
                                         <span className="font-bold">{new Date(slot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
                                         <span className="ml-2 text-gray-400">{slot.remainingCapacity} / {slot.capacity} miejsc</span>
                                     </div>
-                                    <button
-                                        onClick={() => handlePriceUpdate(slot.id, slot.price)}
-                                        className="text-xs font-bold px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full hover:bg-yellow-100 transition-colors"
-                                    >
-                                        Price: {slot.price || 150} zł
-                                    </button>
+                                    <div className="text-xs font-bold px-3 py-1 bg-gray-50 text-gray-400 rounded-full">
+                                        Slot aktywny
+                                    </div>
                                 </div>
                             ))
                         }

@@ -271,7 +271,7 @@ export async function getAllBookings() {
                 slot: true
             },
             orderBy: {
-                date: 'desc'
+                createdAt: 'desc'
             }
         });
         return bookings;

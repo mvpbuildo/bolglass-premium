@@ -112,8 +112,8 @@ export default function AdminBookingList() {
                 </Card>
             )}
 
-            <Card className="overflow-hidden border-none shadow-lg">
-                <div className="overflow-x-auto">
+            <Card className="border-none shadow-lg">
+                <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                     <table className="w-full text-left bg-white">
                         <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
                             <tr>
@@ -128,7 +128,7 @@ export default function AdminBookingList() {
                         <tbody className="divide-y divide-gray-100 italic">
                             {bookings.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-400 not-italic">
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-400 not-italic">
                                         Brak rezerwacji w systemie.
                                     </td>
                                 </tr>
