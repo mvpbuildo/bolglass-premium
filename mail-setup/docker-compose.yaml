@@ -64,10 +64,6 @@ services:
       - "traefik.http.routers.mailu-admin.entrypoints=websecure"
       - "traefik.http.routers.mailu-admin.tls.certresolver=le"
       - "traefik.http.routers.mailu-admin.service=mailu-front-service"
-      - "traefik.http.routers.mailu-admin.middlewares=mailu-admin-redirect"
-      # Redirect admin.bolann.cloud/ to admin.bolann.cloud/admin/
-      - "traefik.http.middlewares.mailu-admin-redirect.redirectregex.regex=^https://admin.bolann.cloud/$"
-      - "traefik.http.middlewares.mailu-admin-redirect.redirectregex.replacement=https://admin.bolann.cloud/admin/"
 
       # Webmail
       - "traefik.http.routers.mailu-webmail.rule=Host(`webmail.bolann.cloud`)"
@@ -75,10 +71,6 @@ services:
       - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
       - "traefik.http.routers.mailu-webmail.tls.certresolver=le"
       - "traefik.http.routers.mailu-webmail.service=mailu-front-service"
-      - "traefik.http.routers.mailu-webmail.middlewares=mailu-webmail-redirect"
-      # Redirect webmail.bolann.cloud/ to webmail.bolann.cloud/webmail/
-      - "traefik.http.middlewares.mailu-webmail-redirect.redirectregex.regex=^https://webmail.bolann.cloud/$"
-      - "traefik.http.middlewares.mailu-webmail-redirect.redirectregex.replacement=https://webmail.bolann.cloud/webmail/"
 
       - "traefik.http.services.mailu-front-service.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik_default"
