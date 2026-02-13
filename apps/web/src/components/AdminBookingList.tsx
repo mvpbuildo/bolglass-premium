@@ -75,6 +75,7 @@ export default function AdminBookingList() {
                     <h3 className="font-bold mb-4 text-red-900">Nowa Rezerwacja (Tryb Admin)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <select
+                            title="Wybierz slot"
                             className="p-2 border rounded bg-white text-sm"
                             value={formData.slotId}
                             onChange={(e) => setFormData({ ...formData, slotId: e.target.value })}

@@ -330,7 +330,7 @@ export default function BookingCalendar() {
                                                 disabled={loading || !name || !email}
                                                 className="flex-[2]"
                                             >
-                                                {loading ? 'Rezerwowanie...' : `Rezerwuję i Płacę (${currentPrice * (parseInt(people) || 1)} zł)`}
+                                                {loading ? 'Rezerwowanie...' : `Rezerwuję z obowiązkiem zapłaty (${currentPrice * (parseInt(people) || 1)} zł)`}
                                             </Button>
                                         </div>
                                         <p className="text-xs text-center text-gray-400">

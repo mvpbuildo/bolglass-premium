@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import AdminBookingList from '../../../../components/AdminBookingList';
 import AdminCalendar from '../../../../components/AdminCalendar';
 import AdminStats from '../../../../components/AdminStats';
