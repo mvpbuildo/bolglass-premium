@@ -1,17 +1,17 @@
 services:
   # Internal DNS resolver
   resolver:
-    image: ghcr.io/mailu/unbound:2.0
+    image: ghcr.io/mailu/unbound:master
     container_name: mailu-resolver
     restart: always
+    env_file: mailu.env
     networks:
       mailu-net:
         ipv4_address: 192.168.203.254
-    env_file: mailu.env
 
   # Mailu administration and API
   admin:
-    image: ghcr.io/mailu/admin:2.0
+    image: ghcr.io/mailu/admin:master
     container_name: mailu-admin
     restart: always
     env_file: mailu.env
@@ -34,7 +34,7 @@ services:
 
   # Webmail (Roundcube)
   webmail:
-    image: ghcr.io/mailu/webmail:2.0
+    image: ghcr.io/mailu/webmail:master
     container_name: mailu-webmail
     restart: always
     env_file: mailu.env
@@ -56,7 +56,7 @@ services:
 
   # SMTP/IMAP services
   front:
-    image: ghcr.io/mailu/nginx:2.0
+    image: ghcr.io/mailu/nginx:master
     container_name: mailu-front
     restart: always
     env_file: mailu.env
@@ -74,7 +74,7 @@ services:
       - 192.168.203.254
 
   imap:
-    image: ghcr.io/mailu/dovecot:2.0
+    image: ghcr.io/mailu/dovecot:master
     container_name: mailu-imap
     restart: always
     env_file: mailu.env
@@ -87,7 +87,7 @@ services:
       - 192.168.203.254
 
   smtp:
-    image: ghcr.io/mailu/postfix:2.0
+    image: ghcr.io/mailu/postfix:master
     container_name: mailu-smtp
     restart: always
     env_file: mailu.env
@@ -99,7 +99,7 @@ services:
       - 192.168.203.254
 
   antispam:
-    image: ghcr.io/mailu/rspamd:2.0
+    image: ghcr.io/mailu/rspamd:master
     container_name: mailu-antispam
     restart: always
     env_file: mailu.env
