@@ -115,6 +115,7 @@ services:
     image: redis:alpine
     container_name: mailu-redis
     restart: always
+    command: redis-server --save "" --appendonly no
     volumes:
       - ./data/redis:/data
     networks:
