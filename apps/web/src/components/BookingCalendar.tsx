@@ -87,8 +87,11 @@ export default function BookingCalendar() {
 
     const selectedSlot = slots.find(s => s.id === selectedSlotId);
 
-    // Generate people options 1-30
-    const peopleOptions = Array.from({ length: 30 }, (_, i) => ({
+    // Generate people options based on selected slot capacity
+    const selectedSlotData = slots.find(s => s.id === selectedSlotId);
+    const maxPeople = selectedSlotData ? selectedSlotData.remainingCapacity : 10;
+
+    const peopleOptions = Array.from({ length: Math.min(30, maxPeople) }, (_, i) => ({
         label: `${i + 1} ${i === 0 ? 'osoba' : (i < 4 ? 'osoby' : 'osób')}`,
         value: (i + 1).toString()
     }));
