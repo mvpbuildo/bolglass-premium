@@ -1,0 +1,108 @@
+version: '2.2'
+
+services:
+  # Internal DNS resolver
+  resolver:
+    image: mailu/unbound:2024.06
+    container_name: mailu-resolver
+    restart: always
+    networks:
+      mailu-net:
+        ipv4_address: 192.168.203.254
+
+  # Mailu administration and API
+  admin:
+    image: mailu/admin:2024.06
+    container_name: mailu-admin
+    restart: always
+    env_file: mailu.env
+    volumes:
+      - ./data/data:/data
+      - ./data/dkim:/dkim
+    networks:
+      - mailu-net
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailu-admin.rule=Host(`admin.bolann.cloud`)"
+      - "traefik.http.routers.mailu-admin.tls=true"
+      - "traefik.http.routers.mailu-admin.entrypoints=websecure"
+      - "traefik.http.routers.mailu-admin.tls.certresolver=le"
+      - "traefik.http.services.mailu-admin.loadbalancer.server.port=80"
+
+  # Webmail (Roundcube)
+  webmail:
+    image: mailu/webmail:2024.06
+    container_name: mailu-webmail
+    restart: always
+    env_file: mailu.env
+    volumes:
+      - ./data/webmail:/data
+    networks:
+      - mailu-net
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailu-webmail.rule=Host(`webmail.bolann.cloud`)"
+      - "traefik.http.routers.mailu-webmail.tls=true"
+      - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
+      - "traefik.http.routers.mailu-webmail.tls.certresolver=le"
+      - "traefik.http.services.mailu-webmail.loadbalancer.server.port=80"
+
+  # SMTP/IMAP services
+  front:
+    image: mailu/nginx:2024.06
+    container_name: mailu-front
+    restart: always
+    env_file: mailu.env
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "143:143"
+      - "993:993"
+    volumes:
+      - ./data/certs:/certs
+    networks:
+      - mailu-net
+
+  imap:
+    image: mailu/dovecot:2024.06
+    container_name: mailu-imap
+    restart: always
+    env_file: mailu.env
+    volumes:
+      - ./data/mail:/var/mail
+      - ./data/overrides/dovecot:/overrides
+    networks:
+      - mailu-net
+
+  smtp:
+    image: mailu/postfix:2024.06
+    container_name: mailu-smtp
+    restart: always
+    env_file: mailu.env
+    volumes:
+      - ./data/overrides/postfix:/overrides
+    networks:
+      - mailu-net
+
+  antispam:
+    image: mailu/rspamd:2024.06
+    container_name: mailu-antispam
+    restart: always
+    env_file: mailu.env
+    volumes:
+      - ./data/filter:/var/lib/rspamd
+    networks:
+      - mailu-net
+
+networks:
+  mailu-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.203.0/24
+  traefik-net:
+    external: true
+    name: traefik_default
