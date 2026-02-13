@@ -16,7 +16,7 @@ services:
     restart: always
     env_file: mailu.env
     volumes:
-      - ./data/data:/data
+      - ./data:/data
       - ./data/dkim:/dkim
     networks:
       - mailu-net
@@ -51,7 +51,7 @@ services:
       - "traefik.http.routers.mailu-webmail.tls=true"
       - "traefik.http.routers.mailu-webmail.entrypoints=websecure"
       - "traefik.http.routers.mailu-webmail.tls.certresolver=le"
-      - "traefik.http.services.mailu-webmail.loadbalancer.server.port=8080"
+      - "traefik.http.services.mailu-webmail.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik_default"
 
   # SMTP/IMAP services
@@ -68,6 +68,7 @@ services:
       - "993:993"
     volumes:
       - ./data/certs:/certs
+      - ./data/overrides/nginx:/overrides
     networks:
       - mailu-net
     dns:
@@ -115,6 +116,8 @@ services:
     image: redis:alpine
     container_name: mailu-redis
     restart: always
+    volumes:
+      - ./data/redis:/data
     networks:
       - mailu-net
 
