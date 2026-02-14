@@ -13,6 +13,13 @@ export default function AdminBookingList() {
     const [slots, setSlots] = useState<any[]>([]);
     const [formData, setFormData] = useState({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING' });
 
+    // Filtering & Sorting States
+    const [filterSearch, setFilterSearch] = useState('');
+    const [filterType, setFilterType] = useState('ALL');
+    const [filterDateFrom, setFilterDateFrom] = useState('');
+    const [filterDateTo, setFilterDateTo] = useState('');
+    const [sortBy, setSortBy] = useState('date_desc'); // date_asc, date_desc, people_asc, people_desc, price_asc, price_desc
+
     const fetchBookings = async () => {
         setLoading(true);
         const [bData, sData] = await Promise.all([getAllBookings(), getAdminSlots()]);
@@ -56,6 +63,54 @@ export default function AdminBookingList() {
         if (result.success) fetchBookings();
     };
 
+    // Filter and Sort Logic
+    const filteredAndSortedBookings = bookings
+        .filter(b => {
+            const matchesSearch = b.name.toLowerCase().includes(filterSearch.toLowerCase()) ||
+                b.email.toLowerCase().includes(filterSearch.toLowerCase());
+            const matchesType = filterType === 'ALL' || b.type === filterType;
+
+            const bDate = new Date(b.date).getTime();
+            const matchesDateFrom = !filterDateFrom || bDate >= new Date(filterDateFrom).setHours(0, 0, 0, 0);
+            const matchesDateTo = !filterDateTo || bDate <= new Date(filterDateTo).setHours(23, 59, 59, 999);
+
+            return matchesSearch && matchesType && matchesDateFrom && matchesDateTo;
+        })
+        .sort((a, b) => {
+            if (sortBy === 'date_asc') return new Date(a.date).getTime() - new Date(b.date).getTime();
+            if (sortBy === 'date_desc') return new Date(b.date).getTime() - new Date(a.date).getTime();
+            if (sortBy === 'people_asc') return a.people - b.people;
+            if (sortBy === 'people_desc') return b.people - a.people;
+            if (sortBy === 'price_asc') return (a.people * a.priceBase) - (b.people * b.priceBase);
+            if (sortBy === 'price_desc') return (b.people * b.priceBase) - (a.people * a.priceBase);
+            return 0;
+        });
+
+    const handleExport = () => {
+        const headers = ["Data", "Godzina", "Klient", "Email", "Pakiet", "Osob", "Cena/os", "Suma", "Notatki"];
+        const rows = filteredAndSortedBookings.map(b => [
+            new Date(b.date).toLocaleDateString('pl-PL'),
+            new Date(b.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
+            b.name,
+            b.email,
+            b.type === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie',
+            b.people,
+            b.priceBase,
+            b.people * b.priceBase,
+            (b.adminNotes || "").replace(/,/g, ";")
+        ]);
+
+        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `rezerwacje_bolglass_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     if (loading) return <div className="p-8 text-center text-gray-500">Ładowanie rezerwacji...</div>;
 
     return (
@@ -63,12 +118,75 @@ export default function AdminBookingList() {
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Lista Rezerwacji</h2>
                 <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleExport} className="border-green-600 text-green-700 hover:bg-green-50">
+                        📊 Eksportuj Excel
+                    </Button>
                     <Button variant="primary" size="sm" onClick={() => setIsAdding(!isAdding)}>
                         {isAdding ? 'Anuluj Dodawanie' : '+ Dodaj Ręcznie'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={fetchBookings}>Odśwież</Button>
                 </div>
             </div>
+
+            {/* Filters and Sorting Controls */}
+            <Card className="p-4 bg-gray-50/50 border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Szukaj</label>
+                        <input
+                            placeholder="Imię, email..."
+                            className="w-full p-2 text-sm border rounded bg-white"
+                            value={filterSearch}
+                            onChange={(e) => setFilterSearch(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Pakiet</label>
+                        <select
+                            className="w-full p-2 text-sm border rounded bg-white"
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                        >
+                            <option value="ALL">Wszystkie</option>
+                            <option value="SIGHTSEEING">Zwiedzanie</option>
+                            <option value="WORKSHOP">Warsztaty</option>
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Od Daty</label>
+                        <input
+                            type="date"
+                            className="w-full p-2 text-sm border rounded bg-white"
+                            value={filterDateFrom}
+                            onChange={(e) => setFilterDateFrom(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Do Daty</label>
+                        <input
+                            type="date"
+                            className="w-full p-2 text-sm border rounded bg-white"
+                            value={filterDateTo}
+                            onChange={(e) => setFilterDateTo(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Sortuj według</label>
+                        <select
+                            className="w-full p-2 text-sm border rounded bg-white"
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                        >
+                            <option value="date_desc">Data: Najnowsze</option>
+                            <option value="date_asc">Data: Najstarsze</option>
+                            <option value="people_desc">Ludzi: Najwięcej</option>
+                            <option value="people_asc">Ludzi: Najmniej</option>
+                            <option value="price_desc">Suma: Najwyższa</option>
+                            <option value="price_asc">Suma: Najniższa</option>
+                        </select>
+                    </div>
+                </div>
+            </Card>
 
             {isAdding && (
                 <Card className="p-6 bg-red-50 border-red-100 animate-in fade-in slide-in-from-top-4">
@@ -126,14 +244,14 @@ export default function AdminBookingList() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 italic">
-                            {bookings.length === 0 ? (
+                            {filteredAndSortedBookings.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-8 text-center text-gray-400 not-italic">
-                                        Brak rezerwacji w systemie.
+                                        Brak rezerwacji spełniających kryteria.
                                     </td>
                                 </tr>
                             ) : (
-                                bookings.map((booking) => (
+                                filteredAndSortedBookings.map((booking) => (
                                     <tr key={booking.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="font-bold text-gray-900 not-italic">
@@ -206,7 +324,7 @@ export default function AdminBookingList() {
                 <Card className="p-4 bg-gray-50 border-gray-100">
                     <p className="text-xs text-gray-500 font-bold uppercase">Łącznie osób</p>
                     <p className="text-2xl font-black text-gray-900">
-                        {bookings.reduce((sum, b) => sum + b.people, 0)}
+                        {filteredAndSortedBookings.reduce((sum, b) => sum + b.people, 0)}
                     </p>
                 </Card>
             </div>
