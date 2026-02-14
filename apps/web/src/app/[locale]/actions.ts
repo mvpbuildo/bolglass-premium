@@ -2,8 +2,57 @@
 
 import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
+import { sendBookingConfirmation } from '@/lib/mail';
 
 // --- System Settings API ---
+
+export const EMAIL_SETTING_KEYS = {
+    SMTP_HOST: 'smtp_host',
+    SMTP_PORT: 'smtp_port',
+    SMTP_USER: 'smtp_user',
+    SMTP_PASSWORD: 'smtp_password',
+    SMTP_FROM: 'smtp_from',
+    EMAIL_SUBJECT_SIGHTSEEING: 'email_subject_sightseeing',
+    EMAIL_BODY_SIGHTSEEING: 'email_body_sightseeing',
+    EMAIL_SUBJECT_WORKSHOP: 'email_subject_workshop',
+    EMAIL_BODY_WORKSHOP: 'email_body_workshop'
+};
+
+export async function getAdminEmailSettings() {
+    try {
+        const keys = Object.values(EMAIL_SETTING_KEYS);
+        const settings = await prisma.systemSetting.findMany({
+            where: { key: { in: keys } }
+        });
+        const settingsMap: Record<string, string> = {};
+        // Initialize defaults
+        keys.forEach(k => settingsMap[k] = '');
+        settings.forEach(s => settingsMap[s.key] = s.value);
+        return settingsMap;
+    } catch (error) {
+        console.error('Error fetching email settings:', error);
+        return {};
+    }
+}
+
+export async function updateAdminEmailSettings(settings: Record<string, string>) {
+    try {
+        await Promise.all(
+            Object.entries(settings).map(([key, value]) =>
+                prisma.systemSetting.upsert({
+                    where: { key },
+                    update: { value },
+                    create: { key, value }
+                })
+            )
+        );
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error updating email settings:', error);
+        return { success: false, error: error.message };
+    }
+}
 
 export async function getSystemSettings() {
     try {
@@ -258,6 +307,10 @@ export async function createBooking(formData: {
         });
 
         revalidatePath('/', 'layout');
+
+        // Trigger email confirmation asynchronously
+        sendBookingConfirmation(booking).catch(err => console.error('Immediate confirmation send failed:', err));
+
         return { success: true, booking };
     } catch (error: any) {
         console.error('CRITICAL ERROR in createBooking:', error);
