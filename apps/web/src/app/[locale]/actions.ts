@@ -195,7 +195,7 @@ export async function createBooking(formData: {
     console.log('--- SERVER ACTION: createBooking ---', { formData, isAdminOverride });
     console.log('--- START createBooking ---', formData);
     try {
-        const slot = await prisma.slot.findUnique({
+        const slot = await (prisma as any).slot.findUnique({
             where: { id: formData.slotId },
             include: {
                 bookings: { select: { people: true, type: true } }
@@ -210,7 +210,7 @@ export async function createBooking(formData: {
 
         // We need to fetch previous slot to check for shadows occupancy
         // Optimization: Find prev slot from DB
-        const prevSlot = await prisma.slot.findFirst({
+        const prevSlot = await (prisma as any).slot.findFirst({
             where: { date: new Date(prevSlotTime) },
             include: { bookings: { select: { people: true, type: true } } }
         });
@@ -234,7 +234,7 @@ export async function createBooking(formData: {
         // Additional validation for Workshops (Approach B: Blocks next slot too)
         if (formData.type === 'WORKSHOP' && !isAdminOverride) {
             const nextTime = slotTime + (60 * 60 * 1000);
-            const nextSlot = await prisma.slot.findFirst({
+            const nextSlot = await (prisma as any).slot.findFirst({
                 where: { date: new Date(nextTime) },
                 include: { bookings: { select: { people: true, type: true } } }
             });
