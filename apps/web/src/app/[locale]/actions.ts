@@ -73,10 +73,11 @@ export async function updateSystemSetting(key: string, value: string) {
 // --- Slot Logic ---
 
 export async function getAvailableSlots() {
+    console.log('--- SERVER ACTION: getAvailableSlots ---');
     try {
         const globalBlocks = await prisma.globalBlock.findMany();
 
-        // Fetch slots and bookings including TYPE
+        // 1. Fetch future slots
         const slots = await prisma.slot.findMany({
             where: {
                 date: { gte: new Date() },
@@ -86,77 +87,41 @@ export async function getAvailableSlots() {
                 bookings: { select: { people: true, type: true } }
             },
             orderBy: { date: 'asc' },
-        });
+        }) as any[];
 
-        // 1. Build a map of "consumed capacity" per slot time
-        // Key: timestamp (number), Value: current occupancy count
+        if (slots.length === 0) {
+            console.log('No future slots found in DB.');
+            return [];
+        }
+
+        // 2. Build occupancy map (direct + shadow)
         const occupancyMap = new Map<number, number>();
 
-        // Initialize map with base bookings for each slot
+        // Pass 1: Sum all direct and shadow usages
         slots.forEach(slot => {
             const time = slot.date.getTime();
-            let count = 0;
-            if (!occupancyMap.has(time)) occupancyMap.set(time, 0);
+            const direct = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
 
-            slot.bookings.forEach(b => {
-                count += b.people;
-                // Approach B: WORKSHOP lasts ~80 mins -> Blocks current AND next slot (assuming 1h slots)
-                // If this is a WORKSHOP, it adds "shadow occupancy" to the next hour
-                if (b.type === 'WORKSHOP') {
-                    const nextHourTime = time + (60 * 60 * 1000); // +1 hour
-                    const currentShadow = occupancyMap.get(nextHourTime) || 0;
-                    occupancyMap.set(nextHourTime, currentShadow + b.people);
-                }
-            });
+            const current = occupancyMap.get(time) || 0;
+            occupancyMap.set(time, current + direct);
 
-            const currentTotal = occupancyMap.get(time) || 0;
-            occupancyMap.set(time, currentTotal + count);
+            // Approach B: Workshop blocks the next slot too
+            const workshopUsage = slot.bookings
+                .filter((b: any) => b.type === 'WORKSHOP')
+                .reduce((sum: number, b: any) => sum + b.people, 0);
+
+            if (workshopUsage > 0) {
+                const nextTime = time + (60 * 60 * 1000);
+                const nextOccupancy = occupancyMap.get(nextTime) || 0;
+                occupancyMap.set(nextTime, nextOccupancy + workshopUsage);
+            }
         });
 
-        return slots.map(slot => {
+        const result = slots.map(slot => {
             const time = slot.date.getTime();
+            const totalOccupied = occupancyMap.get(time) || 0;
+            const remaining = Math.max(0, slot.capacity - totalOccupied);
 
-            // Get total occupancy (direct bookings + shadow from previous workshops)
-            // Note: The loop above might double count direct bookings if referenced incorrectly, 
-            // but here we just need to read the final calculated map.
-            // Wait, the logic above:
-            // For slot T:
-            //   Direct Bookings at T = X
-            //   Shadow from T-1 (Workshops) = Y
-            //   Total Occupancy = X + Y
-
-            // Let's re-calculate correctly to be safe:
-            // We need to look at:
-            // 1. Bookings IN THIS slot (Direct)
-            // 2. Bookings IN PREVIOUS slot that are WORKSHOPS (Shadow)
-
-            const slotTime = slot.date.getTime();
-            const prevSlotTime = slotTime - (60 * 60 * 1000);
-
-            // Find bookings in this slot
-            const directBookings = slot.bookings.reduce((sum, b) => sum + b.people, 0);
-
-            // Find bookings in previous slot (we need to search the slots array again or use a map)
-            // Using a map for quick lookup is better
-            // Ideally we need strictly previous slot.
-            // Let's implement a clean lookup.
-
-            // Re-implementation of logic inside map for clarity:
-            const prevSlot = slots.find(s => s.date.getTime() === prevSlotTime);
-            let shadowOccupancy = 0;
-
-            if (prevSlot) {
-                // Sum people from previous slot who serve 'WORKSHOP'
-                shadowOccupancy = prevSlot.bookings
-                    .filter(b => b.type === 'WORKSHOP')
-                    .reduce((sum, b) => sum + b.people, 0);
-            }
-
-            const totalOccupied = directBookings + shadowOccupancy;
-
-            const { bookings, ...slotData } = slot;
-
-            // Fix timezone issue: use YYYY-MM-DD from local-like perspective
             const d = new Date(slot.date);
             const dateStr = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
             const monthStr = dateStr.substring(0, 7);
@@ -169,12 +134,17 @@ export async function getAvailableSlots() {
             if (isGloballyBlocked) return null;
 
             return {
-                ...slotData,
-                remainingCapacity: Math.max(0, slot.capacity - totalOccupied)
+                id: slot.id,
+                date: slot.date,
+                capacity: slot.capacity,
+                remainingCapacity: remaining
             };
-        }).filter(slot => slot !== null && slot.remainingCapacity > 0);
+        }).filter(s => s !== null && s.remainingCapacity > 0);
+
+        console.log(`Available slots found: ${result.length} out of ${slots.length}`);
+        return result;
     } catch (error) {
-        console.error('Error fetching slots:', error);
+        console.error('Error in getAvailableSlots:', error);
         return [];
     }
 }
@@ -255,9 +225,33 @@ export async function createBooking(formData: {
 
         const totalUsage = directUsage + shadowUsage;
 
-        // Admin can override capacity
+        // Validation for the current slot
         if (!isAdminOverride && (totalUsage + formData.people > slot.capacity)) {
-            throw new Error(`Brak wolnych miejsc. Pozostało: ${slot.capacity - totalUsage}`);
+            console.log('Capacity exceeded for current slot:', { totalUsage, requested: formData.people, capacity: slot.capacity });
+            throw new Error(`Brak wolnych miejsc w wybranej godzinie. Pozostało: ${slot.capacity - totalUsage}`);
+        }
+
+        // Additional validation for Workshops (Approach B: Blocks next slot too)
+        if (formData.type === 'WORKSHOP' && !isAdminOverride) {
+            const nextTime = slotTime + (60 * 60 * 1000);
+            const nextSlot = await prisma.slot.findFirst({
+                where: { date: new Date(nextTime) },
+                include: { bookings: { select: { people: true, type: true } } }
+            });
+
+            if (nextSlot) {
+                const nDirect = nextSlot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
+                const nShadow = slot.bookings
+                    .filter((b: any) => b.type === 'WORKSHOP')
+                    .reduce((sum: number, b: any) => sum + b.people, 0);
+
+                const nTotal = nDirect + nShadow;
+                if (nTotal + formData.people > nextSlot.capacity) {
+                    throw new Error(`Brak wolnych miejsc w kolejnej godzinie (warsztaty wymagają dłuższego czasu). Pozostało: ${nextSlot.capacity - nTotal}`);
+                }
+            } else {
+                console.warn('Workshop requested but next slot does not exist. Allowing booking based on current slot only.');
+            }
         }
 
         // 2. Fetch Pricing from Settings
