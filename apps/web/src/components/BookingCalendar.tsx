@@ -87,11 +87,20 @@ export default function BookingCalendar() {
 
     const selectedSlot = slots.find(s => s.id === selectedSlotId);
 
-    // Generate people options based on selected slot capacity
+    // Generate people options based on selected slot capacity (and next slot for workshops)
     const selectedSlotData = slots.find(s => s.id === selectedSlotId);
-    const maxPeople = selectedSlotData ? selectedSlotData.remainingCapacity : 10;
+    let maxPeople = selectedSlotData ? selectedSlotData.remainingCapacity : 10;
 
-    const peopleOptions = Array.from({ length: Math.min(100, maxPeople) }, (_, i) => ({
+    // If it's a workshop, we must also respect the next slot's capacity
+    if (bookingType === 'WORKSHOP' && selectedSlotData) {
+        const nextTime = new Date(selectedSlotData.date).getTime() + (60 * 60 * 1000);
+        const nextSlot = slots.find(s => new Date(s.date).getTime() === nextTime);
+        if (nextSlot) {
+            maxPeople = Math.min(maxPeople, nextSlot.remainingCapacity);
+        }
+    }
+
+    const peopleOptions = Array.from({ length: Math.max(1, Math.min(100, maxPeople)) }, (_, i) => ({
         label: `${i + 1} ${i === 0 ? 'osoba' : (i < 4 ? 'osoby' : 'osób')}`,
         value: (i + 1).toString()
     }));
