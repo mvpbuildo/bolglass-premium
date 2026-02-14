@@ -1,9 +1,10 @@
 import nodemailer from 'nodemailer';
 import { prisma } from '@bolglass/database';
-import { EMAIL_SETTING_KEYS } from '../app/[locale]/actions';
+import { EMAIL_SETTING_KEYS } from './mail-constants';
 
 export async function getTransporter() {
-    const settings = await (prisma as any).systemSetting.findMany({
+    // @ts-ignore
+    const settings = await prisma.systemSetting.findMany({
         where: {
             key: {
                 in: [
@@ -44,7 +45,8 @@ export async function sendBookingConfirmation(booking: any) {
         const bodyKey = isWorkshop ? EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP : EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING;
         const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
 
-        const settings = await (prisma as any).systemSetting.findMany({
+        // @ts-ignore
+        const settings = await prisma.systemSetting.findMany({
             where: {
                 key: { in: [subjectKey, bodyKey, fromKey] }
             }
@@ -100,7 +102,7 @@ export async function sendBookingConfirmation(booking: any) {
         });
 
         console.log(`Booking confirmation sent to ${booking.email}`);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Failed to send booking confirmation:', error);
     }
 }

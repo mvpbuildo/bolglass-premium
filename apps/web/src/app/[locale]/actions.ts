@@ -3,20 +3,9 @@
 import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
 import { sendBookingConfirmation } from '@/lib/mail';
+import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 
 // --- System Settings API ---
-
-export const EMAIL_SETTING_KEYS = {
-    SMTP_HOST: 'smtp_host',
-    SMTP_PORT: 'smtp_port',
-    SMTP_USER: 'smtp_user',
-    SMTP_PASSWORD: 'smtp_password',
-    SMTP_FROM: 'smtp_from',
-    EMAIL_SUBJECT_SIGHTSEEING: 'email_subject_sightseeing',
-    EMAIL_BODY_SIGHTSEEING: 'email_body_sightseeing',
-    EMAIL_SUBJECT_WORKSHOP: 'email_subject_workshop',
-    EMAIL_BODY_WORKSHOP: 'email_body_workshop'
-};
 
 export async function getAdminEmailSettings() {
     try {
@@ -48,9 +37,9 @@ export async function updateAdminEmailSettings(settings: Record<string, string>)
         );
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating email settings:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -58,7 +47,7 @@ export async function getSystemSettings() {
     try {
         const settings = await prisma.systemSetting.findMany();
         const settingsMap: Record<string, string> = {};
-        settings.forEach(s => settingsMap[s.key] = s.value);
+        settings.forEach((s: { key: string; value: string }) => settingsMap[s.key] = s.value);
         return settingsMap;
     } catch (error) {
         console.error('Error fetching settings:', error);

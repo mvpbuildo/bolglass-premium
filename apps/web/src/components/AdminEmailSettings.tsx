@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Input, Card } from '@bolglass/ui';
-import { getAdminEmailSettings, updateAdminEmailSettings, EMAIL_SETTING_KEYS } from '../app/[locale]/actions';
-import { motion } from 'framer-motion';
+import { getAdminEmailSettings, updateAdminEmailSettings } from '../app/[locale]/actions';
+import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 
 export default function AdminEmailSettings() {
     const [settings, setSettings] = useState<Record<string, string>>({});
