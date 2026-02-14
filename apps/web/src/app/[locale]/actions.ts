@@ -162,15 +162,15 @@ export async function getAdminSlots() {
             const slotTime = slot.date.getTime();
             const prevSlotTime = slotTime - (60 * 60 * 1000);
 
-            const directBookings = slot.bookings.reduce((sum, b) => sum + b.people, 0);
+            const directBookings = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
 
             // Shadow logic for Admin too
             const prevSlot = slots.find(s => s.date.getTime() === prevSlotTime);
             let shadowOccupancy = 0;
             if (prevSlot) {
                 shadowOccupancy = prevSlot.bookings
-                    .filter(b => b.type === 'WORKSHOP')
-                    .reduce((sum, b) => sum + b.people, 0);
+                    .filter((b: any) => b.type === 'WORKSHOP')
+                    .reduce((sum: number, b: any) => sum + b.people, 0);
             }
 
             const { bookings: _bookings, ...slotData } = slot;
