@@ -16,7 +16,7 @@ export async function getTransporter() {
         }
     });
 
-    const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
+    const config = Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
 
     if (!config[EMAIL_SETTING_KEYS.SMTP_HOST] || !config[EMAIL_SETTING_KEYS.SMTP_USER]) {
         console.warn('SMTP configuration is incomplete. Skipping mail delivery.');
