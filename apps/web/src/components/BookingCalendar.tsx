@@ -91,7 +91,7 @@ export default function BookingCalendar() {
     const selectedSlotData = slots.find(s => s.id === selectedSlotId);
     const maxPeople = selectedSlotData ? selectedSlotData.remainingCapacity : 10;
 
-    const peopleOptions = Array.from({ length: Math.min(30, maxPeople) }, (_, i) => ({
+    const peopleOptions = Array.from({ length: Math.min(100, maxPeople) }, (_, i) => ({
         label: `${i + 1} ${i === 0 ? 'osoba' : (i < 4 ? 'osoby' : 'osób')}`,
         value: (i + 1).toString()
     }));

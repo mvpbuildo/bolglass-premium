@@ -14,8 +14,20 @@ export async function getAdminEmailSettings() {
             where: { key: { in: keys } }
         });
         const settingsMap: Record<string, string> = {};
-        // Initialize defaults
-        keys.forEach(k => settingsMap[k] = '');
+
+        // Define defaults for all keys
+        const defaults: Record<string, string> = {
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_SIGHTSEEING]: 'Potwierdzenie rezerwacji zwiedzania - Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING]: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP]: 'Potwierdzenie rezerwacji warsztatów - Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP]: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł'
+        };
+
+        // Initialize with empty strings for SMTP, defaults for bodies
+        keys.forEach(k => settingsMap[k] = defaults[k] || '');
+
         settings.forEach((s: any) => settingsMap[s.key] = s.value);
         return settingsMap;
     } catch (error) {
@@ -365,7 +377,8 @@ export async function sendBookingReminder(id: string) {
         const booking = await prisma.booking.findUnique({ where: { id } });
         if (!booking) throw new Error('Booking not found');
 
-        console.log(`[EMAIL SIMULATION] Sending reminder to ${booking.email} for booking on ${booking.date}`);
+        const { sendBookingReminderEmail } = await import('@/lib/mail');
+        await sendBookingReminderEmail(booking);
 
         await prisma.booking.update({
             where: { id },

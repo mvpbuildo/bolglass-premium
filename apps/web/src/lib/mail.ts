@@ -113,3 +113,71 @@ export async function sendBookingConfirmation(booking: any) {
         console.error('Failed to send booking confirmation:', error);
     }
 }
+
+export async function sendBookingReminderEmail(booking: any) {
+    try {
+        const transporter = await getTransporter();
+        if (!transporter) return;
+
+        const subjectKey = EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER;
+        const bodyKey = EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER;
+        const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
+
+        // @ts-ignore
+        const settings = await prisma.systemSetting.findMany({
+            where: {
+                key: { in: [subjectKey, bodyKey, fromKey] }
+            }
+        });
+
+        const config = Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
+
+        let subject = config[subjectKey] || 'Przypomnienie o wizycie w Bolglass';
+        let body = config[bodyKey] || 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}';
+        const from = config[fromKey] || config[EMAIL_SETTING_KEYS.SMTP_USER];
+
+        const dateStr = new Date(booking.date).toLocaleString('pl-PL', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const replacements: Record<string, string> = {
+            '{{name}}': booking.name,
+            '{{email}}': booking.email,
+            '{{date}}': dateStr,
+            '{{people}}': booking.people.toString(),
+            '{{total}}': (booking.people * (booking.priceBase || 0)).toString(),
+            '{{type}}': booking.type === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie',
+            '{{id}}': booking.id
+        };
+
+        Object.entries(replacements).forEach(([tag, val]) => {
+            subject = (subject || '').replace(new RegExp(tag, 'g'), val);
+            body = (body || '').replace(new RegExp(tag, 'g'), val);
+        });
+
+        const html = `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                <h2 style="color: #333;">${subject}</h2>
+                <div style="white-space: pre-wrap; line-height: 1.6; color: #555;">${body}</div>
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
+                <p style="font-size: 12px; color: #999;">Wiadomość wysłana automatycznie przez system Bolglass. Nie odpowiadaj na ten e-mail.</p>
+            </div>
+        `;
+
+        const info = await transporter.sendMail({
+            from: `"Bolglass" <${from}>`,
+            to: booking.email,
+            subject: subject,
+            text: body,
+            html: html
+        });
+
+        console.log(`Booking reminder sent to ${booking.email}. Response: ${info.response}`);
+    } catch (error: unknown) {
+        console.error('Failed to send booking reminder:', error);
+    }
+}
