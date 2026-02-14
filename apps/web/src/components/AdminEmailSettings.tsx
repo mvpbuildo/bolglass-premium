@@ -104,6 +104,25 @@ export default function AdminEmailSettings() {
                         </div>
                     </div>
 
+                    <div className="p-6 border rounded-xl bg-orange-50/30 border-orange-100">
+                        <h3 className="font-bold text-lg mb-4 text-orange-800">🎨 Warsztaty (Workshop)</h3>
+                        <Input
+                            label="Temat wiadomości"
+                            className="mb-4"
+                            value={settings[EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP] || ''}
+                            onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP, e.target.value)}
+                        />
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium text-gray-700 mb-1">Treść wiadomości</label>
+                            <textarea
+                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                                value={settings[EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP] || ''}
+                                onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP, e.target.value)}
+                                placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{total}}, {{type}}"
+                            />
+                        </div>
+                    </div>
+
                     <div className="p-6 border rounded-xl bg-purple-50/30 border-purple-100">
                         <h3 className="font-bold text-lg mb-4 text-purple-800">⏰ Przypomnienie (Reminder)</h3>
                         <Input
