@@ -125,7 +125,7 @@ export default function AdminEmailSettings() {
                 </div>
 
                 <div className="mt-8 flex justify-between items-center text-xs text-gray-400">
-                    <p>Dostępne tagi: <code className="bg-gray-100 px-1 rounded">{{ name }}</code>, <code className="bg-gray-100 px-1 rounded">{{ date }}</code>, <code className="bg-gray-100 px-1 rounded">{{ people }}</code>, <code className="bg-gray-100 px-1 rounded">{{ type }}</code></p>
+                    <p>Dostępne tagi: <code className="bg-gray-100 px-1 rounded">{'{{name}}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{{date}}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{{people}}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{{type}}'}</code></p>
                     <Button
                         variant="primary"
                         size="lg"
