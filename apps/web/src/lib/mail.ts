@@ -80,13 +80,14 @@ export async function sendBookingConfirmation(booking: any) {
             '{{email}}': booking.email,
             '{{date}}': dateStr,
             '{{people}}': booking.people.toString(),
+            '{{total}}': (booking.people * (booking.priceBase || 0)).toString(),
             '{{type}}': isWorkshop ? 'Warsztaty' : 'Zwiedzanie',
             '{{id}}': booking.id
         };
 
         Object.entries(replacements).forEach(([tag, val]) => {
-            subject = subject.replace(new RegExp(tag, 'g'), val);
-            body = body.replace(new RegExp(tag, 'g'), val);
+            subject = (subject || '').replace(new RegExp(tag, 'g'), val);
+            body = (body || '').replace(new RegExp(tag, 'g'), val);
         });
 
         // Simple HTML wrap

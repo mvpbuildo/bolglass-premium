@@ -18,6 +18,7 @@ docker compose exec -T bolglass-web npx prisma db push --schema=packages/databas
 # 4. Initialize settings and update slot capacity
 echo "⚙️ Initializing system settings and capacities..."
 docker compose exec -T bolglass-web node initialize-settings.js
+echo "Updating all slots capacity to 100..."
 docker compose exec -T bolglass-web node update-capacity.js
 
 echo "--- ✅ UPDATE COMPLETE ---"

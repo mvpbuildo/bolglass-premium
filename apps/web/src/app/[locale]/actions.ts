@@ -452,7 +452,7 @@ export async function generateMonthSlots(year: number, month: number) {
     try {
         const startHour = 8;
         const endHour = 17;
-        const capacity = 50;
+        const capacity = 100;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         for (let day = 1; day <= daysInMonth; day++) {

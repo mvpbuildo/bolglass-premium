@@ -12,7 +12,9 @@ async function main() {
             { key: 'smtp_user', value: 'rezerwacje@bolann.cloud' },
             { key: 'smtp_from', value: 'rezerwacje@bolann.cloud' },
             { key: 'email_subject_sightseeing', value: 'Potwierdzenie rezerwacji zwiedzania - Bolglass' },
-            { key: 'email_subject_workshop', value: 'Potwierdzenie rezerwacji warsztatów - Bolglass' }
+            { key: 'email_body_sightseeing', value: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' },
+            { key: 'email_subject_workshop', value: 'Potwierdzenie rezerwacji warsztatów - Bolglass' },
+            { key: 'email_body_workshop', value: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' }
         ];
 
         for (const s of settings) {
