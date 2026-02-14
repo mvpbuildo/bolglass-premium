@@ -6,7 +6,13 @@ async function main() {
     try {
         const settings = [
             { key: 'price_sightseeing', value: '35' },
-            { key: 'price_workshop', value: '60' }
+            { key: 'price_workshop', value: '60' },
+            { key: 'smtp_host', value: 'mail.bolann.cloud' },
+            { key: 'smtp_port', value: '587' },
+            { key: 'smtp_user', value: 'rezerwacje@bolann.cloud' },
+            { key: 'smtp_from', value: 'rezerwacje@bolann.cloud' },
+            { key: 'email_subject_sightseeing', value: 'Potwierdzenie rezerwacji zwiedzania - Bolglass' },
+            { key: 'email_subject_workshop', value: 'Potwierdzenie rezerwacji warsztatów - Bolglass' }
         ];
 
         for (const s of settings) {
