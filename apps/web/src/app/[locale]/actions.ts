@@ -16,7 +16,7 @@ export async function getAdminEmailSettings() {
         const settingsMap: Record<string, string> = {};
         // Initialize defaults
         keys.forEach(k => settingsMap[k] = '');
-        settings.forEach(s => settingsMap[s.key] = s.value);
+        settings.forEach((s: any) => settingsMap[s.key] = s.value);
         return settingsMap;
     } catch (error) {
         console.error('Error fetching email settings:', error);
@@ -179,7 +179,7 @@ export async function getAdminSlots() {
                 remainingCapacity: Math.max(0, slot.capacity - (directBookings + shadowOccupancy))
             };
         });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Error fetching admin slots:', error);
         return [];
     }
@@ -312,7 +312,7 @@ export async function getAllBookings() {
             }
         });
         return bookings;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching all bookings:', error);
         return [];
     }
@@ -415,7 +415,7 @@ export async function getAdminStats() {
         });
 
         return { dayStats, hourStats };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching admin stats:', error);
         return { dayStats: {}, hourStats: {} };
     }
