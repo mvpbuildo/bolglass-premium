@@ -215,12 +215,12 @@ export async function createBooking(formData: {
             include: { bookings: { select: { people: true, type: true } } }
         });
 
-        const directUsage = slot.bookings.reduce((sum, b) => sum + b.people, 0);
+        const directUsage = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
         let shadowUsage = 0;
         if (prevSlot) {
             shadowUsage = prevSlot.bookings
-                .filter(b => b.type === 'WORKSHOP')
-                .reduce((sum, b) => sum + b.people, 0);
+                .filter((b: any) => b.type === 'WORKSHOP')
+                .reduce((sum: number, b: any) => sum + b.people, 0);
         }
 
         const totalUsage = directUsage + shadowUsage;
