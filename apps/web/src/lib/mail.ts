@@ -24,6 +24,8 @@ export async function getTransporter() {
         return null;
     }
 
+    console.log(`--- SMTP Config: ${config[EMAIL_SETTING_KEYS.SMTP_HOST]}:${config[EMAIL_SETTING_KEYS.SMTP_PORT]} (SSL/TLS: ${config[EMAIL_SETTING_KEYS.SMTP_PORT] === '465'}) ---`);
+
     return nodemailer.createTransport({
         host: config[EMAIL_SETTING_KEYS.SMTP_HOST],
         port: parseInt(config[EMAIL_SETTING_KEYS.SMTP_PORT]) || 587,
@@ -32,6 +34,10 @@ export async function getTransporter() {
             user: config[EMAIL_SETTING_KEYS.SMTP_USER],
             pass: config[EMAIL_SETTING_KEYS.SMTP_PASSWORD],
         },
+        tls: {
+            // Often required for VPS and private mail servers
+            rejectUnauthorized: false
+        }
     });
 }
 
@@ -93,7 +99,7 @@ export async function sendBookingConfirmation(booking: any) {
             </div>
         `;
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
             from: `"Bolglass" <${from}>`,
             to: booking.email,
             subject: subject,
@@ -101,7 +107,7 @@ export async function sendBookingConfirmation(booking: any) {
             html: html
         });
 
-        console.log(`Booking confirmation sent to ${booking.email}`);
+        console.log(`Booking confirmation sent to ${booking.email}. Response: ${info.response}`);
     } catch (error: unknown) {
         console.error('Failed to send booking confirmation:', error);
     }
