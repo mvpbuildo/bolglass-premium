@@ -233,17 +233,17 @@ export default function AdminBookingList() {
             <Card className="border-none shadow-lg">
                 <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                     <table className="w-full text-left bg-white">
-                        <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
+                        <thead className="bg-gray-50 text-gray-600 text-[10px] uppercase font-semibold">
                             <tr>
-                                <th className="px-6 py-4">Termin</th>
-                                <th className="px-6 py-4">Dane Klienta</th>
-                                <th className="px-6 py-4">Pakiet</th>
-                                <th className="px-6 py-4 text-center">Osób/Cena</th>
-                                <th className="px-6 py-4">Notatki Admina</th>
-                                <th className="px-6 py-4 text-right">Akcje</th>
+                                <th className="px-3 py-2">Termin</th>
+                                <th className="px-3 py-2">Dane Klienta</th>
+                                <th className="px-3 py-2">Pakiet</th>
+                                <th className="px-3 py-2 text-center">Osób/Cena</th>
+                                <th className="px-3 py-2">Notatki Admina</th>
+                                <th className="px-3 py-2 text-right">Akcje</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 italic">
+                        <tbody className="divide-y divide-gray-100 italic text-sm">
                             {filteredAndSortedBookings.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-8 text-center text-gray-400 not-italic">
@@ -253,57 +253,59 @@ export default function AdminBookingList() {
                             ) : (
                                 filteredAndSortedBookings.map((booking) => (
                                     <tr key={booking.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="font-bold text-gray-900 not-italic">
+                                        <td className="px-3 py-2">
+                                            <div className="font-bold text-gray-900 not-italic text-sm">
                                                 {new Date(booking.date).toLocaleDateString('pl-PL')}
                                             </div>
-                                            <div className="text-xs text-red-600 font-medium not-italic">
+                                            <div className="text-[10px] text-red-600 font-medium not-italic">
                                                 {new Date(booking.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 not-italic">
-                                            <div className="font-medium">{booking.name}</div>
-                                            <div className="text-xs text-gray-400">{booking.email}</div>
+                                        <td className="px-3 py-2 not-italic">
+                                            <div className="font-medium text-sm truncate max-w-[150px]" title={booking.name}>{booking.name}</div>
+                                            <div className="text-[10px] text-gray-400 truncate max-w-[150px]" title={booking.email}>{booking.email}</div>
                                         </td>
-                                        <td className="px-6 py-4 not-italic">
-                                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${booking.type === 'WORKSHOP'
+                                        <td className="px-3 py-2 not-italic">
+                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${booking.type === 'WORKSHOP'
                                                 ? 'bg-red-100 text-red-600 border border-red-200'
                                                 : 'bg-blue-50 text-blue-600 border border-blue-100'
                                                 }`}>
                                                 {booking.type === 'WORKSHOP' ? '🎨 Warsztaty' : '👀 Zwiedzanie'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-center not-italic">
-                                            <div className="font-bold text-red-600">{booking.people} os.</div>
-                                            <div className="text-[10px] text-gray-400 font-bold">{booking.priceBase} zł/os.</div>
-                                            <div className="mt-1 text-xs font-black text-gray-900 border-t pt-1 border-gray-100">
-                                                Suma: {booking.people * booking.priceBase} zł
+                                        <td className="px-3 py-2 text-center not-italic">
+                                            <div className="flex flex-col items-center">
+                                                <span className="font-bold text-red-600 text-sm">{booking.people} os.</span>
+                                                <span className="text-[10px] text-gray-400">({booking.priceBase} zł/os)</span>
+                                                <span className="text-xs font-black text-gray-900 border-t border-gray-100 mt-0.5 pt-0.5">
+                                                    {booking.people * booking.priceBase} zł
+                                                </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 not-italic">
+                                        <td className="px-3 py-2 not-italic">
                                             <input
                                                 defaultValue={booking.adminNotes || ''}
                                                 onBlur={(e) => handleUpdate(booking.id, e.target.value)}
                                                 placeholder="Dodaj notatkę..."
-                                                className="text-xs p-1 border border-transparent hover:border-gray-200 rounded w-full focus:bg-white"
+                                                className="text-[11px] p-1 border border-transparent hover:border-gray-200 rounded w-full focus:bg-white bg-transparent transition-all truncate focus:w-auto focus:absolute focus:z-10 focus:shadow-md focus:min-w-[200px]"
                                             />
                                         </td>
-                                        <td className="px-6 py-4 text-right not-italic space-x-2">
+                                        <td className="px-3 py-2 text-right not-italic space-x-1">
                                             <button
                                                 title={booking.reminderSentAt ? `Przypomnienie wysłane: ${new Date(booking.reminderSentAt).toLocaleTimeString()}` : "Wyślij przypomnienie"}
                                                 onClick={() => handleSendReminder(booking.id)}
-                                                className={`transition-colors ${booking.reminderSentAt ? 'text-green-500' : 'text-blue-400 hover:text-blue-600'}`}
+                                                className={`transition-colors p-1 rounded hover:bg-gray-100 ${booking.reminderSentAt ? 'text-green-500' : 'text-blue-400 hover:text-blue-600'}`}
                                             >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                                 </svg>
                                             </button>
                                             <button
                                                 title="Usuń rezerwację"
                                                 onClick={() => handleDelete(booking.id)}
-                                                className="text-gray-300 hover:text-red-600 transition-colors"
+                                                className="text-gray-300 hover:text-red-600 transition-colors p-1 rounded hover:bg-gray-100"
                                             >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
