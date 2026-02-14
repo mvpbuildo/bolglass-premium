@@ -50,7 +50,7 @@ export async function sendBookingConfirmation(booking: any) {
             }
         });
 
-        const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
+        const config = Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
 
         let subject = config[subjectKey] || (isWorkshop ? 'Potwierdzenie rezerwacji warsztatów' : 'Potwierdzenie rezerwacji zwiedzania');
         let body = config[bodyKey] || (isWorkshop
