@@ -25,10 +25,19 @@ export async function getAdminEmailSettings() {
             [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł'
         };
 
-        // Initialize with empty strings for SMTP, defaults for bodies
+        // Initialize with defaults
         keys.forEach(k => settingsMap[k] = defaults[k] || '');
 
-        settings.forEach((s: any) => settingsMap[s.key] = s.value);
+        settings.forEach((s: any) => {
+            // If the database has a value, but it's an email body and it's too short, 
+            // we ignore it and keep our professional default.
+            const isBody = s.key.includes('body');
+            const isTooShort = isBody && s.value.trim().length < 20;
+
+            if (s.value && !isTooShort) {
+                settingsMap[s.key] = s.value;
+            }
+        });
         return settingsMap;
     } catch (error) {
         console.error('Error fetching email settings:', error);

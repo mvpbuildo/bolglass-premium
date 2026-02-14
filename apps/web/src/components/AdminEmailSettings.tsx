@@ -99,7 +99,7 @@ export default function AdminEmailSettings() {
                                 className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                                 value={settings[EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING] || ''}
                                 onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING, e.target.value)}
-                                placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{type}}"
+                                placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{total}}, {{type}}"
                             />
                         </div>
                     </div>

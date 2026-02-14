@@ -14,16 +14,26 @@ async function main() {
             { key: 'email_subject_sightseeing', value: 'Potwierdzenie rezerwacji zwiedzania - Bolglass' },
             { key: 'email_body_sightseeing', value: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' },
             { key: 'email_subject_workshop', value: 'Potwierdzenie rezerwacji warsztatów - Bolglass' },
-            { key: 'email_body_workshop', value: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' }
+            { key: 'email_body_workshop', value: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' },
+            { key: 'email_subject_reminder', value: 'Przypomnienie o wizycie w Bolglass' },
+            { key: 'email_body_reminder', value: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' }
         ];
 
         for (const s of settings) {
-            const result = await prisma.systemSetting.upsert({
-                where: { key: s.key },
-                update: {}, // Don't overwrite if already exists
-                create: s
-            });
-            console.log(`Setting [${s.key}] checked/created.`);
+            // Check if exists
+            const existing = await prisma.systemSetting.findUnique({ where: { key: s.key } });
+
+            if (!existing || (s.key.includes('body') && existing.value.length < 20)) {
+                // Create or overwrite if it's just the default/empty
+                await prisma.systemSetting.upsert({
+                    where: { key: s.key },
+                    update: { value: s.value },
+                    create: s
+                });
+                console.log(`Setting [${s.key}] updated with professional template.`);
+            } else {
+                console.log(`Setting [${s.key}] already exists (custom).`);
+            }
         }
 
         console.log('--- Initialization Complete ---');
