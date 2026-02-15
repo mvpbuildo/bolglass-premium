@@ -13,7 +13,7 @@ docker compose up -d --build
 
 # 3. Wait for DB to be ready and sync schema
 echo "🔄 Syncing database schema..."
-docker compose exec -T bolglass-web npx prisma db push --schema=packages/database/prisma/schema.prisma
+docker compose exec -T bolglass-web npx prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss
 
 # 4. Initialize settings and update slot capacity
 echo "⚙️ Initializing system settings and capacities..."
