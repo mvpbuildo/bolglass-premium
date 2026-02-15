@@ -1,85 +1,99 @@
 'use server'
 
 import { prisma } from '@bolglass/database';
-import { redirect } from 'next/navigation';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
 export async function createProduct(formData: FormData) {
-    const name = formData.get('name') as string;
-    const description = formData.get('description') as string;
-
-    // Identifiers
-    const ean = formData.get('ean') as string;
-    const manufacturerCode = formData.get('manufacturerCode') as string;
-
-    // Pricing
-    const priceNet = parseFloat(formData.get('priceNet') as string) || 0;
-    const vatRate = parseInt(formData.get('vatRate') as string) || 23;
-    const priceGross = priceNet * (1 + vatRate / 100);
-
-    // Logistics
-    const weight = parseFloat(formData.get('weight') as string) || 0;
-    const height = parseFloat(formData.get('height') as string) || 0;
-    const width = parseFloat(formData.get('width') as string) || 0;
-    const depth = parseFloat(formData.get('depth') as string) || 0;
-    const packaging = formData.get('packaging') as string;
-
-    const isConfigurable = formData.get('isConfigurable') === 'on';
-
-    // Handle Multiple Images
-    const files = formData.getAll('images') as File[];
-    const imageUrls: string[] = [];
-
-    // Ensure upload directory exists
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-
     try {
-        await mkdir(uploadDir, { recursive: true });
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
 
-        for (const file of files) {
-            if (file.size > 0) {
-                const bytes = await file.arrayBuffer();
-                const buffer = Buffer.from(bytes);
+        if (!name) return { error: "Nazwa produktu jest wymagana." };
 
-                // Sanitize and Unique filename
-                const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}`;
-                const filepath = join(uploadDir, filename);
+        // Identifiers
+        const ean = formData.get('ean') as string || null;
+        const manufacturerCode = formData.get('manufacturerCode') as string || null;
 
-                await writeFile(filepath, buffer);
-                imageUrls.push(`/uploads/${filename}`);
+        // Pricing
+        const priceNet = parseFloat(formData.get('priceNet') as string) || 0;
+        const vatRate = parseInt(formData.get('vatRate') as string) || 23;
+        const priceGross = priceNet * (1 + vatRate / 100);
+
+        // Logistics
+        const weight = parseFloat(formData.get('weight') as string) || 0;
+        const height = parseFloat(formData.get('height') as string) || 0;
+        const width = parseFloat(formData.get('width') as string) || 0;
+        const depth = parseFloat(formData.get('depth') as string) || 0;
+        const packaging = formData.get('packaging') as string;
+
+        const isConfigurable = formData.get('isConfigurable') === 'on';
+
+        // Handle Multiple Images
+        const files = formData.getAll('images') as File[];
+        const imageUrls: string[] = [];
+
+        // Ensure upload directory exists
+        const uploadDir = join(process.cwd(), 'public', 'uploads');
+
+        try {
+            await mkdir(uploadDir, { recursive: true });
+
+            for (const file of files) {
+                if (file.size > 0) {
+                    const bytes = await file.arrayBuffer();
+                    const buffer = Buffer.from(bytes);
+
+                    // Sanitize and Unique filename
+                    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
+                    const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}`;
+                    const filepath = join(uploadDir, filename);
+
+                    await writeFile(filepath, buffer);
+                    imageUrls.push(`/uploads/${filename}`);
+                }
             }
+        } catch (error) {
+            console.error("Upload failed:", error);
+            // We continue even if upload fails, but could return error here if critical
         }
-    } catch (error) {
-        console.error("Upload failed:", error);
+
+        // Generate a simple slug from name
+        const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+        const sku = `BG-${Math.floor(Math.random() * 10000)}`;
+
+        await prisma.product.create({
+            data: {
+                name,
+                slug: `${slug}-${Date.now()}`,
+                description,
+                price: priceGross,
+                priceNet,
+                vatRate,
+                weight,
+                height,
+                width,
+                depth,
+                packaging,
+                images: imageUrls,
+                sku,
+                ean,
+                manufacturerCode,
+                isConfigurable,
+                stock: 100
+            }
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Create product failed:", error);
+
+        if (error.code === 'P2002') {
+            const target = error.meta?.target || [];
+            if (target.includes('ean')) return { error: "Produkt z tym kodem EAN już istnieje." };
+            if (target.includes('sku')) return { error: "Produkt z tym kodem SKU już istnieje." };
+        }
+
+        return { error: "Wystąpił błąd podczas zapisywania produktu w bazie danych." };
     }
-
-    // Generate a simple slug from name
-    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-    const sku = `BG-${Math.floor(Math.random() * 10000)}`;
-
-    await prisma.product.create({
-        data: {
-            name,
-            slug: `${slug}-${Date.now()}`,
-            description,
-            price: priceGross,
-            priceNet,
-            vatRate,
-            weight,
-            height,
-            width,
-            depth,
-            packaging,
-            images: imageUrls,
-            sku,
-            ean: ean || null,
-            manufacturerCode: manufacturerCode || null,
-            isConfigurable,
-            stock: 100
-        }
-    });
-
-    redirect('/admin/products');
 }

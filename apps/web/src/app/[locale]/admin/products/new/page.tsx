@@ -1,15 +1,17 @@
 'use client';
 
-import { Link } from '@/i18n/navigation';
+import { useRouter, Link } from '@/i18n/navigation';
 import { Button, Card } from '@bolglass/ui';
 import { useState, ChangeEvent } from 'react';
 import { createProduct } from './actions';
 import Image from 'next/image';
 
 export default function AdminNewProductPage() {
+    const router = useRouter();
     const [images, setImages] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -29,23 +31,22 @@ export default function AdminNewProductPage() {
 
     async function handleSubmit(formData: FormData) {
         setIsSubmitting(true);
-        // Append all images manually because file input might be cleared or modified in UI state
-        // Actually, we must rely on the input or append manually.
-        // Since we have a state `images`, we should append them to formData before sending.
+        setError(null);
 
-        // Note: The original input[type=file] might not have all files if we added them incrementally.
         // Strategy: We remove the 'image' field from formData (if any) and append our state `images`.
         formData.delete('images');
         images.forEach(file => {
             formData.append('images', file);
         });
 
-        try {
-            await createProduct(formData);
-        } catch (error) {
-            console.error(error);
-            alert("Błąd podczas zapisywania produktu.");
+        const result = await createProduct(formData);
+
+        if (result?.error) {
+            setError(result.error);
             setIsSubmitting(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            router.push('/admin/products');
         }
     }
 
@@ -60,6 +61,12 @@ export default function AdminNewProductPage() {
                 </div>
 
                 <Card className="p-8 bg-white shadow-sm">
+                    {error && (
+                        <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-lg text-sm font-bold border border-red-100 flex items-center gap-2">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            {error}
+                        </div>
+                    )}
                     <form action={handleSubmit} className="space-y-8">
                         {/* SECTION 1: BASIC INFO */}
                         <div className="space-y-4">
