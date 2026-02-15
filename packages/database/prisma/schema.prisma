@@ -80,7 +80,9 @@ model Product {
   name           String
   slug           String    @unique
   description    String
-  price          Float
+  price          Float     @default(0) // Gross Price (Brutto) - kept for compatibility
+  priceNet       Float?    @default(0) // Net Price (Netto)
+  vatRate        Int       @default(23)// VAT % (e.g. 23)
   images         String[]  // Array of image URLs
   
   // Inventory
@@ -91,10 +93,18 @@ model Product {
   categoryId     String?
   category       Category? @relation(fields: [categoryId], references: [id])
   
+  // Logistics
+  weight         Float?    // kg
+  height         Float?    // cm
+  width          Float?    // cm
+  depth          Float?    // cm
+  packaging      String?   // e.g. "Box", "Tube"
+  
   // 3D & Customization
   isConfigurable Boolean   @default(false)
   model3DUrl     String?   // URL to .glb file
   baseConfig     String?   // Default JSON configuration
+  technicalSpecs Json?     // Flexible storage for extra technical data
 
   orderItems     OrderItem[]
   createdAt      DateTime  @default(now())
