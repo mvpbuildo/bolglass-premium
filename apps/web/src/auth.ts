@@ -48,7 +48,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.id = token.sub
             }
             if (token.role && session.user) {
-                // @ts-expect-error: Custom property in next-auth
                 session.user.role = token.role as string
             }
             return session
@@ -62,7 +61,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             if (!existingUser) return token
 
-            // @ts-expect-error: Custom property in next-auth
             token.role = existingUser.role
             return token
         }

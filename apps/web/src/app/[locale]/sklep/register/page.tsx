@@ -70,20 +70,20 @@ export default function RegisterPage() {
                     </div>
                 )}
 
-                <form action={handleSubmit} className="space-y-6">
+                <form action={handleSubmit} className="space-y-6 text-left">
                     {/* Common Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="col-span-2">
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
-                            <input name="email" type="email" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                            <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-1">Email</label>
+                            <input id="email" name="email" type="email" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Hasło</label>
-                            <input name="password" type="password" required minLength={6} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                            <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-1">Hasło</label>
+                            <input id="password" name="password" type="password" required minLength={6} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Powtórz Hasło</label>
-                            <input name="confirmPassword" type="password" required minLength={6} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                            <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700 mb-1">Powtórz Hasło</label>
+                            <input id="confirmPassword" name="confirmPassword" type="password" required minLength={6} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                         </div>
                     </div>
 
@@ -93,38 +93,38 @@ export default function RegisterPage() {
                             {isCompany && (
                                 <>
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-bold text-gray-700 mb-1">Nazwa Firmy</label>
-                                        <input name="companyName" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                                        <label htmlFor="companyName" className="block text-sm font-bold text-gray-700 mb-1">Nazwa Firmy</label>
+                                        <input id="companyName" name="companyName" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-bold text-gray-700 mb-1">NIP</label>
-                                        <input name="nip" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                                        <label htmlFor="nip" className="block text-sm font-bold text-gray-700 mb-1">NIP</label>
+                                        <input id="nip" name="nip" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                                     </div>
                                 </>
                             )}
 
                             {!isCompany && (
                                 <div className="col-span-2">
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Imię i Nazwisko</label>
-                                    <input name="name" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                                    <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-1">Imię i Nazwisko</label>
+                                    <input id="name" name="name" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                                 </div>
                             )}
 
                             <div className="col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Ulica i Numer</label>
-                                <input name="street" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                                <label htmlFor="street" className="block text-sm font-bold text-gray-700 mb-1">Ulica i Numer</label>
+                                <input id="street" name="street" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Kod Pocztowy</label>
-                                <input name="zipCode" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="00-000" />
+                                <label htmlFor="zipCode" className="block text-sm font-bold text-gray-700 mb-1">Kod Pocztowy</label>
+                                <input id="zipCode" name="zipCode" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="00-000" />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Miasto</label>
-                                <input name="city" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                                <label htmlFor="city" className="block text-sm font-bold text-gray-700 mb-1">Miasto</label>
+                                <input id="city" name="city" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                             </div>
                             <div className="col-span-2">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Telefon</label>
-                                <input name="phone" required type="tel" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
+                                <label htmlFor="phone" className="block text-sm font-bold text-gray-700 mb-1">Telefon</label>
+                                <input id="phone" name="phone" required type="tel" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" />
                             </div>
                         </div>
                     </div>
