@@ -31,6 +31,11 @@ model User {
   isCompany     Boolean   @default(false)
   companyName   String?
   nip           String?   // Tax ID
+
+  // Password Reset
+  resetPasswordToken   String?   @unique
+  resetPasswordExpires DateTime?
+
   accounts      Account[]
   sessions      Session[]
   

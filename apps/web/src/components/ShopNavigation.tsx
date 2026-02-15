@@ -55,9 +55,9 @@ export default function ShopNavigation() {
                         {/* Account */}
                         {session ? (
                             <div className="flex items-center gap-2">
-                                <Link href="/admin/bookings">
+                                <Link href={session.user?.role === 'ADMIN' ? "/admin" : "/sklep/konto"}>
                                     <Button variant="outline" size="sm" className="hidden sm:flex">
-                                        Mój Profil ({session.user?.name?.split(' ')[0]})
+                                        Mój Profil ({session.user?.name?.split(' ')[0] || 'Konto'})
                                     </Button>
                                 </Link>
                                 <Button
