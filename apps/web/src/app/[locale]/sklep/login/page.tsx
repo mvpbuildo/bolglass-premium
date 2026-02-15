@@ -1,6 +1,7 @@
 import { signIn } from "@/auth"
 import { Button } from "@bolglass/ui"
 import { Card } from "@bolglass/ui"
+import { Link } from "@/i18n/navigation"
 
 export default function ShopLoginPage() {
     return (
@@ -42,7 +43,7 @@ export default function ShopLoginPage() {
                 </div>
 
                 <p className="text-center text-xs text-gray-400">
-                    Jesteś administratorem? <a href="/login" className="text-red-600 hover:underline">Przejdź do panelu admina</a>.
+                    Jesteś administratorem? <Link href="/login" className="text-red-600 hover:underline">Przejdź do panelu admina</Link>.
                 </p>
             </Card>
         </div>
