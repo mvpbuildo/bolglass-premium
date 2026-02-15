@@ -18,6 +18,19 @@ model User {
   emailVerified DateTime?
   image         String?
   role          String    @default("USER") // "USER" or "ADMIN"
+  password      String?   // Hashed password for Credentials
+
+  // Profile Data
+  phone         String?
+  street        String?
+  city          String?
+  zipCode       String?
+  country       String?   @default("PL")
+
+  // Company Data
+  isCompany     Boolean   @default(false)
+  companyName   String?
+  nip           String?   // Tax ID
   accounts      Account[]
   sessions      Session[]
   

@@ -42,8 +42,8 @@ export default function ShopLoginPage() {
                     </div>
                 </div>
 
-                <p className="text-center text-xs text-gray-400">
-                    Jesteś administratorem? <Link href="/login" className="text-red-600 hover:underline">Przejdź do panelu admina</Link>.
+                <p className="text-center text-sm text-gray-500">
+                    Nie masz jeszcze konta? <Link href="/sklep/register" className="text-red-600 font-bold hover:underline">Załóż konto teraz</Link>
                 </p>
             </Card>
         </div>
