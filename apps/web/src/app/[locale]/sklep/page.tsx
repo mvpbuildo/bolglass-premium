@@ -41,7 +41,7 @@ export default async function ShopPage() {
                                     name: product.name,
                                     price: product.price,
                                     slug: product.slug,
-                                    image: product.images[0] || null,
+                                    image: (product.images && product.images[0]) || null,
                                     priceNet: product.priceNet || 0,
                                     vatRate: product.vatRate
                                 }}
