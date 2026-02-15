@@ -3,6 +3,7 @@ import { Button, Card } from '@bolglass/ui';
 import AdminNavigation from '../../../../components/AdminNavigation';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
+import { Link } from '@/i18n/navigation';
 
 async function getUsers() {
     return await prisma.user.findMany({
