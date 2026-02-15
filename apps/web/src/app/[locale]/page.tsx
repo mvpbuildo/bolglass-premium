@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import ProductionProcess from '@/components/ProductionProcess';
 import BookingCalendar from '@/components/BookingCalendar';
 import BaubleConfigurator from '@/components/BaubleConfigurator';
@@ -31,7 +32,7 @@ export default function HomePage() {
                         <a href="#offer" className="hover:text-white transition-colors">{t('nav.offer')}</a>
                         <a href="#booking" className="hover:text-white transition-colors">{t('nav.workshops')}</a>
                         <a href="#studio-3d" className="hover:text-white transition-colors">{t('nav.studio3d')}</a>
-                        <a href="#shop" className="hover:text-white transition-colors">{t('nav.shop')}</a>
+                        <Link href="/sklep" className="hover:text-white transition-colors">{t('nav.shop')}</Link>
                         <a href="#b2b" className="hover:text-white transition-colors">{t('nav.b2b')}</a>
                         <a href="#contact" className="hover:text-white transition-colors">{t('nav.contact')}</a>
                     </div>

@@ -4,6 +4,7 @@ import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { CartProvider } from "@/context/CartContext";
 
 
 const geistSans = Geist({
@@ -43,7 +44,9 @@ export default async function LocaleLayout({
         <html lang={locale}>
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
                 <NextIntlClientProvider messages={messages}>
-                    {children}
+                    <CartProvider>
+                        {children}
+                    </CartProvider>
                 </NextIntlClientProvider>
             </body>
         </html>
