@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { Button } from '@bolglass/ui';
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function ShopNavigation() {
     const pathname = usePathname();
@@ -54,11 +54,21 @@ export default function ShopNavigation() {
 
                         {/* Account */}
                         {session ? (
-                            <Link href="/admin/bookings">
-                                <Button variant="outline" size="sm" className="hidden sm:flex">
-                                    Mój Profil ({session.user?.name?.split(' ')[0]})
+                            <div className="flex items-center gap-2">
+                                <Link href="/admin/bookings">
+                                    <Button variant="outline" size="sm" className="hidden sm:flex">
+                                        Mój Profil ({session.user?.name?.split(' ')[0]})
+                                    </Button>
+                                </Link>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    className="text-gray-500 hover:text-red-600"
+                                >
+                                    Wyloguj
                                 </Button>
-                            </Link>
+                            </div>
                         ) : (
                             <Link href="/api/auth/signin">
                                 <Button variant="primary" size="sm" className="bg-gray-900 hover:bg-black text-white">
