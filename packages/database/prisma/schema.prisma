@@ -87,6 +87,8 @@ model Product {
   
   // Inventory
   sku            String?   @unique
+  ean            String?   @unique // Barcode
+  manufacturerCode String?         // MPN
   stock          Int       @default(0)
   
   // Categorization

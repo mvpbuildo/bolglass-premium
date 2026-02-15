@@ -1,87 +1,52 @@
+'use client';
+
 import { Link } from '@/i18n/navigation';
-import { prisma } from '@bolglass/database';
 import { Button, Card } from '@bolglass/ui';
-import { redirect } from 'next/navigation';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { useState, ChangeEvent } from 'react';
+import { createProduct } from './actions';
+import Image from 'next/image';
 
 export default function AdminNewProductPage() {
-    async function createProduct(formData: FormData) {
-        'use server'
+    const [images, setImages] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-        const name = formData.get('name') as string;
-        const description = formData.get('description') as string;
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            setImages(prev => [...prev, ...filesArray]);
 
-        // Pricing
-        const priceNet = parseFloat(formData.get('priceNet') as string) || 0;
-        const vatRate = parseInt(formData.get('vatRate') as string) || 23;
-        const priceGross = priceNet * (1 + vatRate / 100);
-
-        // Logistics
-        const weight = parseFloat(formData.get('weight') as string) || 0;
-        const height = parseFloat(formData.get('height') as string) || 0;
-        const width = parseFloat(formData.get('width') as string) || 0;
-        const depth = parseFloat(formData.get('depth') as string) || 0;
-        const packaging = formData.get('packaging') as string;
-
-        const file = formData.get('image') as File;
-        const isConfigurable = formData.get('isConfigurable') === 'on';
-
-        let imageUrl = '';
-
-        if (file && file.size > 0) {
-            const bytes = await file.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            // Robust path resolution for Docker/Standalone
-            // In standalone output, public folder is copied to .next/standalone/public (sometimes)
-            // But we want to map to the volume.
-            // Best practice: Use process.cwd() which in Docker is /app
-            // and assume 'public/uploads' is mapped.
-            const uploadDir = join(process.cwd(), 'public', 'uploads');
-
-            try {
-                await mkdir(uploadDir, { recursive: true });
-
-                // Generate unique filename
-                // Sanitize filename to be safe
-                const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                const filename = `${Date.now()}-${sanitizedName}`;
-                const filepath = join(uploadDir, filename);
-
-                await writeFile(filepath, buffer);
-                imageUrl = `/uploads/${filename}`;
-            } catch (error) {
-                console.error("Upload failed:", error);
-                // Fail gracefully or throw? For now log and continue without image
-            }
+            // Create previews
+            const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+            setPreviews(prev => [...prev, ...newPreviews]);
         }
+    };
 
-        // Generate a simple slug from name
-        const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-        const sku = `BG-${Math.floor(Math.random() * 10000)}`;
+    const removeImage = (index: number) => {
+        setImages(prev => prev.filter((_, i) => i !== index));
+        setPreviews(prev => prev.filter((_, i) => i !== index));
+    };
 
-        await prisma.product.create({
-            data: {
-                name,
-                slug: `${slug}-${Date.now()}`,
-                description,
-                price: priceGross, // Store Gross for compatibility
-                priceNet,
-                vatRate,
-                weight,
-                height,
-                width,
-                depth,
-                packaging,
-                images: imageUrl ? [imageUrl] : [],
-                sku,
-                isConfigurable,
-                stock: 100
-            }
+    async function handleSubmit(formData: FormData) {
+        setIsSubmitting(true);
+        // Append all images manually because file input might be cleared or modified in UI state
+        // Actually, we must rely on the input or append manually.
+        // Since we have a state `images`, we should append them to formData before sending.
+
+        // Note: The original input[type=file] might not have all files if we added them incrementally.
+        // Strategy: We remove the 'image' field from formData (if any) and append our state `images`.
+        formData.delete('images');
+        images.forEach(file => {
+            formData.append('images', file);
         });
 
-        redirect('/admin/products');
+        try {
+            await createProduct(formData);
+        } catch (error) {
+            console.error(error);
+            alert("Błąd podczas zapisywania produktu.");
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -95,7 +60,7 @@ export default function AdminNewProductPage() {
                 </div>
 
                 <Card className="p-8 bg-white shadow-sm">
-                    <form action={createProduct} className="space-y-8">
+                    <form action={handleSubmit} className="space-y-8">
                         {/* SECTION 1: BASIC INFO */}
                         <div className="space-y-4">
                             <h3 className="text-lg font-bold text-gray-900 border-b pb-2">1. Podstawowe Informacje</h3>
@@ -107,6 +72,14 @@ export default function AdminNewProductPage() {
                                 <div className="col-span-2">
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Opis</label>
                                     <textarea name="description" required rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="Opisz produkt..." />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">Kod EAN (Opcjonalnie)</label>
+                                    <input name="ean" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 590..." />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1">Kod Producenta (MPN)</label>
+                                    <input name="manufacturerCode" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. BG-2024-X" />
                                 </div>
                             </div>
                         </div>
@@ -163,17 +136,34 @@ export default function AdminNewProductPage() {
 
                         {/* SECTION 4: MEDIA */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-gray-900 border-b pb-2">4. Zdjęcie</h3>
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Wgraj Plik</label>
-                                <input
-                                    name="image"
-                                    type="file"
-                                    accept="image/*"
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">Zostanie zapisane na serwerze w /uploads.</p>
+                            <h3 className="text-lg font-bold text-gray-900 border-b pb-2">4. Zdjęcia({images.length})</h3>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                {previews.map((src, idx) => (
+                                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                                        <Image src={src} alt="Preview" fill className="object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeImage(idx)}
+                                            className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        </button>
+                                    </div>
+                                ))}
+                                <label className="flex flex-col items-center justify-center aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                    <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                    <span className="text-sm text-gray-500">Dodaj zdjęcie</span>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                    />
+                                </label>
                             </div>
+                            <p className="text-xs text-gray-500">Pierwsze zdjęcie będzie miniaturką.</p>
                         </div>
 
                         <div className="flex items-center gap-2 pt-4">
@@ -184,8 +174,12 @@ export default function AdminNewProductPage() {
                         </div>
 
                         <div className="pt-6 border-t flex justify-end">
-                            <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all">
-                                Zapisz Produkt (Gotowe)
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                            >
+                                {isSubmitting ? 'Zapisywanie...' : 'Zapisz Produkt'}
                             </Button>
                         </div>
                     </form>
