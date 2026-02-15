@@ -2,6 +2,8 @@ import { Link } from '@/i18n/navigation';
 import { prisma } from '@bolglass/database';
 import { Button, Card } from '@bolglass/ui';
 import { redirect } from 'next/navigation';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
 
 export default function AdminNewProductPage() {
     async function createProduct(formData: FormData) {
@@ -10,8 +12,26 @@ export default function AdminNewProductPage() {
         const name = formData.get('name') as string;
         const price = parseFloat(formData.get('price') as string);
         const description = formData.get('description') as string;
-        const imageUrl = formData.get('imageUrl') as string;
+        const file = formData.get('image') as File;
         const isConfigurable = formData.get('isConfigurable') === 'on';
+
+        let imageUrl = '';
+
+        if (file && file.size > 0) {
+            const bytes = await file.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+
+            // Ensure directory exists
+            const uploadDir = join(process.cwd(), 'public', 'uploads');
+            await mkdir(uploadDir, { recursive: true });
+
+            // Generate unique filename
+            const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+            const filepath = join(uploadDir, filename);
+
+            await writeFile(filepath, buffer);
+            imageUrl = `/uploads/${filename}`;
+        }
 
         // Generate a simple slug from name
         const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
@@ -20,13 +40,13 @@ export default function AdminNewProductPage() {
         await prisma.product.create({
             data: {
                 name,
-                slug: `${slug}-${Date.now()}`, // Ensure uniqueness
+                slug: `${slug}-${Date.now()}`,
                 description,
                 price,
                 images: imageUrl ? [imageUrl] : [],
                 sku,
                 isConfigurable,
-                stock: 100 // Default stock
+                stock: 100
             }
         });
 
@@ -61,8 +81,14 @@ export default function AdminNewProductPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">URL Obrazka (Opcjonalnie)</label>
-                            <input name="imageUrl" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="https://..." />
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Zdjęcie Produktu</label>
+                            <input
+                                name="image"
+                                type="file"
+                                accept="image/*"
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Wybierz plik z dysku (JPG, PNG). Zostanie zapisany na serwerze.</p>
                         </div>
 
                         <div className="flex items-center gap-2">
