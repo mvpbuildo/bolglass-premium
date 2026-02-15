@@ -73,7 +73,7 @@ export default function AccountPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label htmlFor="currentPassword" class="block text-sm font-bold text-gray-700 mb-1">Obecne hasło</label>
+                                <label htmlFor="currentPassword" className="block text-sm font-bold text-gray-700 mb-1">Obecne hasło</label>
                                 <input
                                     id="currentPassword"
                                     type="password"
@@ -84,7 +84,7 @@ export default function AccountPage() {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="newPassword" class="block text-sm font-bold text-gray-700 mb-1">Nowe hasło</label>
+                                <label htmlFor="newPassword" className="block text-sm font-bold text-gray-700 mb-1">Nowe hasło</label>
                                 <input
                                     id="newPassword"
                                     type="password"
@@ -96,7 +96,7 @@ export default function AccountPage() {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="confirmPassword" class="block text-sm font-bold text-gray-700 mb-1">Powtórz nowe hasło</label>
+                                <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700 mb-1">Powtórz nowe hasło</label>
                                 <input
                                     id="confirmPassword"
                                     type="password"
