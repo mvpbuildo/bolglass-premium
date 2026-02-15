@@ -90,7 +90,7 @@ export async function createProduct(formData: FormData) {
 
         const prismaError = error as { code?: string; meta?: { target?: string[] } };
         if (prismaError.code === 'P2002') {
-            const target = error.meta?.target || [];
+            const target = prismaError.meta?.target || [];
             if (target.includes('ean')) return { error: "Produkt z tym kodem EAN już istnieje." };
             if (target.includes('sku')) return { error: "Produkt z tym kodem SKU już istnieje." };
         }
