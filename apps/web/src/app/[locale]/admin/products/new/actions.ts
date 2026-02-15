@@ -85,10 +85,11 @@ export async function createProduct(formData: FormData) {
         });
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Create product failed:", error);
 
-        if (error.code === 'P2002') {
+        const prismaError = error as { code?: string; meta?: { target?: string[] } };
+        if (prismaError.code === 'P2002') {
             const target = error.meta?.target || [];
             if (target.includes('ean')) return { error: "Produkt z tym kodem EAN już istnieje." };
             if (target.includes('sku')) return { error: "Produkt z tym kodem SKU już istnieje." };
