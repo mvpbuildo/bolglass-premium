@@ -70,7 +70,7 @@ export default function ShopNavigation() {
                                 </Button>
                             </div>
                         ) : (
-                            <Link href="/login">
+                            <Link href="/sklep/login">
                                 <Button variant="primary" size="sm" className="bg-gray-900 hover:bg-black text-white">
                                     Zaloguj
                                 </Button>

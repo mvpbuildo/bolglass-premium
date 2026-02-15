@@ -2,19 +2,19 @@ import { signIn } from "@/auth"
 import { Button } from "@bolglass/ui"
 import { Card } from "@bolglass/ui"
 
-export default function LoginPage() {
+export default function ShopLoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
             <Card className="w-full max-w-md p-8 space-y-6 bg-white shadow-xl rounded-2xl">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Panel Administratora</h1>
-                    <p className="text-gray-500">Zaloguj się, aby zarządzać serwisem.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Strefa Klienta</h1>
+                    <p className="text-gray-500">Zaloguj się, aby śledzić swoje zamówienia i szybciej robić zakupy.</p>
                 </div>
 
                 <form
                     action={async () => {
                         "use server"
-                        await signIn("google", { redirectTo: "/admin" })
+                        await signIn("google", { redirectTo: "/sklep" })
                     }}
                     className="space-y-4"
                 >
@@ -42,7 +42,7 @@ export default function LoginPage() {
                 </div>
 
                 <p className="text-center text-xs text-gray-400">
-                    Jeśli jesteś administratorem, twoje uprawnienia zostaną nadane automatycznie po weryfikacji adresu email.
+                    Jesteś administratorem? <a href="/login" className="text-red-600 hover:underline">Przejdź do panelu admina</a>.
                 </p>
             </Card>
         </div>
