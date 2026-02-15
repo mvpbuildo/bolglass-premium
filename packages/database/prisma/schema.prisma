@@ -9,20 +9,146 @@ datasource db {
 
 // --- Ecommerce Models ---
 
-model Message {
-  id        String   @id @default(cuid())
-  email     String
-  name      String?
-  content   String
-  createdAt DateTime @default(now())
+// --- Authentication & User Management ---
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("USER") // "USER" or "ADMIN"
+  accounts      Account[]
+  sessions      Session[]
+  
+  orders        Order[]   // Order history
+  bookings      Booking[] // Booking history (workshops)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- Ecommerce Models ---
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id             String    @id @default(cuid())
+  name           String
+  slug           String    @unique
+  description    String
+  price          Float
+  images         String[]  // Array of image URLs
+  
+  // Inventory
+  sku            String?   @unique
+  stock          Int       @default(0)
+  
+  // Categorization
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id])
+  
+  // 3D & Customization
+  isConfigurable Boolean   @default(false)
+  model3DUrl     String?   // URL to .glb file
+  baseConfig     String?   // Default JSON configuration
+
+  orderItems     OrderItem[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Order {
+  id              String         @id @default(cuid())
+  userId          String?        // Link to registered user (optional for guest checkout)
+  user            User?          @relation(fields: [userId], references: [id])
+  
+  email           String         // Contact email (required even for guests)
+  status          String         @default("PENDING") // PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  total           Float
+  
+  // Payment
+  paymentStatus   String         @default("UNPAID") // UNPAID, PAID, FAILED
+  paymentProvider String?        // "PAYU", "P24", "MANUAL"
+  transactionId   String?
+
+  // Shipping
+  shippingMethod  String         @default("COURIER") // "COURIER", "LOCKER", "PICKUP"
+  shippingCost    Float          @default(0)
+  shippingAddress Json?          // JSON: { name, street, city, zip, phone, lockerId }
+  
+  items           OrderItem[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId     String? 
+  product       Product? @relation(fields: [productId], references: [id])
+  
+  name          String  // Snapshot of product name
+  price         Float   // Snapshot of price at purchase
+  quantity      Int
+  
+  // Custom 3D configuration snapshot
+  configuration String? // JSON string: { color: "red", text: "Mama" }
+}
+
+// --- Booking System (Existing) ---
 
 model Slot {
   id        String   @id @default(cuid())
   date      DateTime @unique
   capacity  Int      @default(50)
   isBlocked Boolean  @default(false)
-  price     Int?     // Special price for this slot (in PLN)
+  price     Int?     
   bookings  Booking[]
   createdAt DateTime @default(now())
 }
@@ -33,14 +159,17 @@ model Booking {
   email          String
   name           String
   people         Int       @default(1)
-  type           String    @default("SIGHTSEEING") // SIGHTSEEING or WORKSHOP
+  type           String    @default("SIGHTSEEING") 
   status         String    @default("CONFIRMED")
   adminNotes     String?
-  priceBase      Int       @default(150) // Price at the time of booking
+  priceBase      Int       @default(150)
   reminderSentAt DateTime?
   
   slotId         String?
   slot           Slot?     @relation(fields: [slotId], references: [id])
+  
+  userId         String?   // Link to registered user
+  user           User?     @relation(fields: [userId], references: [id])
   
   createdAt      DateTime  @default(now())
 }
@@ -53,42 +182,15 @@ model GlobalBlock {
   createdAt DateTime @default(now())
 }
 
-model Order {
-  id        String      @id @default(cuid())
-  status    String      @default("PENDING") // PENDING, PAID, SHIPPED
-  total     Float
-  email     String
-  items     OrderItem[]
-  createdAt DateTime    @default(now())
-}
-
 model SystemSetting {
   key   String @id
   value String
 }
 
-model OrderItem {
-  id            String  @id @default(cuid())
-  orderId       String
-  order         Order   @relation(fields: [orderId], references: [id])
-  
-  // For standard products
-  productId     String?
-  productName   String
-  price         Float
-  quantity      Int
-
-  // For custom 3D config
-  isCustom      Boolean @default(false)
-  configuration String? // JSON string: { color: "#F00", text: "Ala" }
-}
-
-model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  image       String
-  stock       Int      @default(0)
-  createdAt   DateTime @default(now())
+model Message {
+  id        String   @id @default(cuid())
+  email     String
+  name      String?
+  content   String
+  createdAt DateTime @default(now())
 }
