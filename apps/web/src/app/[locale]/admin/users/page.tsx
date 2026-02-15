@@ -39,9 +39,16 @@ export default async function AdminUsersPage() {
             <div className="max-w-6xl mx-auto px-4">
                 <AdminNavigation />
 
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900">Użytkownicy</h2>
-                    <p className="text-gray-500 text-sm">Zarządzaj dostępem do panelu administratora</p>
+                <div className="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Użytkownicy</h2>
+                        <p className="text-gray-500 text-sm">Zarządzaj dostępem do panelu administratora</p>
+                    </div>
+                    <Link href="/admin/users/new">
+                        <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                            + Dodaj Użytkownika
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">

@@ -17,7 +17,7 @@ export default function AdminNavigation() {
             bg: 'bg-blue-50',
             items: [
                 { name: 'Rezerwacje', path: '/admin/bookings', icon: '📅' },
-                // Future: { name: 'Kalendarz', path: '/admin/calendar', icon: '🗓️' },
+                { name: 'Ustawienia Rezerwacji', path: '/admin/settings', icon: '⚙️' },
             ]
         },
         {
@@ -35,7 +35,6 @@ export default function AdminNavigation() {
             bg: 'bg-gray-50',
             items: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: '👥' },
-                { name: 'Ustawienia', path: '/admin/settings', icon: '⚙️' },
             ]
         }
     ];
