@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { Button } from "@bolglass/ui";
 import { LogOut, Package, User, Settings } from "lucide-react";
 

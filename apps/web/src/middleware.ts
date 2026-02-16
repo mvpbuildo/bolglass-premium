@@ -12,9 +12,10 @@ const intlMiddleware = createMiddleware({
 export default auth((req) => {
   const isAuth = !!req.auth;
   const role = req.auth?.user?.role;
+  const isLoginPage = req.nextUrl.pathname.includes('/login');
   const isAdminPath = req.nextUrl.pathname.includes('/admin');
 
-  if (isAdminPath) {
+  if (isAdminPath && !isLoginPage) {
     if (!isAuth) {
       return Response.redirect(new URL('/admin/login', req.nextUrl));
     }
