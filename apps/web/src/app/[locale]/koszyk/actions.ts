@@ -50,7 +50,7 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
                 phone
             },
             items: {
-                create: items.map((item: any) => ({
+                create: items.map((item: { id: string; name: string; price: number; quantity: number }) => ({
                     productId: item.id,
                     name: item.name,
                     price: item.price,
@@ -69,13 +69,10 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
                     isCompany: true,
                     companyName: companyName,
                     nip: nip,
-                    // If we want to store address separately, we'd need more fields or parse companyAddress
-                    // For now, let's just store the primary ones we have schema for
-                    // companyStreet: parsedStreet, etc.
                 }
             });
-        } catch (e) {
-            console.error("Failed to update user profile with company data", e);
+        } catch {
+            console.error("Failed to update user profile with company data");
         }
     }
 
