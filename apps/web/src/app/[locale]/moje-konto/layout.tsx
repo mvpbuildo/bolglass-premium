@@ -5,13 +5,16 @@ import { LogOut, Package, User, Settings } from "lucide-react";
 
 export default async function AccountLayout({
     children,
+    params
 }: {
     children: React.ReactNode;
+    params: Promise<{ locale: string }>;
 }) {
     const session = await auth();
+    const { locale } = await params;
 
     if (!session) {
-        redirect("/sklep/login");
+        redirect({ href: "/sklep/login", locale });
     }
 
     const navigation = [
