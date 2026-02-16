@@ -54,11 +54,7 @@ export async function updateProduct(id: string, formData: FormData) {
                     const bytes = await file.arrayBuffer();
                     const buffer = Buffer.from(bytes);
 
-                    // Sanitize and Unique filename
-                    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                    const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}`;
-                    const filepath = join(uploadDir, filename);
-
+                    // Simple file write - compression is now client-side
                     await writeFile(filepath, buffer);
                     newImageUrls.push(`/uploads/${filename}`);
                 }

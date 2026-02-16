@@ -13,13 +13,30 @@ export default function NewProductForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    import { compressImage } from '@/utils/imageCompression';
+
+    // ... inside NewProductForm component ...
+
+    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            setImages(prev => [...prev, ...filesArray]);
 
-            // Create previews
-            const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+            // Compress images before setting state
+            const compressedFiles = await Promise.all(
+                filesArray.map(async (file) => {
+                    try {
+                        return await compressImage(file);
+                    } catch (error) {
+                        console.error("Compression failed for", file.name, error);
+                        return file; // Fallback to original
+                    }
+                })
+            );
+
+            setImages(prev => [...prev, ...compressedFiles]);
+
+            // Create previews from compressed files (blobs)
+            const newPreviews = compressedFiles.map(file => URL.createObjectURL(file));
             setPreviews(prev => [...prev, ...newPreviews]);
         }
     };

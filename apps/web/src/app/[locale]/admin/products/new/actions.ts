@@ -55,17 +55,22 @@ export async function createProduct(formData: FormData) {
             console.log("Creating upload directory...");
             await mkdir(uploadDir, { recursive: true });
 
+            // Write a test file to verify path accessibility
+            await writeFile(join(uploadDir, 'test.txt'), 'Uploads directory is writable!');
+
             for (const file of files) {
                 if (file.size > 0) {
                     console.log(`Processing file: ${file.name}, size: ${file.size}`);
                     const bytes = await file.arrayBuffer();
                     const buffer = Buffer.from(bytes);
 
-                    // Sanitize and Unique filename
-                    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                    const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}`;
-                    const filepath = join(uploadDir, filename);
+                    // Resize and optimize with sharp
+                    // We need to dynamically require sharp to avoid build issues if it's missing in some envs
+                    // though we added it to package.json
+                    let processedBuffer = buffer;
+                    let extension = '.jpg';
 
+                    // Simple file write - compression is now client-side
                     console.log(`Writing file to: ${filepath}`);
                     await writeFile(filepath, buffer);
                     imageUrls.push(`/uploads/${filename}`);

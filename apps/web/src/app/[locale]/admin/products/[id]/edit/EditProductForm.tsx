@@ -19,13 +19,30 @@ export default function EditProductForm({ product }: EditProductFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    import { compressImage } from '@/utils/imageCompression';
+
+    // ... inside EditProductForm component ...
+
+    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
-            setNewImages(prev => [...prev, ...filesArray]);
+
+            // Compress images before setting state
+            const compressedFiles = await Promise.all(
+                filesArray.map(async (file) => {
+                    try {
+                        return await compressImage(file);
+                    } catch (error) {
+                        console.error("Compression failed for", file.name, error);
+                        return file; // Fallback to original
+                    }
+                })
+            );
+
+            setNewImages(prev => [...prev, ...compressedFiles]);
 
             // Create previews for new images
-            const previews = filesArray.map(file => URL.createObjectURL(file));
+            const previews = compressedFiles.map(file => URL.createObjectURL(file));
             setNewPreviews(prev => [...prev, ...previews]);
         }
     };
