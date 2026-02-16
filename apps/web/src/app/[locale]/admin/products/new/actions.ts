@@ -42,9 +42,14 @@ export async function createProduct(formData: FormData) {
         console.log("Files received:", files.length);
 
         // Robust path handling for Monorepo + Docker
-        // We target the /app/apps/web/public/uploads path directly or relative to root
-        const uploadDir = join(process.cwd(), 'apps', 'web', 'public', 'uploads');
-        console.log("Upload directory target path:", uploadDir);
+        // Check if we are already in apps/web (standard Next.js start) or root (Turbo dev)
+        const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+
+        const uploadDir = isWebPackage
+            ? join(process.cwd(), 'public', 'uploads')
+            : join(process.cwd(), 'apps', 'web', 'public', 'uploads');
+
+        console.log("Upload directory resolved to:", uploadDir);
 
         try {
             console.log("Creating upload directory...");

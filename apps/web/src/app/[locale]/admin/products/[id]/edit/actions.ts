@@ -39,7 +39,12 @@ export async function updateProduct(id: string, formData: FormData) {
         const newImageUrls: string[] = [];
 
         // Robust path handling for Monorepo + Docker
-        const uploadDir = join(process.cwd(), 'apps', 'web', 'public', 'uploads');
+        // Check if we are already in apps/web (standard Next.js start) or root (Turbo dev)
+        const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+
+        const uploadDir = isWebPackage
+            ? join(process.cwd(), 'public', 'uploads')
+            : join(process.cwd(), 'apps', 'web', 'public', 'uploads');
 
         try {
             await mkdir(uploadDir, { recursive: true });
