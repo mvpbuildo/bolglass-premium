@@ -60,7 +60,7 @@ export default async function AdminProductsPage() {
                                     <p className="text-xs text-gray-500 line-clamp-2 mb-4">{product.description}</p>
 
                                     <div className="flex gap-2">
-                                        <Link href={`/admin/products/${product.id}`} className="flex-1">
+                                        <Link href={`/admin/products/${product.id}/edit`} className="flex-1">
                                             <Button variant="outline" className="w-full text-xs">Edytuj</Button>
                                         </Link>
                                     </div>
