@@ -25,13 +25,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     where: { email: credentials.email as string }
                 });
 
-                if (!user || !user.password) {
+                if (!user || !(user as any).password) {
                     return null;
                 }
 
                 const passwordsMatch = await bcrypt.compare(
                     credentials.password as string,
-                    user.password
+                    (user as any).password
                 );
 
                 if (passwordsMatch) {
@@ -65,6 +65,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
 
             return token
+        },
+        async redirect({ url, baseUrl }) {
+            // Allows relative callback URLs
+            if (url.startsWith("/")) return `${baseUrl}${url}`
+            // Allows callback URLs on the same origin
+            else if (new URL(url).origin === baseUrl) return url
+            return baseUrl
         }
     },
 });
