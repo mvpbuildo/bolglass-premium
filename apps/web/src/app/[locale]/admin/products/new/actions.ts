@@ -41,9 +41,10 @@ export async function createProduct(formData: FormData) {
         const imageUrls: string[] = [];
         console.log("Files received:", files.length);
 
-        // Ensure upload directory exists
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
-        console.log("Upload directory path:", uploadDir);
+        // Robust path handling for Monorepo + Docker
+        // We target the /app/apps/web/public/uploads path directly or relative to root
+        const uploadDir = join(process.cwd(), 'apps', 'web', 'public', 'uploads');
+        console.log("Upload directory target path:", uploadDir);
 
         try {
             console.log("Creating upload directory...");
@@ -80,21 +81,21 @@ export async function createProduct(formData: FormData) {
         await prisma.product.create({
             data: {
                 name,
-                slug: `${slug}-${Date.now()}`,
                 description,
-                price: priceGross,
+                ean,
+                manufacturerCode,
                 priceNet,
                 vatRate,
+                price: priceGross, // Mapping internal priceGross to schema field 'price'
                 weight,
                 height,
                 width,
                 depth,
                 packaging,
-                images: imageUrls,
-                sku,
-                ean,
-                manufacturerCode,
                 isConfigurable,
+                images: imageUrls, // Mapping internal imageUrls to schema field 'images'
+                slug: `${slug}-${Date.now()}`, // Keep the unique slug generation
+                sku,
                 stock: 100
             }
         });
