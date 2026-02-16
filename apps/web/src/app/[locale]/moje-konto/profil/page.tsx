@@ -22,7 +22,7 @@ export default async function ProfilePage() {
             </div>
 
             <Card className="p-8">
-                <ProfileForm user={user as any} />
+                <ProfileForm user={user} />
             </Card>
         </div>
     );
