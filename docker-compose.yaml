@@ -25,7 +25,7 @@ services:
       - "traefik.http.services.bolglass-web.loadbalancer.server.port=3000"
       - "traefik.docker.network=traefik_default"
     volumes:
-      - bolglass-uploads:/app/apps/web/public/uploads
+      - ./data/uploads:/app/apps/web/public/uploads
     networks:
       - traefik-net
       - db-net
@@ -38,5 +38,4 @@ networks:
     external: true
     name: postrges16_internal # Typo from user's screenshot
 
-volumes:
-  bolglass-uploads:
+volumes: # Named volumes are not used for uploads anymore; using bind mounts for easier VPS management.

@@ -30,15 +30,24 @@ export default async function LocaleLayout({
     params: Promise<{ locale: string }>;
 }) {
     const { locale } = await params;
+    console.log(`[Layout] Rendering layout for locale: ${locale}`);
 
     // Ensure that the incoming `locale` is valid
     if (!['en', 'de', 'pl'].includes(locale)) {
+        console.warn(`[Layout] Invalid locale: ${locale}`);
         notFound();
     }
 
     // Providing all messages to the client
     // side is the easiest way to get started
-    const messages = await getMessages();
+    let messages;
+    try {
+        console.log(`[Layout] Fetching messages for: ${locale}`);
+        messages = await getMessages();
+    } catch (e) {
+        console.error(`[Layout] Failed to get messages:`, e);
+        messages = {};
+    }
 
     return (
         <html lang={locale}>
