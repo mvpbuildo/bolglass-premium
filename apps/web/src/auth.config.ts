@@ -3,7 +3,7 @@ import type { NextAuthConfig } from "next-auth"
 export default {
     providers: [],
     pages: {
-        signIn: "/login",
+        signIn: "/admin/login",
     },
     callbacks: {
         async session({ session, token }) {

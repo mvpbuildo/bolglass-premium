@@ -12,7 +12,7 @@ export default async function AccountLayout({
     const session = await auth();
 
     if (!session) {
-        redirect("/login");
+        redirect("/sklep/login");
     }
 
     const navigation = [

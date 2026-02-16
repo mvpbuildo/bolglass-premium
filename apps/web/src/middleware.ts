@@ -16,14 +16,14 @@ export default auth((req) => {
 
   if (isAdminPath) {
     if (!isAuth) {
-      return Response.redirect(new URL('/login', req.nextUrl));
+      return Response.redirect(new URL('/admin/login', req.nextUrl));
     }
 
     const provider = (req.auth?.user as any)?.provider;
 
     if (provider !== 'credentials') {
       // Must log in via email/password for admin access
-      return Response.redirect(new URL('/login', req.nextUrl));
+      return Response.redirect(new URL('/admin/login', req.nextUrl));
     }
 
     if (role !== 'ADMIN') {
