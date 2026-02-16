@@ -3,8 +3,9 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { Link } from "@/i18n/navigation";
-import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Button } from "@bolglass/ui";
-import { Package, ChevronRight } from "lucide-react";
+import { Card, Button } from "@bolglass/ui";
+import { Package } from "lucide-react";
+import OrderCard from "./OrderCard";
 
 export default async function OrderHistoryPage() {
     const session = await auth();
@@ -22,29 +23,7 @@ export default async function OrderHistoryPage() {
         }
     });
 
-    const getStatusLabel = (status: string) => {
-        const labels: Record<string, string> = {
-            'PENDING': 'Oczekujące',
-            'PROCESSING': 'W trakcie',
-            'COMPLETED': 'Zakończone',
-            'CANCELLED': 'Anulowane',
-            'PAID': 'Opłacone',
-            'SHIPPED': 'Wysłane',
-            'DELIVERED': 'Dostarczone'
-        };
-        return labels[status] || status;
-    };
 
-    const getStatusColor = (status: string) => {
-        const colors: Record<string, string> = {
-            'PENDING': 'bg-yellow-100 text-yellow-800',
-            'PROCESSING': 'bg-blue-100 text-blue-800',
-            'COMPLETED': 'bg-green-100 text-green-800',
-            'CANCELLED': 'bg-red-100 text-red-800',
-            'PAID': 'bg-purple-100 text-purple-800'
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800';
-    };
 
     return (
         <div className="space-y-6">
@@ -64,46 +43,11 @@ export default async function OrderHistoryPage() {
                     </Link>
                 </Card>
             ) : (
-                <Card className="overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Zamówienie</TableHead>
-                                <TableHead>Data</TableHead>
-                                <TableHead>Suma</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="w-[100px]"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {orders.map((order) => (
-                                <TableRow key={order.id} className="group">
-                                    <TableCell>
-                                        <span className="font-bold">#{order.id.substring(0, 8)}</span>
-                                    </TableCell>
-                                    <TableCell className="text-gray-500">
-                                        {format(new Date(order.createdAt), 'dd.MM.yyyy')}
-                                    </TableCell>
-                                    <TableCell className="font-medium text-gray-900">
-                                        {order.total.toFixed(2)} PLN
-                                    </TableCell>
-                                    <TableCell>
-                                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
-                                            {getStatusLabel(order.status)}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Link href={`/moje-konto/zamowienia/${order.id}`}>
-                                            <Button variant="ghost" size="sm" className="group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
-                                                <ChevronRight className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {orders.map((order) => (
+                        <OrderCard key={order.id} order={order} />
+                    ))}
+                </div>
             )}
         </div>
     );
