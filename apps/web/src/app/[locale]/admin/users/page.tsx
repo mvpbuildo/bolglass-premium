@@ -10,9 +10,6 @@ export const dynamic = 'force-dynamic';
 async function getUsers() {
     return await prisma.user.findMany({
         orderBy: { createdAt: 'desc' },
-        include: {
-            accounts: true,
-        }
     });
 }
 
@@ -50,19 +47,6 @@ export default async function AdminUsersPage() {
                     </div>
                 </div>
 
-                <div className="mt-12 p-6 bg-blue-50 rounded-2xl border border-blue-100 flex items-start gap-4">
-                    <div className="bg-blue-600 p-2 rounded-lg text-white">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-blue-900 uppercase tracking-wide">Wskazówka Bezpieczeństwa</h4>
-                        <p className="text-sm text-blue-700 leading-relaxed mt-1">
-                            Użytkownicy z ikonką <b>G</b> logują się przez konto Google. Użytkownicy z ikonką <b>Klucza</b> logują się za pomocą adresu email i hasła nadanego w tym panelu. Zawsze weryfikuj uprawnienia nowych administratorów.
-                        </p>
-                    </div>
-                </div>
             </div>
         </main>
     );

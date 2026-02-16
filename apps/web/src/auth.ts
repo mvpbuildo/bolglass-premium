@@ -44,11 +44,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         ...authConfig.callbacks,
-        async jwt({ token, user }) {
+        async jwt({ token, user, account }) {
             if (user) {
                 token.role = (user as any).role
-                return token
             }
+            if (account) {
+                token.provider = account.provider
+            }
+
+            if (user) return token
 
             if (!token.sub) return token
 

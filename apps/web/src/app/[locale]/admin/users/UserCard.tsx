@@ -37,7 +37,6 @@ export default function UserCard({ user, isCurrentUser }: UserCardProps) {
         }
     };
 
-    const isGoogleAccount = user.accounts && user.accounts.some((acc: any) => acc.provider === 'google');
 
     return (
         <Card className={`p-4 flex items-center justify-between group transition-all hover:shadow-md border-gray-200 ${isCurrentUser ? 'border-l-4 border-l-red-600 bg-red-50/10' : ''}`}>
@@ -52,14 +51,8 @@ export default function UserCard({ user, isCurrentUser }: UserCardProps) {
                             </span>
                         )}
                     </div>
-                    <div className="absolute -bottom-1 -right-1 p-1 bg-white rounded-full shadow-sm border border-gray-100" title={isGoogleAccount ? "Konto Google" : "Konto Email/Hasło"}>
-                        {isGoogleAccount ? (
-                            <div className="w-4 h-4 bg-blue-50 rounded flex items-center justify-center">
-                                <span className="text-[10px] font-black text-blue-600">G</span>
-                            </div>
-                        ) : (
-                            <Key className="w-4 h-4 text-orange-500 p-0.5" />
-                        )}
+                    <div className="absolute -bottom-1 -right-1 p-1 bg-white rounded-full shadow-sm border border-gray-100">
+                        <Key className="w-4 h-4 text-gray-400 p-0.5" />
                     </div>
                 </div>
 

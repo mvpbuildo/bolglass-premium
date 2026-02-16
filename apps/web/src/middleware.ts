@@ -18,6 +18,14 @@ export default auth((req) => {
     if (!isAuth) {
       return Response.redirect(new URL('/login', req.nextUrl));
     }
+
+    const provider = (req.auth?.user as any)?.provider;
+
+    if (provider !== 'credentials') {
+      // Must log in via email/password for admin access
+      return Response.redirect(new URL('/login', req.nextUrl));
+    }
+
     if (role !== 'ADMIN') {
       // Jeśli zalogowany, ale nie jest adminem - przekieruj na stronę informacyjną
       return Response.redirect(new URL('/unauthorized', req.nextUrl));
