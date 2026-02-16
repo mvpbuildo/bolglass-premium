@@ -19,9 +19,8 @@ export default auth((req) => {
       return Response.redirect(new URL('/login', req.nextUrl));
     }
     if (role !== 'ADMIN') {
-      // Jeśli zalogowany, ale nie jest adminem - przekieruj na stronę główną
-      // (można by też na dedykowaną stronę błędu 403)
-      return Response.redirect(new URL('/', req.nextUrl));
+      // Jeśli zalogowany, ale nie jest adminem - przekieruj na stronę informacyjną
+      return Response.redirect(new URL('/unauthorized', req.nextUrl));
     }
   }
 
