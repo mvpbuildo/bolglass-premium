@@ -31,6 +31,9 @@ model User {
   isCompany     Boolean   @default(false)
   companyName   String?
   nip           String?   // Tax ID
+  companyStreet String?
+  companyCity   String?
+  companyZip    String?
 
   // Password Reset
   resetPasswordToken   String?   @unique
@@ -145,7 +148,10 @@ model Order {
   paymentProvider String?        // "PAYU", "P24", "MANUAL"
   transactionId   String?
 
-  // Shipping
+  // Shipping & Billing
+  documentType    String         @default("RECEIPT") // "RECEIPT", "INVOICE"
+  invoiceData     Json?          // Snapshot of NIP, Company Name, etc.
+  
   shippingMethod  String         @default("COURIER") // "COURIER", "LOCKER", "PICKUP"
   shippingCost    Float          @default(0)
   shippingAddress Json?          // JSON: { name, street, city, zip, phone, lockerId }

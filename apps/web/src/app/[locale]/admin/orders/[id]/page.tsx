@@ -48,16 +48,43 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Info */}
                 <Card className="p-6 space-y-4">
-                    <h3 className="text-lg font-bold border-b pb-2">Dane Klienta</h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="text-gray-500">Imię i Nazwisko:</div>
-                        <div className="font-medium">{customerName}</div>
-                        <div className="text-gray-500">Email:</div>
-                        <div className="font-medium">{order.email}</div>
-                        <div className="text-gray-500">Telefon:</div>
-                        <div className="font-medium">{customerPhone}</div>
-                        <div className="text-gray-500">Adres:</div>
-                        <div className="font-medium whitespace-pre-line">{customerAddress}</div>
+                    <h3 className="text-lg font-bold border-b pb-2">Dane Klienta i Rozliczenie</h3>
+                    <div className="space-y-4 text-sm">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="text-gray-500">Imię i Nazwisko:</div>
+                            <div className="font-medium">{customerName}</div>
+                            <div className="text-gray-500">Email:</div>
+                            <div className="font-medium">{order.email}</div>
+                            <div className="text-gray-500">Telefon:</div>
+                            <div className="font-medium">{customerPhone}</div>
+                            <div className="text-gray-500">Adres Dostawy:</div>
+                            <div className="font-medium whitespace-pre-line">{customerAddress}</div>
+                        </div>
+
+                        <div className="pt-4 mt-4 border-t space-y-3">
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-500">Rodzaj dokumentu:</span>
+                                <span className={`px-2 py-1 rounded text-xs font-bold ${order.documentType === 'INVOICE'
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : 'bg-green-100 text-green-700'
+                                    }`}>
+                                    {order.documentType === 'INVOICE' ? 'FAKTURA VAT' : 'PARAGON'}
+                                </span>
+                            </div>
+
+                            {order.documentType === 'INVOICE' && order.invoiceData && (
+                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 space-y-2">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="text-gray-400 text-xs">NIP:</div>
+                                        <div className="font-bold">{(order.invoiceData as any).nip}</div>
+                                        <div className="text-gray-400 text-xs">Firma:</div>
+                                        <div className="font-medium">{(order.invoiceData as any).companyName}</div>
+                                        <div className="text-gray-400 text-xs">Adres:</div>
+                                        <div className="font-medium text-xs whitespace-pre-line">{(order.invoiceData as any).companyAddress}</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </Card>
 
