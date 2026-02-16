@@ -1,11 +1,16 @@
 'use server';
 
 import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
 
-const UPLOADS_DIR = path.join(process.cwd(), 'apps/web/public/uploads');
+// Robust path handling for Monorepo + Docker
+const isWebPackage = process.cwd().endsWith('web') || existsSync(path.join(process.cwd(), 'public'));
+const UPLOADS_DIR = isWebPackage
+    ? path.join(process.cwd(), 'public', 'uploads')
+    : path.join(process.cwd(), 'apps', 'web', 'public', 'uploads');
 
 export async function listFiles() {
     const session = await auth();
