@@ -14,8 +14,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    // Legacy/Alias for proxyClientMaxBodySize in some versions
-    middlewareClientMaxBodySize: '100mb',
+    // Renamed from middlewareClientMaxBodySize
     proxyClientMaxBodySize: '100mb',
   }
 };
