@@ -38,4 +38,4 @@ networks:
     external: true
     name: postrges16_internal # Typo from user's screenshot
 
-volumes: # Named volumes are not used for uploads anymore; using bind mounts for easier VPS management.
+# Note: No top-level volumes are needed as we use bind mounts.
