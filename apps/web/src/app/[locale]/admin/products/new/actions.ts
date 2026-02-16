@@ -70,6 +70,11 @@ export async function createProduct(formData: FormData) {
                     let processedBuffer = buffer;
                     let extension = '.jpg';
 
+                    // Sanitize and Unique filename
+                    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '').replace(/\.[^/.]+$/, "");
+                    const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}.jpg`; // Extension is .jpg from client compression
+                    const filepath = join(uploadDir, filename);
+
                     // Simple file write - compression is now client-side
                     console.log(`Writing file to: ${filepath}`);
                     await writeFile(filepath, buffer);
