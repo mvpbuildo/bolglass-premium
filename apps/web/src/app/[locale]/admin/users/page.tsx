@@ -30,6 +30,21 @@ async function toggleUserRole(userId: string, currentRole: string) {
     revalidatePath('/admin/users');
 }
 
+async function deleteUser(userId: string) {
+    'use server'
+    const session = await auth();
+    if (session?.user?.role !== 'ADMIN') return;
+
+    // Safety check: Prevent self-deletion
+    if (session?.user?.id === userId) return;
+
+    await prisma.user.delete({
+        where: { id: userId }
+    });
+
+    revalidatePath('/admin/users');
+}
+
 export default async function AdminUsersPage() {
     const users = await getUsers();
     const session = await auth();
@@ -77,22 +92,43 @@ export default async function AdminUsersPage() {
                                 </div>
                             </div>
 
-                            <form action={toggleUserRole.bind(null, user.id, user.role)}>
-                                <Button
-                                    type="submit"
-                                    variant="outline"
-                                    disabled={user.id === currentUserId}
-                                    className={`
-                                        text-xs font-bold
-                                        ${user.role === 'ADMIN'
-                                            ? 'text-red-600 border-red-200 hover:bg-red-50'
-                                            : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
-                                        ${user.id === currentUserId ? 'opacity-50 cursor-not-allowed' : ''}
-                                    `}
+                            <div className="flex items-center gap-2">
+                                <form action={toggleUserRole.bind(null, user.id, user.role)}>
+                                    <Button
+                                        type="submit"
+                                        variant="outline"
+                                        disabled={user.id === currentUserId}
+                                        className={`
+                                            text-xs font-bold
+                                            ${user.role === 'ADMIN'
+                                                ? 'text-red-600 border-red-200 hover:bg-red-50'
+                                                : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
+                                            ${user.id === currentUserId ? 'opacity-50 cursor-not-allowed' : ''}
+                                        `}
+                                    >
+                                        {user.role === 'ADMIN' ? 'Zabierz Admina ⬇️' : 'Daj Admina ⬆️'}
+                                    </Button>
+                                </form>
+
+                                <form
+                                    action={deleteUser.bind(null, user.id)}
+                                    onSubmit={(e) => {
+                                        if (!confirm(`Czy na pewno chcesz usunąć użytkownika ${user.email}? Tej operacji nie można cofnąć.`)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                 >
-                                    {user.role === 'ADMIN' ? 'Zabierz Admina ⬇️' : 'Daj Admina ⬆️'}
-                                </Button>
-                            </form>
+                                    <Button
+                                        type="submit"
+                                        variant="ghost"
+                                        disabled={user.id === currentUserId}
+                                        className="text-gray-400 hover:text-red-600 transition-colors"
+                                        title="Usuń użytkownika"
+                                    >
+                                        🗑️
+                                    </Button>
+                                </form>
+                            </div>
                         </Card>
                     ))}
                 </div>
