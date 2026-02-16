@@ -1,90 +1,109 @@
 'use client';
 
-import { Button, Card } from '@bolglass/ui';
+import { Card, Button } from '@bolglass/ui';
 import { toggleUserRole, deleteUser } from './actions';
+import { Shield, ShieldAlert, Trash2, Mail, Key } from 'lucide-react';
 import { useState } from 'react';
 
 interface UserCardProps {
     user: any;
-    currentUserId?: string;
+    isCurrentUser: boolean;
 }
 
-export default function UserCard({ user, currentUserId }: UserCardProps) {
-    const [isPending, setIsPending] = useState(false);
+export default function UserCard({ user, isCurrentUser }: UserCardProps) {
+    const [loading, setLoading] = useState<string | null>(null);
 
     const handleToggleRole = async () => {
         try {
-            setIsPending(true);
+            setLoading('role');
             await toggleUserRole(user.id, user.role);
         } catch (error: any) {
             alert(error.message || 'Błąd podczas zmiany roli');
         } finally {
-            setIsPending(false);
+            setLoading(null);
         }
     };
 
     const handleDelete = async () => {
-        if (confirm(`Czy na pewno chcesz usunąć użytkownika ${user.email}? Tej operacji nie można cofnąć.`)) {
+        if (confirm(`Czy na pewno chcesz usunąć użytkownika ${user.email}?`)) {
             try {
-                setIsPending(true);
+                setLoading('delete');
                 await deleteUser(user.id);
             } catch (error: any) {
                 alert(error.message || 'Błąd podczas usuwania użytkownika');
             } finally {
-                setIsPending(false);
+                setLoading(null);
             }
         }
     };
 
+    const isGoogleAccount = user.accounts && user.accounts.some((acc: any) => acc.provider === 'google');
+
     return (
-        <Card className="p-4 flex items-center justify-between">
+        <Card className={`p-4 flex items-center justify-between group transition-all hover:shadow-md border-gray-200 ${isCurrentUser ? 'border-l-4 border-l-red-600 bg-red-50/10' : ''}`}>
             <div className="flex items-center gap-4">
-                {user.image ? (
-                    <img src={user.image} alt={user.name || ''} className="w-10 h-10 rounded-full" />
-                ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
-                        {user.name?.[0] || '?'}
+                <div className="relative">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+                        {user.image ? (
+                            <img src={user.image} alt={user.name || ''} className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="text-xl font-black text-gray-400">
+                                {user.name?.[0].toUpperCase() || user.email?.[0].toUpperCase()}
+                            </span>
+                        )}
                     </div>
-                )}
+                    <div className="absolute -bottom-1 -right-1 p-1 bg-white rounded-full shadow-sm border border-gray-100" title={isGoogleAccount ? "Konto Google" : "Konto Email/Hasło"}>
+                        {isGoogleAccount ? (
+                            <div className="w-4 h-4 bg-blue-50 rounded flex items-center justify-center">
+                                <span className="text-[10px] font-black text-blue-600">G</span>
+                            </div>
+                        ) : (
+                            <Key className="w-4 h-4 text-orange-500 p-0.5" />
+                        )}
+                    </div>
+                </div>
+
                 <div>
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                        {user.name}
-                        {user.role === 'ADMIN' && (
-                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] uppercase font-bold rounded-full">Admin</span>
-                        )}
-                        {user.id === currentUserId && (
-                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] uppercase font-bold rounded-full">Ty</span>
-                        )}
-                    </h3>
-                    <p className="text-sm text-gray-500">{user.email}</p>
+                    <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-gray-900">{user.name || 'Użytkownik bez nazwy'}</h3>
+                        {isCurrentUser && <span className="text-[10px] font-black text-red-600 uppercase bg-red-50 px-1.5 py-0.5 rounded border border-red-100 tracking-tighter">TY</span>}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                        <Mail className="w-3 h-3" />
+                        {user.email}
+                    </div>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2">
-                <Button
-                    onClick={handleToggleRole}
-                    variant="outline"
-                    disabled={user.id === currentUserId || isPending}
-                    className={`
-                        text-xs font-bold
-                        ${user.role === 'ADMIN'
-                            ? 'text-red-600 border-red-200 hover:bg-red-50'
-                            : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
-                        ${user.id === currentUserId ? 'opacity-50 cursor-not-allowed' : ''}
-                    `}
-                >
-                    {user.role === 'ADMIN' ? 'Zabierz Admina ⬇️' : 'Daj Admina ⬆️'}
-                </Button>
+            <div className="flex items-center gap-3">
+                <div className="flex flex-col items-end mr-4">
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Uprawnienia</span>
+                    <button
+                        onClick={handleToggleRole}
+                        disabled={isCurrentUser || !!loading}
+                        className={`
+                            flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition-all border shadow-sm
+                            ${user.role === 'ADMIN'
+                                ? 'bg-red-50 text-red-700 border-red-100 hover:bg-red-100'
+                                : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100'}
+                        `}
+                    >
+                        {user.role === 'ADMIN' ? <ShieldAlert className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+                        {user.role}
+                    </button>
+                </div>
 
-                <Button
-                    onClick={handleDelete}
-                    variant="ghost"
-                    disabled={user.id === currentUserId || isPending}
-                    className="text-gray-400 hover:text-red-600 transition-colors"
-                    title="Usuń użytkownika"
-                >
-                    🗑️
-                </Button>
+                <div className="flex items-center gap-2 border-l pl-4 border-gray-100 h-10">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDelete}
+                        disabled={isCurrentUser || !!loading}
+                        className="text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors p-2"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                    </Button>
+                </div>
             </div>
         </Card>
     );

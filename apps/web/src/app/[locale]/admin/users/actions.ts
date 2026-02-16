@@ -3,6 +3,7 @@
 import { prisma } from '@bolglass/database';
 import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
+import bcrypt from 'bcryptjs';
 
 export async function toggleUserRole(userId: string, currentRole: string) {
     const session = await auth();
