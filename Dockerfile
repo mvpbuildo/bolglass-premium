@@ -49,6 +49,7 @@ COPY --from=builder /app/turbo.json ./turbo.json
 COPY --from=builder /app/package-lock.json ./package-lock.json
 COPY --from=builder /app/initialize-settings.js ./initialize-settings.js
 COPY --from=builder /app/update-capacity.js ./update-capacity.js
+COPY --from=builder /app/promote-admin.js ./promote-admin.js
 
 EXPOSE 3000
 
