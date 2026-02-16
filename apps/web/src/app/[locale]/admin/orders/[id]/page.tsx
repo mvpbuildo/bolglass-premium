@@ -24,6 +24,14 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
         notFound();
     }
 
+    // Helper to safely access shipping address
+    const shippingAddress = order.shippingAddress as Record<string, string> || {};
+    const customerName = shippingAddress.name || 'Gość';
+    const customerPhone = shippingAddress.phone || 'Brak';
+    const customerAddress = shippingAddress.street
+        ? `${shippingAddress.street}\n${shippingAddress.zip} ${shippingAddress.city}`
+        : 'Brak danych adresowych';
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
@@ -39,13 +47,13 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                     <h3 className="text-lg font-bold border-b pb-2">Dane Klienta</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div className="text-gray-500">Imię i Nazwisko:</div>
-                        <div className="font-medium">{order.customerName}</div>
+                        <div className="font-medium">{customerName}</div>
                         <div className="text-gray-500">Email:</div>
-                        <div className="font-medium">{order.customerEmail}</div>
+                        <div className="font-medium">{order.email}</div>
                         <div className="text-gray-500">Telefon:</div>
-                        <div className="font-medium">{order.customerPhone}</div>
+                        <div className="font-medium">{customerPhone}</div>
                         <div className="text-gray-500">Adres:</div>
-                        <div className="font-medium whitespace-pre-line">{order.customerAddress}</div>
+                        <div className="font-medium whitespace-pre-line">{customerAddress}</div>
                     </div>
                 </Card>
 
@@ -56,7 +64,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                         <div className="text-gray-500">Data złożenia:</div>
                         <div className="font-medium">{format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</div>
                         <div className="text-gray-500">Metoda płatności:</div>
-                        <div className="font-medium">{order.paymentMethod}</div>
+                        <div className="font-medium">{order.paymentProvider || 'Nieznana'}</div>
                         <div className="text-gray-500">Status:</div>
                         <div>
                             <form action={updateOrderStatus} className="flex gap-2">

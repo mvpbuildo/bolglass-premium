@@ -49,15 +49,17 @@ export default async function AdminOrdersPage() {
                                     <TableCell>{format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col">
-                                            <span className="font-medium">{order.customerEmail}</span>
-                                            <span className="text-xs text-gray-500">{order.customerPhone}</span>
+                                            <span className="font-medium">{order.email}</span>
+                                            <span className="text-xs text-gray-500">
+                                                {(order.shippingAddress as any)?.phone || 'Brak'}
+                                            </span>
                                         </div>
                                     </TableCell>
                                     <TableCell>
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                                                order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                                    order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                                                        'bg-gray-100 text-gray-800'
+                                            order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                                    'bg-gray-100 text-gray-800'
                                             }`}>
                                             {order.status}
                                         </span>
