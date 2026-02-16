@@ -11,7 +11,7 @@ export async function updateOrderStatus(formData: FormData) {
     const status = formData.get('status') as OrderStatus;
 
     if (!id || !status) {
-        return { error: 'Invalid data' };
+        return;
     }
 
     try {
@@ -22,9 +22,7 @@ export async function updateOrderStatus(formData: FormData) {
 
         revalidatePath(`/admin/orders/${id}`);
         revalidatePath('/admin/orders');
-        return { success: true };
     } catch (error) {
         console.error('Failed to update order status:', error);
-        return { error: 'Failed to update status' };
     }
 }
