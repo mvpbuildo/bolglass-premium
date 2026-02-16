@@ -15,7 +15,7 @@ export default function NewProductForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const [error, setError] = useState<string | null>(null);
+
 
     // ... inside NewProductForm component ...
 

@@ -21,7 +21,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const [error, setError] = useState<string | null>(null);
+
 
     // ... inside EditProductForm component ...
 
