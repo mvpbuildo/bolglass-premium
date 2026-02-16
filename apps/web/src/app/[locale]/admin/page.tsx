@@ -1,7 +1,7 @@
 import AdminNavigation from '@/components/AdminNavigation';
 import { Link } from '@/i18n/navigation';
 import { Card } from '@bolglass/ui';
-import { Calendar, ShoppingBag, Settings, ChevronRight, Package, Users, ShoppingCart, Clock } from 'lucide-react';
+import { Calendar, ShoppingBag, Settings, ChevronRight, Package, Users, ShoppingCart, Clock, Tag, Image } from 'lucide-react';
 
 export default function AdminDashboardPage() {
     const modules = [
@@ -25,6 +25,28 @@ export default function AdminDashboardPage() {
             links: [
                 { name: 'Produkty', path: '/admin/products', icon: <Package className="w-4 h-4" /> },
                 { name: 'Zamówienia', path: '/admin/orders', icon: <ShoppingCart className="w-4 h-4" /> },
+            ]
+        },
+        {
+            title: 'MARKETING',
+            description: 'Zarządzaj promocjami i komunikacją z klientami.',
+            icon: <Tag className="w-8 h-8 text-purple-600" />,
+            color: 'border-purple-100 bg-purple-50/30',
+            bg: 'bg-purple-600',
+            links: [
+                { name: 'Promocje', path: '/admin/marketing/promocje', icon: <Tag className="w-4 h-4" /> },
+                { name: 'Newsletter', path: '/admin/marketing/newsletter', icon: <ShoppingCart className="w-4 h-4" /> },
+            ]
+        },
+        {
+            title: 'GALERIA',
+            description: 'Zarządzaj multimediami i galerią realizacji.',
+            icon: <Image className="w-8 h-8 text-orange-600" />,
+            color: 'border-orange-100 bg-orange-50/30',
+            bg: 'bg-orange-600',
+            links: [
+                { name: 'Zdjęcia', path: '/admin/gallery', icon: <Image className="w-4 h-4" /> },
+                { name: 'Realizacje', path: '/admin/gallery/realizacje', icon: <ShoppingCart className="w-4 h-4" /> },
             ]
         },
         {

@@ -30,6 +30,24 @@ export default function AdminNavigation() {
             ]
         },
         {
+            title: 'MARKETING',
+            color: 'text-purple-600',
+            bg: 'bg-purple-50',
+            items: [
+                { name: 'Promocje', path: '/admin/marketing/promocje', icon: '🏷️' },
+                { name: 'Newsletter', path: '/admin/marketing/newsletter', icon: '📧' },
+            ]
+        },
+        {
+            title: 'GALERIA',
+            color: 'text-orange-600',
+            bg: 'bg-orange-50',
+            items: [
+                { name: 'Zdjęcia', path: '/admin/gallery', icon: '🖼️' },
+                { name: 'Realizacje', path: '/admin/gallery/realizacje', icon: '✨' },
+            ]
+        },
+        {
             title: 'SYSTEM',
             color: 'text-gray-600',
             bg: 'bg-gray-50',
@@ -62,7 +80,7 @@ export default function AdminNavigation() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {modules.map((module) => (
                     <div key={module.title} className={`bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition-all ${checkActiveGroup(module.items.map(i => i.path)) ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:shadow-md'}`}>
                         <h3 className={`text-xs font-black tracking-wider mb-3 flex items-center gap-2 ${module.color}`}>

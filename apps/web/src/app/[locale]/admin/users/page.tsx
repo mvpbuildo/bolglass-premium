@@ -1,48 +1,16 @@
 import { prisma } from '@bolglass/database';
-import { Button, Card } from '@bolglass/ui';
-import AdminNavigation from '../../../../components/AdminNavigation';
-import { revalidatePath } from 'next/cache';
+import { Button } from '@bolglass/ui';
+import AdminNavigation from '@/components/AdminNavigation';
 import { auth } from '@/auth';
 import { Link } from '@/i18n/navigation';
+import UserCard from './UserCard';
+
+export const dynamic = 'force-dynamic';
 
 async function getUsers() {
     return await prisma.user.findMany({
-        orderBy: { createdAt: 'desc' },
-        include: { sessions: true }
+        orderBy: { createdAt: 'desc' }
     });
-}
-
-async function toggleUserRole(userId: string, currentRole: string) {
-    'use server'
-    const session = await auth();
-    if (session?.user?.role !== 'ADMIN') return;
-
-    // Safety check: Prevent modifying own role
-    if (session?.user?.id === userId) return;
-
-    const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN';
-
-    await prisma.user.update({
-        where: { id: userId },
-        data: { role: newRole }
-    });
-
-    revalidatePath('/admin/users');
-}
-
-async function deleteUser(userId: string) {
-    'use server'
-    const session = await auth();
-    if (session?.user?.role !== 'ADMIN') return;
-
-    // Safety check: Prevent self-deletion
-    if (session?.user?.id === userId) return;
-
-    await prisma.user.delete({
-        where: { id: userId }
-    });
-
-    revalidatePath('/admin/users');
 }
 
 export default async function AdminUsersPage() {
@@ -69,67 +37,11 @@ export default async function AdminUsersPage() {
 
                 <div className="grid grid-cols-1 gap-4">
                     {users.map((user) => (
-                        <Card key={user.id} className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                {user.image ? (
-                                    <img src={user.image} alt={user.name || ''} className="w-10 h-10 rounded-full" />
-                                ) : (
-                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
-                                        {user.name?.[0] || '?'}
-                                    </div>
-                                )}
-                                <div>
-                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                        {user.name}
-                                        {user.role === 'ADMIN' && (
-                                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] uppercase font-bold rounded-full">Admin</span>
-                                        )}
-                                        {user.id === currentUserId && (
-                                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] uppercase font-bold rounded-full">Ty</span>
-                                        )}
-                                    </h3>
-                                    <p className="text-sm text-gray-500">{user.email}</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <form action={toggleUserRole.bind(null, user.id, user.role)}>
-                                    <Button
-                                        type="submit"
-                                        variant="outline"
-                                        disabled={user.id === currentUserId}
-                                        className={`
-                                            text-xs font-bold
-                                            ${user.role === 'ADMIN'
-                                                ? 'text-red-600 border-red-200 hover:bg-red-50'
-                                                : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
-                                            ${user.id === currentUserId ? 'opacity-50 cursor-not-allowed' : ''}
-                                        `}
-                                    >
-                                        {user.role === 'ADMIN' ? 'Zabierz Admina ⬇️' : 'Daj Admina ⬆️'}
-                                    </Button>
-                                </form>
-
-                                <form
-                                    action={deleteUser.bind(null, user.id)}
-                                    onSubmit={(e) => {
-                                        if (!confirm(`Czy na pewno chcesz usunąć użytkownika ${user.email}? Tej operacji nie można cofnąć.`)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                >
-                                    <Button
-                                        type="submit"
-                                        variant="ghost"
-                                        disabled={user.id === currentUserId}
-                                        className="text-gray-400 hover:text-red-600 transition-colors"
-                                        title="Usuń użytkownika"
-                                    >
-                                        🗑️
-                                    </Button>
-                                </form>
-                            </div>
-                        </Card>
+                        <UserCard
+                            key={user.id}
+                            user={user}
+                            currentUserId={currentUserId}
+                        />
                     ))}
                 </div>
             </div>
