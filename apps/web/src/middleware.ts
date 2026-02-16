@@ -11,10 +11,18 @@ const intlMiddleware = createMiddleware({
 
 export default auth((req) => {
   const isAuth = !!req.auth;
+  const role = req.auth?.user?.role;
   const isAdminPath = req.nextUrl.pathname.includes('/admin');
 
-  if (isAdminPath && !isAuth) {
-    return Response.redirect(new URL('/login', req.nextUrl));
+  if (isAdminPath) {
+    if (!isAuth) {
+      return Response.redirect(new URL('/login', req.nextUrl));
+    }
+    if (role !== 'ADMIN') {
+      // Jeśli zalogowany, ale nie jest adminem - przekieruj na stronę główną
+      // (można by też na dedykowaną stronę błędu 403)
+      return Response.redirect(new URL('/', req.nextUrl));
+    }
   }
 
   return intlMiddleware(req);
