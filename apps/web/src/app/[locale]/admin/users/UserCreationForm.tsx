@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Card, Input, Label } from '@bolglass/ui';
+import { Button, Card, Input } from '@bolglass/ui';
 import { createUser } from './actions';
 import { UserPlus, Loader2, X } from 'lucide-react';
 
@@ -48,17 +48,17 @@ export default function UserCreationForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Imię i Nazwisko</Label>
+                        <label htmlFor="name" className="text-sm font-bold text-gray-700">Imię i Nazwisko</label>
                         <Input id="name" name="name" placeholder="np. Jan Kowalski" required />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="email">Adres Email</Label>
+                        <label htmlFor="email" className="text-sm font-bold text-gray-700">Adres Email</label>
                         <Input id="email" name="email" type="email" placeholder="jan@bolann.cloud" required />
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password">Hasło tymczasowe</Label>
+                    <label htmlFor="password" className="text-sm font-bold text-gray-700">Hasło tymczasowe</label>
                     <Input id="password" name="password" type="password" placeholder="••••••••" required />
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">
                         Hasło musi zawierać minimum 8 znaków.
