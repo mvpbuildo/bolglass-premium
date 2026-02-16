@@ -43,26 +43,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         })
     ],
     callbacks: {
-        async session({ session, token }) {
-            if (token.sub && session.user) {
-                session.user.id = token.sub
+        ...authConfig.callbacks,
+        async jwt({ token, user }) {
+            if (user) {
+                token.role = (user as any).role
+                return token
             }
-            if (token.role && session.user) {
-                session.user.role = token.role as string
-            }
-            return session
-        },
-        async jwt({ token }) {
+
             if (!token.sub) return token
 
-            const existingUser = await prisma.user.findUnique({
-                where: { id: token.sub },
-            })
+            // Optional: Re-fetch role from DB if needed for live updates, 
+            // but for now relying on token.role set at login.
+            // If token.role is missing, fetch it once.
+            if (!token.role) {
+                const existingUser = await prisma.user.findUnique({
+                    where: { id: token.sub },
+                })
+                if (existingUser) {
+                    token.role = existingUser.role
+                }
+            }
 
-            if (!existingUser) return token
-
-            token.role = existingUser.role
             return token
         }
     },
-})
+});
