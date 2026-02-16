@@ -5,7 +5,6 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
       {
@@ -14,16 +13,18 @@ const nextConfig = {
       },
     ],
   },
-  // In Next.js 16/15+, serverActions is a top-level property.
-  // We use @ts-nocheck to bypass the strict type error during 'next build'.
-  serverActions: {
-    bodySizeLimit: '100mb',
-  },
   experimental: {
-    // Renamed from middlewareClientMaxBodySize
+    // Legacy/Alias for proxyClientMaxBodySize in some versions
+    middlewareClientMaxBodySize: '100mb',
     proxyClientMaxBodySize: '100mb',
-    serverActions: true, // Occasionally helps in some beta versions
-  },
+  }
 };
 
-export default withNextIntl(nextConfig);
+const finalConfig = withNextIntl(nextConfig);
+
+// Force top-level properties for Next.js 15/16+
+finalConfig.serverActions = {
+  bodySizeLimit: '100mb',
+};
+
+export default finalConfig;
