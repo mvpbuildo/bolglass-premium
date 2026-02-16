@@ -11,6 +11,8 @@ interface EditProductFormProps {
     product: Product;
 }
 
+import { compressImage } from '@/utils/imageCompression';
+
 export default function EditProductForm({ product }: EditProductFormProps) {
     const router = useRouter();
     const [existingImages, setExistingImages] = useState<string[]>(product.images || []);
@@ -19,7 +21,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    import { compressImage } from '@/utils/imageCompression';
+    const [error, setError] = useState<string | null>(null);
 
     // ... inside EditProductForm component ...
 

@@ -6,6 +6,8 @@ import { useState, ChangeEvent } from 'react';
 import { createProduct } from './actions';
 import Image from 'next/image';
 
+import { compressImage } from '@/utils/imageCompression';
+
 export default function NewProductForm() {
     const router = useRouter();
     const [images, setImages] = useState<File[]>([]);
@@ -13,7 +15,7 @@ export default function NewProductForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    import { compressImage } from '@/utils/imageCompression';
+    const [error, setError] = useState<string | null>(null);
 
     // ... inside NewProductForm component ...
 
