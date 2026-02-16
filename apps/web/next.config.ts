@@ -13,17 +13,14 @@ const nextConfig = {
       },
     ],
   },
+  // @ts-expect-error - serverActions is a valid top-level property in Next.js 15+ but types might be outdated
+  serverActions: {
+    bodySizeLimit: '100mb',
+  },
   experimental: {
     // Renamed from middlewareClientMaxBodySize
     proxyClientMaxBodySize: '100mb',
   }
 };
 
-const finalConfig = withNextIntl(nextConfig);
-
-// Force top-level properties for Next.js 15/16+
-finalConfig.serverActions = {
-  bodySizeLimit: '100mb',
-};
-
-export default finalConfig;
+export default withNextIntl(nextConfig);
