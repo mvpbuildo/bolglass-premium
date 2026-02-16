@@ -64,7 +64,8 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                 <select
                                     name="status"
                                     defaultValue={order.status}
-                                    className="border rounded px-2 py-1 text-sm bg-white"
+                                    className="border rounded px-2 py-1 text-sm bgbw-white"
+                                    aria-label="Zmień status zamówienia"
                                 >
                                     <option value="PENDING">Oczekujące</option>
                                     <option value="PROCESSING">W trakcie</option>

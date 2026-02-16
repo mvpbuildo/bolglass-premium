@@ -2,7 +2,9 @@
 
 import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
-import { OrderStatus } from '@prisma/client';
+
+// Define status locally since it's a String in schema, not an Enum
+type OrderStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED';
 
 export async function updateOrderStatus(formData: FormData) {
     const id = formData.get('id') as string;
