@@ -54,6 +54,14 @@ export default function AdminNavigation() {
             items: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: '👥' },
             ]
+        },
+        {
+            title: 'ZASOBY',
+            color: 'text-blue-600',
+            bg: 'bg-blue-50',
+            items: [
+                { name: 'Pliki', path: '/admin/files', icon: '📁' },
+            ]
         }
     ];
 
@@ -80,7 +88,7 @@ export default function AdminNavigation() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {modules.map((module) => (
                     <div key={module.title} className={`bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition-all ${checkActiveGroup(module.items.map(i => i.path)) ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:shadow-md'}`}>
                         <h3 className={`text-xs font-black tracking-wider mb-3 flex items-center gap-2 ${module.color}`}>

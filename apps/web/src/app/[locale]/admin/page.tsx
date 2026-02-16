@@ -1,9 +1,45 @@
 import AdminNavigation from '@/components/AdminNavigation';
 import { Link } from '@/i18n/navigation';
-import { Card } from '@bolglass/ui';
-import { Calendar, ShoppingBag, Settings, ChevronRight, Package, Users, ShoppingCart, Clock, Tag, Image } from 'lucide-react';
+import { Card, Button } from '@bolglass/ui';
+import {
+    Calendar,
+    ShoppingBag,
+    Settings,
+    ChevronRight,
+    Package,
+    Users,
+    ShoppingCart,
+    Clock,
+    Tag,
+    Image as ImageIcon,
+    Files,
+    ExternalLink
+} from 'lucide-react';
+import { prisma } from '@bolglass/database';
+import { format } from 'date-fns';
 
-export default function AdminDashboardPage() {
+async function getRecentOrders() {
+    return await prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: {
+            items: true
+        }
+    });
+}
+
+function getStatusStyles(status: string) {
+    switch (status) {
+        case 'COMPLETED': return 'bg-green-50 text-green-700 border-green-100';
+        case 'PENDING': return 'bg-yellow-50 text-yellow-700 border-yellow-100';
+        case 'CANCELLED': return 'bg-red-50 text-red-700 border-red-100';
+        default: return 'bg-gray-50 text-gray-700 border-gray-100';
+    }
+}
+
+export default async function AdminDashboardPage() {
+    const orders = await getRecentOrders();
+
     const modules = [
         {
             title: 'WARSZTATY',
@@ -18,7 +54,7 @@ export default function AdminDashboardPage() {
         },
         {
             title: 'SKLEP',
-            description: 'Zarządzaj asortymentem produktów i zamówieniami klientów.',
+            description: 'Zarządzaj asortymentem produktów i zamówieniami.',
             icon: <ShoppingBag className="w-8 h-8 text-green-600" />,
             color: 'border-green-100 bg-green-50/30',
             bg: 'bg-green-600',
@@ -41,22 +77,32 @@ export default function AdminDashboardPage() {
         {
             title: 'GALERIA',
             description: 'Zarządzaj multimediami i galerią realizacji.',
-            icon: <Image className="w-8 h-8 text-orange-600" />,
+            icon: <ImageIcon className="w-8 h-8 text-orange-600" />,
             color: 'border-orange-100 bg-orange-50/30',
             bg: 'bg-orange-600',
             links: [
-                { name: 'Zdjęcia', path: '/admin/gallery', icon: <Image className="w-4 h-4" /> },
+                { name: 'Zdjęcia', path: '/admin/gallery', icon: <ImageIcon className="w-4 h-4" /> },
                 { name: 'Realizacje', path: '/admin/gallery/realizacje', icon: <ShoppingCart className="w-4 h-4" /> },
             ]
         },
         {
             title: 'SYSTEM',
-            description: 'Zarządzaj użytkownikami i uprawnieniami systemowymi.',
+            description: 'Zarządzaj użytkownikami i uprawnieniami.',
             icon: <Settings className="w-8 h-8 text-gray-600" />,
             color: 'border-gray-100 bg-gray-50/30',
             bg: 'bg-gray-900',
             links: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+            ]
+        },
+        {
+            title: 'ZASOBY',
+            description: 'Zarządzaj plikami i obrazami na serwerze.',
+            icon: <Files className="w-8 h-8 text-cyan-600" />,
+            color: 'border-cyan-100 bg-cyan-50/30',
+            bg: 'bg-cyan-600',
+            links: [
+                { name: 'Pliki', path: '/admin/files', icon: <Files className="w-4 h-4" /> },
             ]
         }
     ];
@@ -71,7 +117,7 @@ export default function AdminDashboardPage() {
                     <p className="text-gray-500 mt-2">Wybierz moduł, którym chcesz dzisiaj zarządzać.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
                     {modules.map((module) => (
                         <Card key={module.title} className={`p-0 overflow-hidden border-2 flex flex-col h-full hover:shadow-xl transition-all duration-300 ${module.color}`}>
                             <div className="p-8 flex-grow">
@@ -97,6 +143,66 @@ export default function AdminDashboardPage() {
                             </div>
                         </Card>
                     ))}
+                </div>
+
+                {/* Recent Orders Section */}
+                <div className="space-y-6">
+                    <div className="flex justify-between items-end border-b border-gray-200 pb-4">
+                        <div>
+                            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Ostatnie Zamówienia</h2>
+                            <p className="text-gray-500 text-sm mt-1">Szybki podgląd najnowszej aktywności w sklepie.</p>
+                        </div>
+                        <Link href="/admin/orders">
+                            <Button variant="outline" size="sm" className="font-bold gap-2">
+                                Wszystkie Zamówienia <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        </Link>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                        {orders.length === 0 ? (
+                            <Card className="p-8 text-center border-dashed border-gray-200">
+                                <p className="text-gray-500 font-medium">Brak niedawnych zamówień.</p>
+                            </Card>
+                        ) : (
+                            orders.map((order) => (
+                                <Card key={order.id} className="p-4 hover:shadow-md transition-shadow group">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
+                                                <ShoppingCart className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-mono text-xs font-bold text-gray-400">#{order.id.substring(0, 8)}</span>
+                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase border ${getStatusStyles(order.status)}`}>
+                                                        {order.status}
+                                                    </span>
+                                                </div>
+                                                <h3 className="font-bold text-gray-900 truncate max-w-[200px] md:max-w-md">{order.email}</h3>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-8">
+                                            <div className="text-right hidden sm:block">
+                                                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Data</p>
+                                                <p className="font-bold text-sm">{format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</p>
+                                            </div>
+                                            <div className="text-right min-w-[100px]">
+                                                <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Suma</p>
+                                                <p className="text-lg font-black text-gray-900">{order.total.toFixed(2)} PLN</p>
+                                            </div>
+                                            <Link href={`/admin/orders/${order.id}`}>
+                                                <Button size="sm" variant="ghost" className="p-2 h-auto hover:bg-gray-100 rounded-lg group">
+                                                    <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-colors" />
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))
+                        )}
+                    </div>
                 </div>
 
                 <div className="mt-16 text-center text-xs text-gray-400 font-medium">
