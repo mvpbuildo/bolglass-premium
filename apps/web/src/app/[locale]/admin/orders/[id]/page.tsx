@@ -11,7 +11,11 @@ async function getOrder(id: string) {
     return await prisma.order.findUnique({
         where: { id },
         include: {
-            items: true
+            items: {
+                include: {
+                    product: true
+                }
+            }
         }
     });
 }
@@ -108,12 +112,9 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                 <TableCell className="font-medium">
                                     <div className="flex flex-col">
                                         <span>{item.name}</span>
-                                        {item.originalPrice !== item.price && (
-                                            <span className="text-xs text-red-500 line-through">{item.originalPrice.toFixed(2)} PLN</span>
-                                        )}
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-xs text-gray-500">{item.sku}</TableCell>
+                                <TableCell className="text-xs text-gray-500">{item.product?.sku || '-'}</TableCell>
                                 <TableCell className="text-center">{item.quantity}</TableCell>
                                 <TableCell className="text-right">{item.price.toFixed(2)} PLN</TableCell>
                                 <TableCell className="text-right font-bold">
