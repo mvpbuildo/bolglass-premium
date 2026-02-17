@@ -13,7 +13,8 @@ import {
     Tag,
     Image as ImageIcon,
     Files,
-    ArrowRight
+    ArrowRight,
+    Phone
 } from 'lucide-react';
 import { prisma } from '@bolglass/database';
 import { format } from 'date-fns';
@@ -93,6 +94,16 @@ export default async function AdminDashboardPage() {
             bg: 'bg-gray-900',
             links: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+            ]
+        },
+        {
+            title: 'KONTAKT',
+            description: 'Edytuj dane firmy, mapę i social media.',
+            icon: <Phone className="w-8 h-8 text-pink-600" />,
+            color: 'border-pink-100 bg-pink-50/30',
+            bg: 'bg-pink-600',
+            links: [
+                { name: 'Konfiguracja', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
             ]
         },
         {
