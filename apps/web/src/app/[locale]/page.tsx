@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation';
 import ProductionProcess from '@/components/ProductionProcess';
 import BookingCalendar from '@/components/BookingCalendar';
 import BaubleConfigurator from '@/components/BaubleConfigurator';
+import ContactSection from '@/components/ContactSection';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Button } from '@bolglass/ui';
 
@@ -79,6 +80,8 @@ export default function HomePage() {
             <div id="studio-3d">
                 <BaubleConfigurator />
             </div>
+
+            <ContactSection />
         </>
     );
 }
