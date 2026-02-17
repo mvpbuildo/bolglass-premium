@@ -22,6 +22,9 @@ export const metadata: Metadata = {
     description: "Ręcznie dmuchane bombki choinkowe",
 };
 
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
 export default async function LocaleLayout({
     children,
     params
@@ -30,31 +33,27 @@ export default async function LocaleLayout({
     params: Promise<{ locale: string }>;
 }) {
     const { locale } = await params;
-    console.log(`[Layout] Rendering layout for locale: ${locale}`);
 
     // Ensure that the incoming `locale` is valid
     if (!['en', 'de', 'pl'].includes(locale)) {
-        console.warn(`[Layout] Invalid locale: ${locale}`);
         notFound();
     }
 
-    // Providing all messages to the client
-    // side is the easiest way to get started
     let messages;
     try {
-        console.log(`[Layout] Fetching messages for: ${locale}`);
         messages = await getMessages();
-    } catch (e) {
-        console.error(`[Layout] Failed to get messages:`, e);
+    } catch {
         messages = {};
     }
 
     return (
         <html lang={locale}>
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-                <NextIntlClientProvider messages={messages}>
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans bg-black text-white`}>
+                <NextIntlClientProvider messages={messages} locale={locale}>
                     <Providers>
+                        <Navbar />
                         {children}
+                        <Footer />
                     </Providers>
                 </NextIntlClientProvider>
             </body>

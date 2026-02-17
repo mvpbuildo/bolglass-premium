@@ -4,6 +4,7 @@ import { useCart } from '@/context/CartContext';
 import { Button } from '@bolglass/ui';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { ShoppingCart } from 'lucide-react';
 
 type ProductProps = {
     id: string;
@@ -13,7 +14,6 @@ type ProductProps = {
     slug: string;
     priceNet: number;
     vatRate: number;
-    // Add other fields as needed
 };
 
 export default function ProductCard({ product }: { product: ProductProps }) {
@@ -23,63 +23,58 @@ export default function ProductCard({ product }: { product: ProductProps }) {
         addItem({
             id: product.id,
             name: product.name,
-            price: product.price, // Gross price
+            price: product.price,
             image: product.image || undefined,
             quantity: 1,
             slug: product.slug
         });
-        // Optional: Toast notification here
     };
 
     return (
-        <div className="group relative bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full flex flex-col">
-            {/* Image Container with Shine Effect */}
-            <Link href={`/sklep/${product.slug}`} className="block relative aspect-[4/5] bg-gray-50 overflow-hidden">
-                {product.image ? (
-                    <>
-                        <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    </>
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                        {/* Placeholder Icon */}
-                    </div>
-                )}
+        <div className="group relative rounded-2xl overflow-hidden border border-white/5 bg-white/5 backdrop-blur-md transition-all duration-500 hover:border-amber-500/30 hover:shadow-[0_0_50px_rgba(245,158,11,0.1)] h-full flex flex-col">
+            <Link href={`/sklep/produkt/${product.slug}`} className="block relative aspect-square overflow-hidden bg-white/5">
+                <Image
+                    src={product.image || '/placeholder-bauble.png'}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+
                 {/* Shine overlay */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-x-[-100%] group-hover:translate-x-[100%] transform skew-x-[-25deg]"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-x-[-100%] group-hover:translate-x-[100%] transform skew-x-[-25deg] pointer-events-none"></div>
             </Link>
 
-            <div className="p-6 flex flex-col flex-grow bg-white/50 backdrop-blur-sm">
-                <Link href={`/sklep/${product.slug}`}>
-                    <h3 className="font-serif text-xl text-gray-900 group-hover:text-red-700 transition-colors line-clamp-2 leading-tight mb-2">
-                        {product.name}
-                    </h3>
-                </Link>
-                {/* Decorative line */}
-                <div className="w-12 h-0.5 bg-amber-200 mb-4 group-hover:w-full group-hover:bg-amber-400 transition-all duration-500"></div>
+            <div className="p-6 space-y-4 flex flex-col flex-grow">
+                <div className="space-y-1">
+                    <Link href={`/sklep/produkt/${product.slug}`}>
+                        <h3 className="text-xl font-serif text-amber-50 line-clamp-1 group-hover:text-amber-200 transition-colors leading-tight">
+                            {product.name}
+                        </h3>
+                    </Link>
+                    <p className="text-[10px] text-amber-500/40 font-black uppercase tracking-widest">Manufaktura Bolglass</p>
+                </div>
 
-                <div className="mt-auto flex items-end justify-between gap-4">
-                    <div>
-                        <p className="text-2xl font-bold text-gray-900 tracking-tight">{product.price.toFixed(2)} <span className="text-sm font-normal text-gray-500">zł</span></p>
+                <div className="mt-auto flex items-center justify-between">
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-black text-white tracking-tighter">
+                            {product.price.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                        </span>
+                        <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">Cena Brutto</span>
                     </div>
-
                     <Button
-                        size="sm"
                         onClick={handleAddToCart}
-                        className="bg-gray-900 hover:bg-red-700 text-white rounded-xl px-6 py-2 shadow-lg hover:shadow-red-500/30 transition-all duration-300"
+                        size="sm"
+                        className="rounded-full h-11 w-11 p-0 bg-white/5 border border-white/10 hover:bg-amber-500 hover:text-black hover:border-amber-500 transition-all shadow-lg hover:shadow-amber-500/20"
+                        title="Dodaj do koszyka"
                     >
-                        Do Koszyka
+                        <ShoppingCart className="w-4 h-4" />
                     </Button>
                 </div>
             </div>
 
-            {/* Glass Border Effect */}
-            <div className="absolute inset-0 border-2 border-transparent group-hover:border-amber-500/20 rounded-2xl pointer-events-none transition-colors duration-500"></div>
+            {/* Subtle glow border effect */}
+            <div className="absolute inset-0 border border-transparent group-hover:border-amber-500/20 rounded-2xl pointer-events-none transition-colors duration-500"></div>
         </div>
     );
 }

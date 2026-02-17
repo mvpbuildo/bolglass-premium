@@ -1,5 +1,5 @@
 {
-  "HomePage": {
+  "Common": {
     "nav": {
       "about": "O Nas",
       "manufactory": "Manufaktura",
@@ -10,7 +10,9 @@
       "gallery": "Galeria",
       "b2b": "Strefa B2B",
       "contact": "Kontakt"
-    },
+    }
+  },
+  "HomePage": {
     "title": "Bolglass - Magia Szklanych Ozdób",
     "hero": {
       "headline": "Nasza fabryka istnieje na rynku od 78 lat",

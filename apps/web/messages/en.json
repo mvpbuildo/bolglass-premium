@@ -1,5 +1,5 @@
 {
-    "HomePage": {
+    "Common": {
         "nav": {
             "about": "About Us",
             "manufactory": "Manufactory",
@@ -7,10 +7,12 @@
             "workshops": "Workshops",
             "studio3d": "3D Studio",
             "shop": "Shop",
-            "gallery": "Galerie",
-            "b2b": "B2B-Bereich",
+            "gallery": "Gallery",
+            "b2b": "B2B Area",
             "contact": "Contact"
-        },
+        }
+    },
+    "HomePage": {
         "title": "Bolglass - The Magic of Glass Ornaments",
         "hero": {
             "headline": "Creating Holiday Magic for 78 Years",

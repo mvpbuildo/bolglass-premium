@@ -1,13 +1,12 @@
 'use client';
 
-import ShopNavigation from '@/components/ShopNavigation';
 import { useCart } from '@/context/CartContext';
 import { Button, Card } from '@bolglass/ui';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { placeOrder } from './actions';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
     const { items, updateQuantity, removeItem, total, clearCart } = useCart();
@@ -38,42 +37,47 @@ export default function CheckoutPage() {
     }
     if (items.length === 0) {
         return (
-            <main className="min-h-screen bg-gray-50">
-                <ShopNavigation />
-                <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-                    <h1 className="text-3xl font-bold mb-4">Twój koszyk jest pusty</h1>
-                    <p className="text-gray-500 mb-8">Dodaj coś pięknego z naszego sklepu.</p>
+            <main className="min-h-screen bg-[#050505] pt-32">
+                <div className="max-w-7xl mx-auto px-6 text-center">
+                    <h1 className="text-4xl font-serif text-amber-50 mb-4">Twój koszyk jest pusty</h1>
+                    <p className="text-amber-200/40 mb-12">Dodaj coś pięknego z naszej manufaktury.</p>
+                    <Link href="/sklep">
+                        <Button className="bg-amber-500 hover:bg-amber-600 text-black px-8 rounded-full font-black uppercase tracking-widest text-xs">Wróć do Sklepu</Button>
+                    </Link>
                 </div>
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen bg-gray-50">
-            <ShopNavigation />
+        <main className="min-h-screen bg-[#050505] pt-20">
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-3xl font-black text-gray-900 mb-8">Koszyk i Zamówienie</h1>
+            <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
+                <div className="flex items-center gap-4 mb-12">
+                    <h1 className="text-4xl md:text-5xl font-serif text-amber-50">Koszyk i Zamówienie</h1>
+                    <div className="h-px flex-1 bg-white/5" />
+                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                     {/* LEFT COLUMN: Cart Items */}
-                    <div className="space-y-6">
-                        <Card className="p-6 bg-white shadow-sm">
-                            <h2 className="text-xl font-bold mb-4 border-b pb-2">Produkty</h2>
-                            <div className="space-y-4">
+                    <div className="space-y-8">
+                        <Card className="p-8 bg-white/5 border-white/5 backdrop-blur-xl rounded-[2rem] shadow-2xl">
+                            <h2 className="text-xs font-black text-amber-500 uppercase tracking-[0.3em] mb-8 border-b border-white/5 pb-4">Wybrane Produkty</h2>
+                            <div className="space-y-6">
                                 {items.map((item) => (
-                                    <div key={item.id} className="flex gap-4 items-center">
-                                        <div className="relative w-20 h-20 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                                    <div key={item.id} className="flex gap-6 items-center group relative">
+                                        <div className="relative w-24 h-24 bg-white/5 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5">
                                             {item.image ? (
-                                                <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                                <Image src={item.image} alt={item.name} fill className="object-cover transition-transform group-hover:scale-110" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-300">📦</div>
+                                                <div className="w-full h-full flex items-center justify-center text-amber-500/20">📦</div>
                                             )}
                                         </div>
                                         <div className="flex-grow">
-                                            <h3 className="font-bold text-gray-900">{item.name}</h3>
-                                            <p className="text-sm text-gray-500">{item.price.toFixed(2)} zł</p>
+                                            <h3 className="font-serif text-lg text-amber-50 mb-1">{item.name}</h3>
+                                            <p className="text-amber-500 font-black text-sm">{item.price.toFixed(2)} zł</p>
                                         </div>
+                                        {/* ... quantity and remove remain similar but themed ... */}
                                         <div className="flex items-center gap-2">
                                             <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">-</button>
                                             <span className="w-8 text-center font-bold">{item.quantity}</span>
@@ -202,6 +206,11 @@ export default function CheckoutPage() {
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Telefon</label>
                                     <input name="phone" type="tel" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" title="Telefon" />
                                 </div>
+                                {!session && (
+                                    <div className="mb-8 p-6 bg-amber-500/5 border border-amber-500/10 text-amber-200/60 rounded-2xl text-sm italic">
+                                        Kupujesz jako <strong>Gość</strong>. <Link href="/api/auth/signin" className="text-amber-500 underline font-bold">Zaloguj się</Link>, aby zapisać zamówienie w swojej historii.
+                                    </div>
+                                )}
 
                                 <div className="pt-4 mt-4 border-t">
                                     <h3 className="font-bold mb-2">Płatność</h3>
@@ -212,13 +221,13 @@ export default function CheckoutPage() {
 
                                 <Button
                                     type="submit"
-                                    className="w-full bg-red-600 hover:bg-red-700 text-white py-4 text-lg font-bold mt-6 shadow-lg hover:shadow-xl transition-all"
+                                    className="w-full bg-amber-500 hover:bg-amber-600 text-black py-4 text-lg font-black uppercase tracking-widest mt-6 shadow-lg hover:shadow-amber-500/20 transition-all rounded-full"
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? 'Przetwarzanie...' : `Zamawiam i Płacę (${total.toFixed(2)} zł)`}
                                 </Button>
-                                <p className="text-xs text-center text-gray-400 mt-2">
-                                    Klikając "Zamawiam i Płacę" akceptujesz regulamin sklepu.
+                                <p className="text-[10px] text-center text-amber-200/20 mt-4 uppercase tracking-widest leading-loose">
+                                    Klikając &quot;Zamawiam i Płacę&quot; akceptujesz regulamin sklepu.
                                 </p>
                             </form>
                         </Card>

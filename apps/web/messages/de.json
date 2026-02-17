@@ -1,5 +1,5 @@
 {
-    "HomePage": {
+    "Common": {
         "nav": {
             "about": "Über Uns",
             "manufactory": "Manufaktur",
@@ -10,7 +10,9 @@
             "gallery": "Galerie",
             "b2b": "B2B-Bereich",
             "contact": "Kontakt"
-        },
+        }
+    },
+    "HomePage": {
         "title": "Bolglass - Die Magie der Glasornamente",
         "hero": {
             "headline": "Wir erschaffen Weihnachtszauber seit 78 Jahren",
