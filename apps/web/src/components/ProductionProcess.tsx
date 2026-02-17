@@ -35,22 +35,29 @@ const steps = [
 ];
 
 const ProcessStep = ({ step, index, scrollYProgress }: { step: any, index: number, scrollYProgress: MotionValue<number> }) => {
-    // Adjusted timing to prevent overlap and make transitions smoother
-    const stepDuration = 0.2; // 20% of scroll per step
-    const gap = 0.05; // 5% gap between steps
-    const start = index * (stepDuration + gap);
+    // Optimized timing for 4 steps to ensure complete visibility
+    // Total range: 0 to 1
+    // Step duration: 0.25 (25%) including transition
+    // Overlap: 0.05 (5%) to ensure no black gaps
+
+    // Calculate start based on index, shifting slightly earlier to fit all
+    const stepDuration = 0.25;
+    const overlap = 0.05;
+
+    // Start times: 0.0, 0.2, 0.4, 0.6
+    // End times:   0.25, 0.45, 0.65, 0.85 (plus extended visibility for last)
+    const start = index * (stepDuration - overlap);
     const end = start + stepDuration;
 
-    // Fade in
-    // Special handling for the last step to ensure it stays visible longer/until end
-    const isLast = index === 3; // steps.length is 4
-
-    let opacityInput = [start, start + 0.05, end - 0.05, end];
+    // Fade in/out logic
+    let opacityInput = [start, start + 0.1, end - 0.1, end];
     let opacityOutput = [0, 1, 1, 0];
 
+    const isLast = index === 3; // steps.length is 4
     if (isLast) {
-        // Last step fades in and stays visible until the very end of the section
-        opacityInput = [start, start + 0.05, 1];
+        // Last step starts at 0.6 and stays visible until the end (1.0)
+        // This ensures it never disappears while user is still scrolling the section
+        opacityInput = [start, start + 0.1, 1];
         opacityOutput = [0, 1, 1];
     }
 
@@ -60,17 +67,6 @@ const ProcessStep = ({ step, index, scrollYProgress }: { step: any, index: numbe
 
     const opacity = useTransform(scrollYProgress, opacityInput, opacityOutput);
     const scale = useTransform(scrollYProgress, scaleInput, scaleOutput);
-
-    // Initial opacity for the first item needs special handling if we want it visible at start,
-    // but for a "scrolling into view" effect, starting hidden and fading in usually feels better
-    // specifically for this "storytelling" section.
-    // However, if we want the first one to be present immediately:
-    /*
-    if (index === 0) {
-        // ... special logic
-    }
-    */
-    // Let's stick to uniform entry for all steps to keeping it consistent as user scrolls.
 
     return (
         <motion.div
