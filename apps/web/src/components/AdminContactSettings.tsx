@@ -112,13 +112,11 @@ export default function AdminContactSettings() {
                         </h3>
                         <Input
                             label="Link Facebook"
-                            icon={<Facebook size={18} />}
                             value={settings.facebook_url}
                             onChange={(e) => setSettings({ ...settings, facebook_url: e.target.value })}
                         />
                         <Input
                             label="Link Instagram"
-                            icon={<Instagram size={18} />}
                             value={settings.instagram_url}
                             onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
                         />
