@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir } from 'fs/promises';
 import { join, extname } from 'path';
 import { auth } from '@/auth';
+import { GalleryItem } from '@/types/gallery';
 
 // Robust path handling
 const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
@@ -19,24 +20,26 @@ async function ensureAdmin() {
     }
 }
 
-export async function getGalleryItems() {
+export async function getGalleryItems(): Promise<GalleryItem[]> {
     try {
-        return await prisma.galleryItem.findMany({
+        const items = await prisma.galleryItem.findMany({
             orderBy: { order: 'asc' }
         });
+        return items as unknown as GalleryItem[];
     } catch (error) {
         console.error('Error fetching gallery items:', error);
         return [];
     }
 }
 
-export async function getHomeGalleryItems() {
+export async function getHomeGalleryItems(): Promise<GalleryItem[]> {
     try {
-        return await prisma.galleryItem.findMany({
+        const items = await prisma.galleryItem.findMany({
             where: { displayHome: true },
             orderBy: { order: 'asc' },
             take: 6
         });
+        return items as unknown as GalleryItem[];
     } catch (error) {
         console.error('Error fetching home gallery items:', error);
         return [];
