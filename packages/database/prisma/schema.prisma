@@ -230,3 +230,17 @@ model Message {
   content   String
   createdAt DateTime @default(now())
 }
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String?
+  description String?
+  url         String   // URL for images or path for local videos
+  thumbnailUrl String? // Optimized thumbnail for videos/large images
+  type        String   @default("IMAGE") // IMAGE or VIDEO
+  category    String   @default("GENERAL") // e.g. PRODUCTION, REALIZATIONS, EVENTS
+  displayHome Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

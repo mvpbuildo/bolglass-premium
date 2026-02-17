@@ -4,6 +4,7 @@ import ProductionProcess from '@/components/ProductionProcess';
 import BookingCalendar from '@/components/BookingCalendar';
 import BaubleConfigurator from '@/components/BaubleConfigurator';
 import ContactSection from '@/components/ContactSection';
+import GallerySection from '@/components/GallerySection';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Button } from '@bolglass/ui';
 
@@ -33,6 +34,7 @@ export default function HomePage() {
                         <a href="#offer" className="hover:text-white transition-colors">{t('nav.offer')}</a>
                         <a href="#booking" className="hover:text-white transition-colors">{t('nav.workshops')}</a>
                         <a href="#studio-3d" className="hover:text-white transition-colors">{t('nav.studio3d')}</a>
+                        <Link href="/galeria" className="hover:text-white transition-colors">{t('nav.gallery')}</Link>
                         <Link href="/sklep" className="hover:text-white transition-colors">{t('nav.shop')}</Link>
                         <a href="#b2b" className="hover:text-white transition-colors">{t('nav.b2b')}</a>
                         <a href="#contact" className="hover:text-white transition-colors">{t('nav.contact')}</a>
@@ -72,6 +74,7 @@ export default function HomePage() {
                     </svg>
                 </div>
             </main>
+            <GallerySection />
             <ProductionProcess />
             <div id="booking">
                 <BookingCalendar />
