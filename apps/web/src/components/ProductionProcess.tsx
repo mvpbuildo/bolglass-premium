@@ -107,8 +107,15 @@ export default function ProductionProcess() {
             <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
                 {/* Background Atmosphere - Bolglass Premium Theme */}
                 <div className="absolute inset-0 bg-[#0a0500]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-[#0a0500] to-[#000000]" />
-                <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
+                <div className="relative w-full h-full">
+                    <img
+                        src="/production/background.png"
+                        alt="Background"
+                        className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505]" />
+                </div>
 
 
                 {/* Dynamic Process Visualization */}
