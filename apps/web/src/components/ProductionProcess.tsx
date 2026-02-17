@@ -42,8 +42,17 @@ const ProcessStep = ({ step, index, scrollYProgress }: { step: any, index: numbe
     const end = start + stepDuration;
 
     // Fade in
-    const opacityInput = [start, start + 0.05, end - 0.05, end];
-    const opacityOutput = [0, 1, 1, 0];
+    // Special handling for the last step to ensure it stays visible longer/until end
+    const isLast = index === 3; // steps.length is 4
+
+    let opacityInput = [start, start + 0.05, end - 0.05, end];
+    let opacityOutput = [0, 1, 1, 0];
+
+    if (isLast) {
+        // Last step fades in and stays visible until the very end of the section
+        opacityInput = [start, start + 0.05, 1];
+        opacityOutput = [0, 1, 1];
+    }
 
     // Scale effect
     const scaleInput = [start, start + 0.1, end];
