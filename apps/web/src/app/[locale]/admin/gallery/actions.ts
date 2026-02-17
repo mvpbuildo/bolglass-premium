@@ -184,8 +184,9 @@ export async function createGalleryAlbum(data: {
         });
         revalidatePath('/', 'layout');
         return { success: true, album };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return { success: false, error: message };
     }
 }
 
@@ -204,8 +205,9 @@ export async function updateGalleryAlbum(id: string, data: Partial<{
         });
         revalidatePath('/', 'layout');
         return { success: true, album };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return { success: false, error: message };
     }
 }
 
@@ -217,8 +219,9 @@ export async function deleteGalleryAlbum(id: string) {
         });
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return { success: false, error: message };
     }
 }
 
