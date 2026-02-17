@@ -4,6 +4,8 @@ import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
 import { sendBookingConfirmation } from '@/lib/mail';
 import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
 
 // --- System Settings API ---
 
@@ -502,5 +504,41 @@ export async function generateMonthSlots(year: number, month: number) {
     } catch (error: any) {
         console.error('Error generating slots:', error);
         return { success: false, error: error.message };
+    }
+}
+
+export async function uploadContactLogo(formData: FormData) {
+    console.log("uploadContactLogo action started");
+    try {
+        const file = formData.get('file') as File;
+
+        if (!file || file.size === 0) {
+            return { error: "Nie wybrano pliku." };
+        }
+
+        console.log(`Processing logo upload: ${file.name}, size: ${file.size}`);
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Robust path handling
+        const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+        const uploadDir = isWebPackage
+            ? join(process.cwd(), 'public', 'uploads')
+            : join(process.cwd(), 'apps', 'web', 'public', 'uploads');
+
+        await mkdir(uploadDir, { recursive: true });
+
+        const ext = file.name.split('.').pop() || 'jpg';
+        const finalFilename = `logo-${Date.now()}.${ext}`;
+        const filepath = join(uploadDir, finalFilename);
+
+        console.log(`Writing logo to: ${filepath}`);
+        await writeFile(filepath, buffer);
+
+        const fileUrl = `/uploads/${finalFilename}`;
+        return { success: true, url: fileUrl };
+    } catch (error: any) {
+        console.error("Upload logo failed:", error);
+        return { error: "Wystąpił błąd podczas przesyłania logo." };
     }
 }

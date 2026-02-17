@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button, Input, Card } from '@bolglass/ui';
 import { getSystemSettings, updateSystemSetting } from '../app/[locale]/actions';
 import { motion } from 'framer-motion';
-import { Facebook, Instagram, Mail, Phone, MapPin, Globe, Image as ImageIcon } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone, MapPin, Globe, Image as ImageIcon, Upload, X } from 'lucide-react';
 
 export default function AdminContactSettings() {
     const [settings, setSettings] = useState({
@@ -126,12 +126,63 @@ export default function AdminContactSettings() {
                         <h3 className="font-bold text-gray-700 border-b pb-2 flex items-center gap-2">
                             <ImageIcon className="w-4 h-4 text-purple-500" /> Media i Mapa
                         </h3>
-                        <Input
-                            label="URL Logo (opcjonalnie)"
-                            placeholder="https://..."
-                            value={settings.logo_url}
-                            onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
-                        />
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Logo Firmy</label>
+                            <div className="flex items-center gap-6">
+                                {settings.logo_url ? (
+                                    <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                                        <img src={settings.logo_url} alt="Logo Preview" className="max-w-full max-h-full object-contain" />
+                                        <button
+                                            onClick={() => setSettings({ ...settings, logo_url: '' })}
+                                            className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                                        <span className="text-xs">Brak logo</span>
+                                    </div>
+                                )}
+
+                                <div className="flex-1">
+                                    <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <Upload className="w-5 h-5 mr-2 text-gray-500" />
+                                        Wybierz plik z dysku
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/*"
+                                            onChange={async (e) => {
+                                                if (e.target.files && e.target.files[0]) {
+                                                    const file = e.target.files[0];
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+
+                                                    // Optimistic update (show generic loader or keep old until done?) mechanism:
+                                                    // Ideally we need loading state, but let's keep it simple for now or adding a small toast
+                                                    try {
+                                                        const { uploadContactLogo } = await import('../app/[locale]/actions'); // Dynamic import to avoid circular dep issues in client component if any
+                                                        const res = await uploadContactLogo(formData);
+                                                        if (res.success && res.url) {
+                                                            setSettings({ ...settings, logo_url: res.url });
+                                                        } else {
+                                                            alert('Błąd przesyłania: ' + res.error);
+                                                        }
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        alert('Wystąpił błąd podczas przesyłania pliku.');
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </label>
+                                    <p className="mt-2 text-xs text-gray-500">Zalecany format: PNG, JPG. Maks. 2MB.</p>
+                                    {/* Fallback for manual URL if needed, or just hidden */}
+                                    {/* <Input label="lub wklej URL" value={settings.logo_url} onChange={(e) => setSettings({...settings, logo_url: e.target.value})} className="mt-2" /> */}
+                                </div>
+                            </div>
+                        </div>
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-gray-700 mb-1">Kod Iframe Mapy Google</label>
                             <textarea

@@ -34,13 +34,14 @@ export default async function ContactPage() {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-20">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                <div className="space-y-20">
 
-                    {/* LEFT COLUMN: Contact Details & Map */}
-                    <div className="space-y-12">
-                        {/* Information Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-6">
+                    {/* TOP SECTION: Contact Details & Map side-by-side */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+
+                        {/* LEFT: Contact Info */}
+                        <div className="space-y-12">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                 <section>
                                     <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">Adres</h2>
                                     <div className="flex gap-4">
@@ -80,7 +81,7 @@ export default async function ContactPage() {
                                 </section>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t pt-8">
                                 <section>
                                     <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">Godziny Otwarcia</h2>
                                     <div className="flex gap-4">
@@ -112,47 +113,50 @@ export default async function ContactPage() {
                                     </section>
                                 )}
                             </div>
-                        </div>
 
-                        {/* Interactive Map */}
-                        <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-100 aspect-video group">
-                            {contactInfo.map ? (
-                                <div
-                                    className="w-full h-full border-0"
-                                    dangerouslySetInnerHTML={{
-                                        __html: contactInfo.map.replace(/width="\d+"/, 'width="100%"').replace(/height="\d+"/, 'height="100%"')
-                                    }}
-                                />
-                            ) : (
-                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                                    <MapPin size={48} className="mb-4 animate-bounce" />
-                                    <p className="font-bold">Skonfiguruj mapę w panelu admina</p>
+                            {contactInfo.logo && (
+                                <div className="hidden lg:flex justify-start pt-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                                    <Image src={contactInfo.logo} alt="Logo" width={180} height={80} className="object-contain" />
                                 </div>
                             )}
-                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/20 to-transparent h-12 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>
 
-                        {contactInfo.logo && (
-                            <div className="flex justify-center lg:justify-start pt-8 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-                                <Image src={contactInfo.logo} alt="Logo" width={200} height={80} className="object-contain" />
+                        {/* RIGHT: Map */}
+                        <div className="h-full min-h-[400px]">
+                            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-100 aspect-video lg:aspect-square group h-full">
+                                {contactInfo.map ? (
+                                    <div
+                                        className="w-full h-full border-0"
+                                        dangerouslySetInnerHTML={{
+                                            __html: contactInfo.map.replace(/width="\d+"/, 'width="100%"').replace(/height="\d+"/, 'height="100%"')
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-gray-400 bg-gray-200">
+                                        <MapPin size={48} className="mb-4 animate-bounce" />
+                                        <p className="font-bold">Skonfiguruj mapę w panelu admina</p>
+                                    </div>
+                                )}
+                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/20 to-transparent h-12 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </div>
-                        )}
+                        </div>
                     </div>
 
-                    {/* RIGHT COLUMN: Booking Section */}
-                    <div id="rezerwacja" className="lg:sticky lg:top-24">
-                        <div className="bg-white rounded-[2rem] shadow-2xl border-2 border-red-50 overflow-hidden">
-                            <div className="bg-red-600 p-8 text-white text-center">
-                                <h2 className="text-3xl font-black mb-2 uppercase italic tracking-tighter">Zarezerwuj Warsztaty</h2>
-                                <p className="text-red-100 font-medium">Wybierz dogodny termin i stwórz coś wyjątkowego</p>
+                    {/* BOTTOM SECTION: Booking */}
+                    <div id="rezerwacja" className="max-w-5xl mx-auto">
+                        <div className="bg-white rounded-[2rem] shadow-2xl border-2 border-red-50 overflow-hidden transform hover:scale-[1.01] transition-transform duration-500">
+                            <div className="bg-gradient-to-r from-red-600 to-red-700 p-10 text-white text-center relative overflow-hidden">
+                                <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                                <div className="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                                <h2 className="text-4xl font-black mb-3 uppercase italic tracking-tighter relative z-10">Zarezerwuj Warsztaty</h2>
+                                <p className="text-red-100 font-medium text-lg relative z-10">Wybierz dogodny termin i stwórz coś wyjątkowego w naszej hucie</p>
                             </div>
-                            <div className="p-8">
+                            <div className="p-8 lg:p-12">
                                 <BookingCalendar />
                             </div>
                             <div className="bg-gray-50 p-6 border-t text-center">
-                                <p className="text-xs text-gray-400 leading-relaxed">
-                                    Potrzebujesz grupy zorganizowanej? <br />
-                                    Skontaktuj się z nami bezpośrednio przez telefon.
+                                <p className="text-sm text-gray-500 font-medium">
+                                    Potrzebujesz terminu dla grupy zorganizowanej? <a href={`tel:${contactInfo.phones[0]}`} className="text-red-600 font-bold hover:underline">Zadzwoń do nas!</a>
                                 </p>
                             </div>
                         </div>
