@@ -10,7 +10,7 @@ export default async function GalleryPage() {
             {/* Cinematic Hero Background */}
             <div className="fixed inset-0 z-0">
                 <Image
-                    src="/uploads/gallery/magia-tworzenia.png"
+                    src="/images/magia-tworzenia.png"
                     alt="Manufaktura Bolglass Background"
                     fill
                     className="object-cover opacity-30"
