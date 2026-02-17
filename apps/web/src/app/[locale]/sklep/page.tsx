@@ -20,11 +20,11 @@ export default async function ShopPage() {
 
             {/* HER0 SECTION */}
             <div className="relative h-[400px] w-full flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-900 via-amber-900 to-black">
-                    {/* Fallback pattern or if we had an image */}
-                    <div className="absolute inset-0 opacity-20 bg-[url('/noise.png')]"></div>
-                </div>
-                <div className="absolute inset-0 bg-black/40"></div>
+                <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 transform hover:scale-105"
+                    style={{ backgroundImage: "url('/hero-background.png')" }}
+                />
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"></div>
 
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto space-y-6">
                     <h1 className="text-5xl md:text-7xl font-serif text-transparent bg-clip-text bg-gradient-to-b from-amber-100 to-amber-500 drop-shadow-2xl">
