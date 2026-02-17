@@ -69,10 +69,12 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
                     isCompany: true,
                     companyName: companyName,
                     nip: nip,
+                    companyStreet: companyAddress, // Mapping one field to schema for now
+                    // Note: If we had separate city/zip in checkout, we'd update them here too.
                 }
             });
-        } catch {
-            console.error("Failed to update user profile with company data");
+        } catch (err) {
+            console.error("Failed to update user profile with company data:", err);
         }
     }
 
