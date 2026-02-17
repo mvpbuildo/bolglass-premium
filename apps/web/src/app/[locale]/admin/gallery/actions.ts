@@ -3,8 +3,8 @@
 import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
-import { join } from 'path';
-import { mkdir, writeFile, readdir, stat, unlink } from 'fs/promises';
+import { join, extname } from 'path';
+import { mkdir, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { GalleryItem, GalleryAlbum } from '@/types/gallery';
 
@@ -92,9 +92,10 @@ export async function uploadGalleryMedia(formData: FormData) {
             url: `/uploads/gallery/${fileName}`,
             type: isVideo ? 'VIDEO' : 'IMAGE'
         };
-    } catch (error: any) {
-        console.error('Upload failed:', error);
-        return { success: false, error: error.message };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Upload failed:', message);
+        return { success: false, error: message };
     }
 }
 
