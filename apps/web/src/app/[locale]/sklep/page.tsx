@@ -18,13 +18,26 @@ export default async function ShopPage() {
         <main className="min-h-screen bg-gray-50">
             <ShopNavigation />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="mb-8 text-center">
-                    <h1 className="text-4xl font-black text-gray-900 mb-2">Nasze Produkty</h1>
-                    <p className="text-gray-500 max-w-2xl mx-auto">
-                        Odkryj ręcznie malowane arcydzieła, które wniosą magię świąt do Twojego domu.
-                    </p>
+            {/* HER0 SECTION */}
+            <div className="relative h-[400px] w-full flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-900 via-amber-900 to-black">
+                    {/* Fallback pattern or if we had an image */}
+                    <div className="absolute inset-0 opacity-20 bg-[url('/noise.png')]"></div>
                 </div>
+                <div className="absolute inset-0 bg-black/40"></div>
+
+                <div className="relative z-10 text-center px-4 max-w-4xl mx-auto space-y-6">
+                    <h1 className="text-5xl md:text-7xl font-serif text-transparent bg-clip-text bg-gradient-to-b from-amber-100 to-amber-500 drop-shadow-2xl">
+                        Magia Szklanych Świąt
+                    </h1>
+                    <p className="text-xl md:text-2xl text-amber-50/90 font-light tracking-wide max-w-2xl mx-auto">
+                        Ręcznie dmuchane, artystycznie malowane – bombki z duszą.
+                    </p>
+                    <div className="w-24 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto"></div>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
                 {products.length === 0 ? (
                     <div className="text-center py-20 text-gray-400">

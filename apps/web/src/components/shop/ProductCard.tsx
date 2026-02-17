@@ -32,43 +32,54 @@ export default function ProductCard({ product }: { product: ProductProps }) {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 overflow-hidden group flex flex-col h-full">
-            <Link href={`/sklep/${product.slug}`} className="block relative aspect-square bg-gray-50 overflow-hidden">
+        <div className="group relative bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full flex flex-col">
+            {/* Image Container with Shine Effect */}
+            <Link href={`/sklep/${product.slug}`} className="block relative aspect-[4/5] bg-gray-50 overflow-hidden">
                 {product.image ? (
-                    <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    <>
+                        <Image
+                            src={product.image}
+                            alt={product.name}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </>
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                        {/* Placeholder Icon */}
                     </div>
                 )}
+                {/* Shine overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 translate-x-[-100%] group-hover:translate-x-[100%] transform skew-x-[-25deg]"></div>
             </Link>
 
-            <div className="p-4 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow bg-white/50 backdrop-blur-sm">
                 <Link href={`/sklep/${product.slug}`}>
-                    <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-2 min-h-[3rem]">
+                    <h3 className="font-serif text-xl text-gray-900 group-hover:text-red-700 transition-colors line-clamp-2 leading-tight mb-2">
                         {product.name}
                     </h3>
                 </Link>
+                {/* Decorative line */}
+                <div className="w-12 h-0.5 bg-amber-200 mb-4 group-hover:w-full group-hover:bg-amber-400 transition-all duration-500"></div>
 
-                <div className="mt-auto pt-4 flex items-center justify-between">
+                <div className="mt-auto flex items-end justify-between gap-4">
                     <div>
-                        <p className="text-lg font-black text-gray-900">{product.price.toFixed(2)} zł</p>
-                        <p className="text-xs text-gray-400">Brutto (zawiera VAT)</p>
+                        <p className="text-2xl font-bold text-gray-900 tracking-tight">{product.price.toFixed(2)} <span className="text-sm font-normal text-gray-500">zł</span></p>
                     </div>
+
                     <Button
                         size="sm"
                         onClick={handleAddToCart}
-                        className="bg-red-600 hover:bg-red-700 text-white rounded-full px-4"
+                        className="bg-gray-900 hover:bg-red-700 text-white rounded-xl px-6 py-2 shadow-lg hover:shadow-red-500/30 transition-all duration-300"
                     >
-                        + Do Koszyka
+                        Do Koszyka
                     </Button>
                 </div>
             </div>
+
+            {/* Glass Border Effect */}
+            <div className="absolute inset-0 border-2 border-transparent group-hover:border-amber-500/20 rounded-2xl pointer-events-none transition-colors duration-500"></div>
         </div>
     );
 }
