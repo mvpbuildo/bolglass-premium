@@ -20,6 +20,9 @@ export default function BookingCalendar() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [people, setPeople] = useState('1');
+    const [isGroup, setIsGroup] = useState(false);
+    const [institutionName, setInstitutionName] = useState('');
+    const [institutionAddress, setInstitutionAddress] = useState('');
 
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -70,7 +73,10 @@ export default function BookingCalendar() {
                 name,
                 email,
                 people: parseInt(people) || 1,
-                type: bookingType
+                type: bookingType,
+                isGroup,
+                institutionName: isGroup ? institutionName : undefined,
+                institutionAddress: isGroup ? institutionAddress : undefined
             });
             setLoading(false);
             if (result.success) {
@@ -331,6 +337,49 @@ export default function BookingCalendar() {
                                                 onChange={(e) => setPeople(e.target.value)}
                                                 options={peopleOptions}
                                             />
+
+                                            <div className="pt-4 mt-4 border-t border-gray-100">
+                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                    <div className={`relative w-12 h-6 rounded-full transition-colors ${isGroup ? 'bg-red-600' : 'bg-gray-200'}`}>
+                                                        <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isGroup ? 'translate-x-6' : ''}`} />
+                                                        <input
+                                                            type="checkbox"
+                                                            className="sr-only"
+                                                            checked={isGroup}
+                                                            onChange={(e) => setIsGroup(e.target.checked)}
+                                                        />
+                                                    </div>
+                                                    <span className="font-bold text-sm text-gray-700 group-hover:text-red-600 transition-colors">
+                                                        Grupa zorganizowana (szkoły, instytucje)
+                                                    </span>
+                                                </label>
+                                            </div>
+
+                                            <AnimatePresence>
+                                                {isGroup && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: 'auto' }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        className="space-y-4 pt-4 overflow-hidden"
+                                                    >
+                                                        <Input
+                                                            label="Nazwa Instytucji / Szkoły"
+                                                            value={institutionName}
+                                                            onChange={(e) => setInstitutionName(e.target.value)}
+                                                            placeholder="np. Szkoła Podstawowa nr 1"
+                                                            required={isGroup}
+                                                        />
+                                                        <Input
+                                                            label="Adres Instytucji"
+                                                            value={institutionAddress}
+                                                            onChange={(e) => setInstitutionAddress(e.target.value)}
+                                                            placeholder="Ulica, kod pocztowy, miasto"
+                                                            required={isGroup}
+                                                        />
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
 
                                         <div className="pt-6 flex gap-4">

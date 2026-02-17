@@ -214,6 +214,9 @@ export async function createBooking(formData: {
     email: string;
     people: number;
     type: string; // 'SIGHTSEEING' | 'WORKSHOP'
+    isGroup?: boolean;
+    institutionName?: string;
+    institutionAddress?: string;
 }, isAdminOverride = false) {
     console.log('--- SERVER ACTION: createBooking ---', { formData, isAdminOverride });
     console.log('--- START createBooking ---', formData);
@@ -308,7 +311,10 @@ export async function createBooking(formData: {
                 slotId: slot.id,
                 type: formData.type,
                 status: 'CONFIRMED',
-                priceBase: finalPrice
+                priceBase: finalPrice,
+                isGroup: formData.isGroup || false,
+                institutionName: formData.institutionName,
+                institutionAddress: formData.institutionAddress
             },
         });
 

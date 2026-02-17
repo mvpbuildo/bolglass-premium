@@ -201,6 +201,11 @@ model Booking {
   priceBase      Int       @default(150)
   reminderSentAt DateTime?
   
+  // Organized Group Details
+  isGroup            Boolean @default(false)
+  institutionName    String?
+  institutionAddress String?
+  
   slotId         String?
   slot           Slot?     @relation(fields: [slotId], references: [id])
   

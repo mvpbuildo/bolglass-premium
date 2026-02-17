@@ -11,7 +11,7 @@ export default function AdminBookingList() {
 
     // Manual Form States
     const [slots, setSlots] = useState<any[]>([]);
-    const [formData, setFormData] = useState({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING' });
+    const [formData, setFormData] = useState({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING', isGroup: false, institutionName: '', institutionAddress: '' });
 
     // Filtering & Sorting States
     const [filterSearch, setFilterSearch] = useState('');
@@ -45,7 +45,7 @@ export default function AdminBookingList() {
         const res = await createBooking({ ...formData, people: parseInt(formData.people) }, true);
         if (res.success) {
             setIsAdding(false);
-            setFormData({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING' });
+            setFormData({ slotId: '', name: '', email: '', people: '1', type: 'SIGHTSEEING', isGroup: false, institutionName: '', institutionAddress: '' });
             fetchBookings();
         } else {
             alert('Błąd: ' + res.error);
@@ -87,7 +87,7 @@ export default function AdminBookingList() {
         });
 
     const handleExport = () => {
-        const headers = ["Data", "Godzina", "Klient", "Email", "Pakiet", "Osob", "Cena/os", "Suma", "Notatki"];
+        const headers = ["Data", "Godzina", "Klient", "Email", "Pakiet", "Osob", "Cena/os", "Suma", "Grupa", "Instytucja", "Adres Instytucji", "Notatki"];
         const rows = filteredAndSortedBookings.map(b => [
             new Date(b.date).toLocaleDateString('pl-PL'),
             new Date(b.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
@@ -97,6 +97,9 @@ export default function AdminBookingList() {
             b.people,
             b.priceBase,
             b.people * b.priceBase,
+            b.isGroup ? "TAK" : "NIE",
+            b.institutionName || "",
+            b.institutionAddress || "",
             (b.adminNotes || "").replace(/,/g, ";")
         ]);
 
@@ -225,6 +228,30 @@ export default function AdminBookingList() {
                             <option value="SIGHTSEEING">👀 Zwiedzanie</option>
                             <option value="WORKSHOP">🎨 Warsztaty</option>
                         </select>
+                        <select
+                            className="p-2 border rounded bg-white text-sm"
+                            value={formData.isGroup ? 'true' : 'false'}
+                            onChange={(e) => setFormData({ ...formData, isGroup: e.target.value === 'true' })}
+                        >
+                            <option value="false">👤 Indywidualna</option>
+                            <option value="true">🏫 Grupa</option>
+                        </select>
+                        {formData.isGroup && (
+                            <>
+                                <input
+                                    placeholder="Nazwa Instytucji"
+                                    className="p-2 border rounded bg-white text-sm"
+                                    value={formData.institutionName}
+                                    onChange={(e) => setFormData({ ...formData, institutionName: e.target.value })}
+                                />
+                                <input
+                                    placeholder="Adres Instytucji"
+                                    className="p-2 border rounded bg-white text-sm"
+                                    value={formData.institutionAddress}
+                                    onChange={(e) => setFormData({ ...formData, institutionAddress: e.target.value })}
+                                />
+                            </>
+                        )}
                     </div>
                     <Button className="mt-4" onClick={handleAddManual}>Zapisz Rezerwację</Button>
                 </Card>
@@ -262,8 +289,18 @@ export default function AdminBookingList() {
                                             </div>
                                         </td>
                                         <td className="px-3 py-2 not-italic">
-                                            <div className="font-medium text-sm truncate max-w-[150px]" title={booking.name}>{booking.name}</div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="font-medium text-sm truncate max-w-[150px]" title={booking.name}>{booking.name}</div>
+                                                {booking.isGroup && <span title="Grupa Zorganizowana" className="cursor-help text-lg">🏫</span>}
+                                            </div>
                                             <div className="text-[10px] text-gray-400 truncate max-w-[150px]" title={booking.email}>{booking.email}</div>
+                                            {booking.isGroup && (
+                                                <div className="mt-1 p-1.5 bg-red-50 border border-red-100 rounded text-[10px] text-red-800 font-medium">
+                                                    <div className="font-bold uppercase tracking-tighter">Instytucja:</div>
+                                                    <div className="truncate" title={booking.institutionName}>{booking.institutionName}</div>
+                                                    <div className="text-red-600/60 truncate" title={booking.institutionAddress}>{booking.institutionAddress}</div>
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-3 py-2 not-italic">
                                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${booking.type === 'WORKSHOP'
