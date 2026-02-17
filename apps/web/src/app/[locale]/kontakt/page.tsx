@@ -99,12 +99,12 @@ export default async function ContactPage() {
                                         <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">Social Media</h2>
                                         <div className="flex gap-4">
                                             {contactInfo.fb && (
-                                                <a href={contactInfo.fb} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1">
+                                                <a href={contactInfo.fb} target="_blank" rel="noopener noreferrer" title="Facebook Bolglass" className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1">
                                                     <Facebook size={24} />
                                                 </a>
                                             )}
                                             {contactInfo.ig && (
-                                                <a href={contactInfo.ig} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-red-500 hover:to-purple-600 hover:text-white transition-all transform hover:-translate-y-1">
+                                                <a href={contactInfo.ig} target="_blank" rel="noopener noreferrer" title="Instagram Bolglass" className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:bg-gradient-to-tr hover:from-yellow-400 hover:via-red-500 hover:to-purple-600 hover:text-white transition-all transform hover:-translate-y-1">
                                                     <Instagram size={24} />
                                                 </a>
                                             )}
