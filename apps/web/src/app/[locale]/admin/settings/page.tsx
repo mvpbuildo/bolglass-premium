@@ -1,6 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import AdminSettings from '../../../../components/AdminSettings';
 import AdminEmailSettings from '../../../../components/AdminEmailSettings';
+import AdminContactSettings from '../../../../components/AdminContactSettings';
 import AdminNavigation from '../../../../components/AdminNavigation';
 
 export default function AdminSettingsPage() {
@@ -16,7 +17,10 @@ export default function AdminSettingsPage() {
                     <AdminSettings />
                 </div>
 
-                <AdminEmailSettings />
+                <div className="space-y-12">
+                    <AdminContactSettings />
+                    <AdminEmailSettings />
+                </div>
             </div>
         </main>
     );
