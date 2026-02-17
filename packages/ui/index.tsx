@@ -4,3 +4,4 @@ export * from './select';
 export * from './card';
 export * from './LanguageSwitcher';
 export * from './table';
+export * from './loading-spinner';
