@@ -61,10 +61,13 @@ export async function uploadGalleryMedia(formData: FormData) {
 
         await writeFile(filePath, buffer);
 
+        const isVideo = file.type.startsWith('video/') ||
+            ['.mov', '.m4v', '.mp4', '.webm'].includes(extname(file.name).toLowerCase());
+
         return {
             success: true,
             url: `/uploads/gallery/${fileName}`,
-            type: file.type.startsWith('video/') ? 'VIDEO' : 'IMAGE'
+            type: isVideo ? 'VIDEO' : 'IMAGE'
         };
     } catch (error: any) {
         console.error('Upload failed:', error);

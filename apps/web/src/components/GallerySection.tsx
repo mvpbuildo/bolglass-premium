@@ -45,7 +45,7 @@ export default async function GallerySection() {
                             {item.type === 'VIDEO' ? (
                                 <video
                                     src={item.url}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105 bg-black/5"
                                     muted
                                     loop
                                     playsInline
@@ -56,7 +56,7 @@ export default async function GallerySection() {
                                     src={item.url}
                                     alt={item.title || ''}
                                     fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="object-contain transition-transform duration-700 group-hover:scale-105 bg-black/5"
                                 />
                             )}
 

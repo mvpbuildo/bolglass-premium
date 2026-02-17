@@ -60,7 +60,7 @@ export default function GalleryManager() {
             await createGalleryItem({
                 ...newItem,
                 url: result.url,
-                type: result.type as any,
+                type: result.type as 'IMAGE' | 'VIDEO',
                 order: items.length
             });
             setIsAdding(false);
@@ -182,7 +182,7 @@ export default function GalleryManager() {
                                     <VideoIcon className="w-12 h-12 text-white/50" />
                                     <video
                                         src={item.url}
-                                        className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 transition-opacity"
+                                        className="absolute inset-0 w-full h-full object-contain opacity-50 group-hover:opacity-70 transition-opacity"
                                         muted
                                         playsInline
                                     />
@@ -192,7 +192,7 @@ export default function GalleryManager() {
                                     src={item.url}
                                     alt={item.title || ''}
                                     fill
-                                    className="object-cover"
+                                    className="object-contain"
                                 />
                             )}
                             <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -38,7 +38,7 @@ export default async function GalleryPage() {
                                     <div className="w-full h-full relative">
                                         <video
                                             src={item.url}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 bg-black/20"
                                             muted
                                             loop
                                             playsInline
@@ -55,7 +55,7 @@ export default async function GalleryPage() {
                                             src={item.url}
                                             alt={item.title || ''}
                                             fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                            className="object-contain transition-transform duration-700 group-hover:scale-110 bg-black/20"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                         <div className="absolute top-4 right-4 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white">
