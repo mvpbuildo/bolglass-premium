@@ -13,10 +13,10 @@ export default async function GalleryPage() {
                     src="/images/magia-tworzenia.png"
                     alt="Manufaktura Bolglass Background"
                     fill
-                    className="object-cover opacity-30"
+                    className="object-cover opacity-60 scale-105"
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#060606] via-[#060606]/80 to-[#060606]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#060606] via-[#060606]/40 to-[#060606]" />
             </div>
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
