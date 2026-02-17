@@ -32,7 +32,7 @@ export default async function GalleryPage() {
                         {(items as GalleryItem[]).map((item) => (
                             <div
                                 key={item.id}
-                                className="group relative aspect-square md:aspect-video rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-500 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-2 cursor-pointer"
+                                className="group relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-500 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-2 cursor-pointer"
                             >
                                 {item.type === 'VIDEO' ? (
                                     <div className="w-full h-full relative">

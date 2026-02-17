@@ -39,7 +39,7 @@ export default async function GallerySection() {
                     {items.map((item: GalleryItem, index: number) => (
                         <div
                             key={item.id}
-                            className={`group relative rounded-2xl overflow-hidden glass-card shadow-sm border border-orange-100/20 aspect-square ${index === 0 ? 'md:col-span-2 md:row-span-2 md:aspect-auto' : ''
+                            className={`group relative rounded-2xl overflow-hidden glass-card shadow-sm border border-orange-100/20 aspect-video ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''
                                 }`}
                         >
                             {item.type === 'VIDEO' ? (
