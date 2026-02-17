@@ -27,6 +27,13 @@ const steps = [
     },
     {
         id: 4,
+        title: "Lakierowanie (Lacquering)",
+        description: "Po srebrzeniu bombki są lakierowane, aby nadać im niepowtarzalne kolory.",
+        color: "from-red-600 to-rose-900", // Adapted for lacquering/coloring vibe
+        image: "/production/lacquering.png"
+    },
+    {
+        id: 5,
         title: "Dekorowanie (Decorating)",
         description: "Artystki nanoszą wzory z chirurgiczną precyzją. Każde pociągnięcie pędzla to historia.",
         color: "from-purple-500 to-pink-500",
@@ -35,34 +42,42 @@ const steps = [
 ];
 
 const ProcessStep = ({ step, index, scrollYProgress }: { step: any, index: number, scrollYProgress: MotionValue<number> }) => {
-    // Optimized timing for 4 steps to ensure complete visibility
+    // Optimized timing for 5 steps to ensure complete visibility
     // Total range: 0 to 1
-    // Step duration: 0.25 (25%) including transition
+    // Step duration: 0.2 (20%) - 5 steps fit perfectly
     // Overlap: 0.05 (5%) to ensure no black gaps
 
-    // Calculate start based on index, shifting slightly earlier to fit all
-    const stepDuration = 0.25;
+    const stepCount = 5;
+    const stepDuration = 1 / stepCount; // 0.2
     const overlap = 0.05;
 
-    // Start times: 0.0, 0.2, 0.4, 0.6
-    // End times:   0.25, 0.45, 0.65, 0.85 (plus extended visibility for last)
-    const start = index * (stepDuration - overlap);
-    const end = start + stepDuration;
+    // Start times: 0.0, 0.2, 0.4, 0.6, 0.8
+    // End times:   0.2, 0.4, 0.6, 0.8, 1.0 (with overlap)
+    const start = index * (stepDuration - (overlap / 2)); // Slightly adjusting start for overlap
+    // Simple linear distribution might be better for 5 steps to avoid complexity
+    // Let's use simple logic:
+    // 0: 0.0 - 0.25
+    // 1: 0.2 - 0.45
+    // 2: 0.4 - 0.65
+    // 3: 0.6 - 0.85
+    // 4: 0.8 - 1.0
+
+    const simpleStart = index * 0.2;
+    const end = simpleStart + 0.25;
 
     // Fade in/out logic
-    let opacityInput = [start, start + 0.1, end - 0.1, end];
+    let opacityInput = [simpleStart, simpleStart + 0.05, end - 0.05, end];
     let opacityOutput = [0, 1, 1, 0];
 
-    const isLast = index === 3; // steps.length is 4
+    const isLast = index === stepCount - 1;
     if (isLast) {
-        // Last step starts at 0.6 and stays visible until the end (1.0)
-        // This ensures it never disappears while user is still scrolling the section
-        opacityInput = [start, start + 0.1, 1];
+        // Last step stays visible until the end
+        opacityInput = [simpleStart, simpleStart + 0.05, 1];
         opacityOutput = [0, 1, 1];
     }
 
     // Scale effect
-    const scaleInput = [start, start + 0.1, end];
+    const scaleInput = [simpleStart, simpleStart + 0.1, end];
     const scaleOutput = [0.9, 1, 0.9];
 
     const opacity = useTransform(scrollYProgress, opacityInput, opacityOutput);
@@ -108,7 +123,7 @@ export default function ProductionProcess() {
     });
 
     return (
-        <section ref={containerRef} className="relative h-[500vh] bg-[#050505] text-white">
+        <section ref={containerRef} className="relative h-[600vh] bg-[#050505] text-white">
             <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
                 {/* Background Atmosphere - Bolglass Premium Theme */}
                 <div className="absolute inset-0 bg-[#0a0500]" />
