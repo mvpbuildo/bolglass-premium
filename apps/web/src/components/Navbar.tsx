@@ -11,7 +11,7 @@ import { useSession, signOut } from "next-auth/react";
 import { ShoppingCart, User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 import { Button } from '@bolglass/ui';
 
-export default function Navbar() {
+export default function Navbar({ logoUrl }: { logoUrl?: string }) {
     const t = useTranslations('Common.nav');
     const pathname = usePathname();
     const [isScrolled, setIsScrolled] = useState(false);
@@ -52,14 +52,15 @@ export default function Navbar() {
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                 {/* Logo Section */}
-                <Link href="/" className="relative group">
-                    <div className={`relative transition-all duration-500 overflow-hidden rounded-full ring-2 ring-white/5 shadow-2xl ${isScrolled || !isHome ? 'w-12 h-12' : 'w-20 h-20'
+                <Link href="/" className="relative group flex items-center">
+                    <div className={`relative transition-all duration-500 rounded-lg hover:scale-105 ${isScrolled || !isHome ? 'w-24 h-12' : 'w-40 h-20'
                         }`}>
                         <Image
-                            src="/bolglass-logo-blue.png"
+                            src={logoUrl || "/bolglass-logo-white.png"}
                             alt="Bolglass Logo"
                             fill
-                            className="object-contain p-2 bg-white"
+                            className="object-contain"
+                            priority
                         />
                     </div>
                 </Link>

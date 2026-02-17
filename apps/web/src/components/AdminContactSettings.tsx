@@ -16,7 +16,7 @@ export default function AdminContactSettings() {
         email: 'biuro@bolglass.pl',
         facebook_url: 'https://facebook.com/bolglass',
         instagram_url: 'https://instagram.com/bolglass',
-        logo_url: '',
+        contact_logo: '',
         google_maps_iframe: ''
     });
     const [loading, setLoading] = useState(true);
@@ -129,11 +129,11 @@ export default function AdminContactSettings() {
                         <div className="md:col-span-2">
                             <label className="block text-sm font-bold text-gray-700 mb-2">Logo Firmy</label>
                             <div className="flex items-center gap-6">
-                                {settings.logo_url ? (
-                                    <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
-                                        <img src={settings.logo_url} alt="Logo Preview" className="max-w-full max-h-full object-contain" />
+                                {settings.contact_logo ? (
+                                    <div className="relative w-32 h-32 border rounded-lg overflow-hidden bg-black/90 flex items-center justify-center p-2">
+                                        <img src={settings.contact_logo} alt="Logo Preview" className="max-w-full max-h-full object-contain" />
                                         <button
-                                            onClick={() => setSettings({ ...settings, logo_url: '' })}
+                                            onClick={() => setSettings({ ...settings, contact_logo: '' })}
                                             className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
                                         >
                                             <X size={12} />
@@ -159,13 +159,11 @@ export default function AdminContactSettings() {
                                                     const formData = new FormData();
                                                     formData.append('file', file);
 
-                                                    // Optimistic update (show generic loader or keep old until done?) mechanism:
-                                                    // Ideally we need loading state, but let's keep it simple for now or adding a small toast
                                                     try {
-                                                        const { uploadContactLogo } = await import('../app/[locale]/actions'); // Dynamic import to avoid circular dep issues in client component if any
+                                                        const { uploadContactLogo } = await import('../app/[locale]/actions');
                                                         const res = await uploadContactLogo(formData);
                                                         if (res.success && res.url) {
-                                                            setSettings({ ...settings, logo_url: res.url });
+                                                            setSettings({ ...settings, contact_logo: res.url });
                                                         } else {
                                                             alert('Błąd przesyłania: ' + res.error);
                                                         }

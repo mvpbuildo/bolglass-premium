@@ -16,7 +16,7 @@ export default async function Footer() {
         fb: settings.facebook_url,
         ig: settings.instagram_url,
         yt: settings.youtube_url,
-        logo: settings.logo_url
+        logo: settings.contact_logo
     };
 
     return (
@@ -28,13 +28,12 @@ export default async function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
                     {/* Brand Section */}
                     <div className="space-y-6">
-                        <Link href="/" className="inline-block">
-                            <div className="w-16 h-16 bg-white rounded-full p-2 ring-2 ring-white/5 shadow-2xl">
+                        <Link href="/" className="inline-block transition-transform hover:scale-105">
+                            <div className="w-40 h-16 relative">
                                 <Image
-                                    src={contactInfo.logo || "/bolglass-logo-blue.png"}
+                                    src={contactInfo.logo || "/bolglass-logo-white.png"}
                                     alt="Bolglass Logo"
-                                    width={64}
-                                    height={64}
+                                    fill
                                     className="object-contain"
                                 />
                             </div>

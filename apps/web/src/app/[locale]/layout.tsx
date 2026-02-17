@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getSystemSettings } from "@/app/[locale]/actions";
 
 export default async function LocaleLayout({
     children,
@@ -40,8 +41,12 @@ export default async function LocaleLayout({
     }
 
     let messages;
+    let settings: Record<string, string> = {};
     try {
-        messages = await getMessages();
+        [messages, settings] = await Promise.all([
+            getMessages(),
+            getSystemSettings()
+        ]);
     } catch {
         messages = {};
     }
@@ -51,7 +56,7 @@ export default async function LocaleLayout({
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans bg-black text-white`}>
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <Providers>
-                        <Navbar />
+                        <Navbar logoUrl={settings.contact_logo} />
                         {children}
                         <Footer />
                     </Providers>
