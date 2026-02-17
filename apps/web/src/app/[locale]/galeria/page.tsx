@@ -1,9 +1,8 @@
-import { getGalleryItems } from '@/app/[locale]/admin/gallery/actions';
-import GalleryGrid from '@/components/GalleryGrid';
-import { GalleryItem } from '@/types/gallery';
+import { getGalleryData } from '@/app/[locale]/admin/gallery/actions';
+import GalleryLayout from '@/components/GalleryLayout';
 
 export default async function GalleryPage() {
-    const items = await getGalleryItems();
+    const { items, albums } = await getGalleryData();
 
     return (
         <main className="min-h-screen bg-[#0a0a0a] pt-32 pb-20 overflow-hidden relative">
@@ -22,12 +21,12 @@ export default async function GalleryPage() {
                     <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto pt-4" />
                 </div>
 
-                {items.length === 0 ? (
+                {items.length === 0 && albums.length === 0 ? (
                     <div className="py-20 text-center">
                         <p className="text-amber-200/40 text-xl font-serif italic">Galeria jest aktualnie w przygotowaniu...</p>
                     </div>
                 ) : (
-                    <GalleryGrid items={items as GalleryItem[]} />
+                    <GalleryLayout items={items} albums={albums} />
                 )}
             </div>
 

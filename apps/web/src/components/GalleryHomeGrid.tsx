@@ -34,8 +34,7 @@ export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
                     <div
                         key={item.id}
                         onClick={() => openLightbox(index)}
-                        className={`group relative rounded-2xl overflow-hidden glass-card shadow-sm border border-orange-100/20 aspect-video cursor-pointer ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''
-                            }`}
+                        className="group relative rounded-2xl overflow-hidden glass-card shadow-sm border border-orange-100/20 aspect-video cursor-pointer"
                     >
                         {item.type === 'VIDEO' ? (
                             <video
@@ -56,9 +55,12 @@ export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
                         )}
 
                         {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                             <p className="text-white font-medium text-sm md:text-base">{item.title || 'Manufaktura Bolglass'}</p>
-                            <div className="flex items-center gap-1.5 mt-1 text-orange-400">
+                            {item.description && (
+                                <p className="text-white/60 text-[10px] md:text-xs mt-1 line-clamp-2">{item.description}</p>
+                            )}
+                            <div className="flex items-center gap-1.5 mt-2 text-orange-400">
                                 {item.type === 'VIDEO' ? <VideoIcon className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
                                 <span className="text-[10px] uppercase font-bold tracking-tighter">{item.type}</span>
                             </div>

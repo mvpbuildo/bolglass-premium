@@ -2,13 +2,14 @@
 
 import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
-import { writeFile, mkdir } from 'fs/promises';
-import { join, extname } from 'path';
 import { auth } from '@/auth';
-import { GalleryItem } from '@/types/gallery';
+import { join } from 'path';
+import { mkdir, writeFile, readdir, stat, unlink } from 'fs/promises';
+import { existsSync } from 'fs';
+import { GalleryItem, GalleryAlbum } from '@/types/gallery';
 
-// Robust path handling
-const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+// Robust path handling for Monorepo + Docker
+const isWebPackage = process.cwd().endsWith('web') || existsSync(join(process.cwd(), 'public'));
 const UPLOAD_DIR = isWebPackage
     ? join(process.cwd(), 'public', 'uploads', 'gallery')
     : join(process.cwd(), 'apps', 'web', 'public', 'uploads', 'gallery');
@@ -17,6 +18,28 @@ async function ensureAdmin() {
     const session = await auth();
     if (session?.user?.role !== 'ADMIN') {
         throw new Error('Unauthorized');
+    }
+}
+
+export async function getGalleryData() {
+    try {
+        const [items, albums] = await Promise.all([
+            prisma.galleryItem.findMany({
+                where: { albumId: null },
+                orderBy: { order: 'asc' }
+            }),
+            prisma.galleryAlbum.findMany({
+                include: { items: true },
+                orderBy: { order: 'asc' }
+            })
+        ]);
+        return {
+            items: items as unknown as GalleryItem[],
+            albums: albums as unknown as GalleryAlbum[]
+        };
+    } catch (error) {
+        console.error('Error fetching gallery data:', error);
+        return { items: [], albums: [] };
     }
 }
 
@@ -83,6 +106,7 @@ export async function createGalleryItem(data: {
     category?: string;
     displayHome?: boolean;
     order?: number;
+    albumId?: string;
 }) {
     await ensureAdmin();
 
@@ -96,9 +120,10 @@ export async function createGalleryItem(data: {
         });
         revalidatePath('/', 'layout');
         return { success: true, item };
-    } catch (error: any) {
-        console.error('Create failed:', error);
-        return { success: false, error: error.message };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Create failed:', message);
+        return { success: false, error: message };
     }
 }
 
@@ -108,6 +133,7 @@ export async function updateGalleryItem(id: string, data: Partial<{
     category: string;
     displayHome: boolean;
     order: number;
+    albumId: string | null;
 }>) {
     await ensureAdmin();
 
@@ -118,8 +144,79 @@ export async function updateGalleryItem(id: string, data: Partial<{
         });
         revalidatePath('/', 'layout');
         return { success: true, item };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Update failed:', message);
+        return { success: false, error: message };
+    }
+}
+
+// --- Album Actions ---
+
+export async function getGalleryAlbums(): Promise<GalleryAlbum[]> {
+    try {
+        const albums = await prisma.galleryAlbum.findMany({
+            include: { items: true },
+            orderBy: { order: 'asc' }
+        });
+        return albums as unknown as GalleryAlbum[];
+    } catch (error) {
+        console.error('Error fetching gallery albums:', error);
+        return [];
+    }
+}
+
+export async function createGalleryAlbum(data: {
+    title: string;
+    description?: string;
+    coverUrl?: string;
+    category?: string;
+    order?: number;
+}) {
+    await ensureAdmin();
+    try {
+        const album = await prisma.galleryAlbum.create({
+            data: {
+                ...data,
+                order: data.order ?? 0
+            }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true, album };
     } catch (error: any) {
-        console.error('Update failed:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateGalleryAlbum(id: string, data: Partial<{
+    title: string;
+    description: string;
+    coverUrl: string;
+    category: string;
+    order: number;
+}>) {
+    await ensureAdmin();
+    try {
+        const album = await prisma.galleryAlbum.update({
+            where: { id },
+            data
+        });
+        revalidatePath('/', 'layout');
+        return { success: true, album };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function deleteGalleryAlbum(id: string) {
+    await ensureAdmin();
+    try {
+        await prisma.galleryAlbum.delete({
+            where: { id }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
         return { success: false, error: error.message };
     }
 }
@@ -133,8 +230,9 @@ export async function deleteGalleryItem(id: string) {
         });
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
-        console.error('Delete failed:', error);
-        return { success: false, error: error.message };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Delete failed:', message);
+        return { success: false, error: message };
     }
 }

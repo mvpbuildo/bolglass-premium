@@ -231,6 +231,18 @@ model Message {
   createdAt DateTime @default(now())
 }
 
+model GalleryAlbum {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  coverUrl    String?
+  category    String   @default("GENERAL")
+  order       Int      @default(0)
+  items       GalleryItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model GalleryItem {
   id          String   @id @default(cuid())
   title       String?
@@ -241,6 +253,10 @@ model GalleryItem {
   category    String   @default("GENERAL") // e.g. PRODUCTION, REALIZATIONS, EVENTS
   displayHome Boolean  @default(false)
   order       Int      @default(0)
+  
+  albumId     String?
+  album       GalleryAlbum? @relation(fields: [albumId], references: [id])
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
