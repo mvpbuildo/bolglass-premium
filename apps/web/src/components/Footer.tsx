@@ -1,12 +1,23 @@
-'use client';
-
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { Mail, Phone, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
+import { getSystemSettings } from '@/app/[locale]/actions';
 
-export default function Footer() {
-    const t = useTranslations('Common.nav');
+export default async function Footer() {
+    const t = await getTranslations('Common.nav');
+    const settings = await getSystemSettings();
+
+    const contactInfo = {
+        address: settings.company_address || 'ul. Witkowska 78',
+        city: settings.company_city || '62-200 Gniezno',
+        phone: settings.phone_1 || '+48 123 456 789',
+        email: settings.email || 'biuro@bolglass.pl',
+        fb: settings.facebook_url,
+        ig: settings.instagram_url,
+        yt: settings.youtube_url,
+        logo: settings.logo_url
+    };
 
     return (
         <footer className="bg-[#050505] border-t border-white/5 pt-20 pb-10 relative overflow-hidden">
@@ -20,7 +31,7 @@ export default function Footer() {
                         <Link href="/" className="inline-block">
                             <div className="w-16 h-16 bg-white rounded-full p-2 ring-2 ring-white/5 shadow-2xl">
                                 <Image
-                                    src="/bolglass-logo-blue.png"
+                                    src={contactInfo.logo || "/bolglass-logo-blue.png"}
                                     alt="Bolglass Logo"
                                     width={64}
                                     height={64}
@@ -32,27 +43,33 @@ export default function Footer() {
                             Od 78 lat tworzymy magię szklanych ozdób choinkowych, łącząc tradycyjne rzemiosło z nowoczesnym designem.
                         </p>
                         <div className="flex gap-4">
-                            <a href="#" className="p-2 rounded-full bg-white/5 border border-white/5 text-amber-500/60 hover:text-amber-500 hover:border-amber-500/30 transition-all" title="Instagram">
-                                <Instagram className="w-4 h-4" />
-                            </a>
-                            <a href="#" className="p-2 rounded-full bg-white/5 border border-white/5 text-amber-500/60 hover:text-amber-500 hover:border-amber-500/30 transition-all" title="Facebook">
-                                <Facebook className="w-4 h-4" />
-                            </a>
-                            <a href="#" className="p-2 rounded-full bg-white/5 border border-white/5 text-amber-500/60 hover:text-amber-500 hover:border-amber-500/30 transition-all" title="Youtube">
-                                <Youtube className="w-4 h-4" />
-                            </a>
+                            {contactInfo.ig && (
+                                <a href={contactInfo.ig} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 border border-white/5 text-amber-500/60 hover:text-amber-500 hover:border-amber-500/30 transition-all" title="Instagram">
+                                    <Instagram className="w-4 h-4" />
+                                </a>
+                            )}
+                            {contactInfo.fb && (
+                                <a href={contactInfo.fb} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 border border-white/5 text-amber-500/60 hover:text-amber-500 hover:border-amber-500/30 transition-all" title="Facebook">
+                                    <Facebook className="w-4 h-4" />
+                                </a>
+                            )}
+                            {contactInfo.yt && (
+                                <a href={contactInfo.yt} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 border border-white/5 text-amber-500/60 hover:text-amber-500 hover:border-amber-500/30 transition-all" title="Youtube">
+                                    <Youtube className="w-4 h-4" />
+                                </a>
+                            )}
                         </div>
                     </div>
 
                     {/* Quick Links */}
                     <div className="space-y-6">
-                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">Nawigacja</h4>
+                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('manufactory')}</h4>
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
-                            <li><Link href="/#about" className="hover:text-amber-500 transition-colors">O Nas</Link></li>
-                            <li><Link href="/galeria" className="hover:text-amber-500 transition-colors">Galeria</Link></li>
-                            <li><Link href="/sklep" className="hover:text-amber-500 transition-colors">Sklep</Link></li>
-                            <li><Link href="/#booking" className="hover:text-amber-500 transition-colors">Warsztaty</Link></li>
-                            <li><Link href="/#b2b" className="hover:text-amber-500 transition-colors">Dla Firm</Link></li>
+                            <li><Link href="/#about" className="hover:text-amber-500 transition-colors">{t('about')}</Link></li>
+                            <li><Link href="/galeria" className="hover:text-amber-500 transition-colors">{t('gallery')}</Link></li>
+                            <li><Link href="/sklep" className="hover:text-amber-500 transition-colors">{t('shop')}</Link></li>
+                            <li><Link href="/#booking" className="hover:text-amber-500 transition-colors">{t('workshops')}</Link></li>
+                            <li><Link href="/#b2b" className="hover:text-amber-500 transition-colors">{t('b2b')}</Link></li>
                         </ul>
                     </div>
 
@@ -62,7 +79,7 @@ export default function Footer() {
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
                             <li><Link href="/moje-konto" className="hover:text-amber-500 transition-colors">Moje Zamówienia</Link></li>
                             <li><Link href="/koszyk" className="hover:text-amber-500 transition-colors">Mój Koszyk</Link></li>
-                            <li><Link href="/kontakt" className="hover:text-amber-500 transition-colors">Pomoc</Link></li>
+                            <li><Link href="/kontakt" className="hover:text-amber-500 transition-colors">{t('contact')}</Link></li>
                             <li><Link href="#" className="hover:text-amber-500 transition-colors">Regulamin</Link></li>
                             <li><Link href="#" className="hover:text-amber-500 transition-colors">Polityka Prywatności</Link></li>
                         </ul>
@@ -70,19 +87,19 @@ export default function Footer() {
 
                     {/* Contact */}
                     <div className="space-y-6">
-                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">Kontakt</h4>
+                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('contact')}</h4>
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
-                                <span>ul. Warszawska 12<br />Nowy Sącz, Polska</span>
+                                <span>{contactInfo.address}<br />{contactInfo.city}</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone className="w-4 h-4 text-amber-500 shrink-0" />
-                                <span>+48 123 456 789</span>
+                                <a href={`tel:${contactInfo.phone}`} className="hover:text-amber-500 transition-colors">{contactInfo.phone}</a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail className="w-4 h-4 text-amber-500 shrink-0" />
-                                <span>biuro@bolglass.pl</span>
+                                <a href={`mailto:${contactInfo.email}`} className="hover:text-amber-500 transition-colors">{contactInfo.email}</a>
                             </li>
                         </ul>
                     </div>
