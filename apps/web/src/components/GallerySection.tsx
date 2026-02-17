@@ -1,8 +1,7 @@
 import { getHomeGalleryItems } from '@/app/[locale]/admin/gallery/actions';
-import { VideoIcon, ImageIcon, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-import { GalleryItem } from '@/types/gallery';
+import GalleryHomeGrid from './GalleryHomeGrid';
 
 export default async function GallerySection() {
     const items = await getHomeGalleryItems();
@@ -35,42 +34,7 @@ export default async function GallerySection() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                    {items.map((item: GalleryItem, index: number) => (
-                        <div
-                            key={item.id}
-                            className={`group relative rounded-2xl overflow-hidden glass-card shadow-sm border border-orange-100/20 aspect-video ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''
-                                }`}
-                        >
-                            {item.type === 'VIDEO' ? (
-                                <video
-                                    src={item.url}
-                                    className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105 bg-black/5"
-                                    muted
-                                    loop
-                                    playsInline
-                                    autoPlay
-                                />
-                            ) : (
-                                <Image
-                                    src={item.url}
-                                    alt={item.title || ''}
-                                    fill
-                                    className="object-contain transition-transform duration-700 group-hover:scale-105 bg-black/5"
-                                />
-                            )}
-
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                                <p className="text-white font-medium text-sm md:text-base">{item.title || 'Manufaktura Bolglass'}</p>
-                                <div className="flex items-center gap-1.5 mt-1 text-orange-400">
-                                    {item.type === 'VIDEO' ? <VideoIcon className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
-                                    <span className="text-[10px] uppercase font-bold tracking-tighter">{item.type}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <GalleryHomeGrid items={items} />
             </div>
         </section>
     );

@@ -1,6 +1,5 @@
 import { getGalleryItems } from '@/app/[locale]/admin/gallery/actions';
-import { VideoIcon, ImageIcon, Maximize2 } from 'lucide-react';
-import Image from 'next/image';
+import GalleryGrid from '@/components/GalleryGrid';
 import { GalleryItem } from '@/types/gallery';
 
 export default async function GalleryPage() {
@@ -28,56 +27,7 @@ export default async function GalleryPage() {
                         <p className="text-amber-200/40 text-xl font-serif italic">Galeria jest aktualnie w przygotowaniu...</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {(items as GalleryItem[]).map((item) => (
-                            <div
-                                key={item.id}
-                                className="group relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-500 hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-2 cursor-pointer"
-                            >
-                                {item.type === 'VIDEO' ? (
-                                    <div className="w-full h-full relative">
-                                        <video
-                                            src={item.url}
-                                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 bg-black/20"
-                                            muted
-                                            loop
-                                            playsInline
-                                            autoPlay
-                                        />
-                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
-                                        <div className="absolute top-4 right-4 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white">
-                                            <VideoIcon className="w-4 h-4" />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="w-full h-full relative">
-                                        <Image
-                                            src={item.url}
-                                            alt={item.title || ''}
-                                            fill
-                                            className="object-contain transition-transform duration-700 group-hover:scale-110 bg-black/20"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                        <div className="absolute top-4 right-4 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white">
-                                            <ImageIcon className="w-4 h-4" />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Overlay Content */}
-                                <div className="absolute inset-0 flex flex-col justify-end p-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                                    <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-4 rounded-xl">
-                                        <h3 className="text-amber-100 font-serif text-xl">{item.title || 'Manufaktura Bolglass'}</h3>
-                                        {item.description && <p className="text-amber-200/60 text-sm mt-1 line-clamp-2">{item.description}</p>}
-                                        <div className="mt-4 flex items-center gap-2 text-amber-500 text-xs font-bold uppercase tracking-widest">
-                                            <span>Powiększ</span>
-                                            <Maximize2 className="w-3 h-3" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <GalleryGrid items={items as GalleryItem[]} />
                 )}
             </div>
 
