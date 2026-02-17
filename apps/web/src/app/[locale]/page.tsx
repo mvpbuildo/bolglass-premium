@@ -13,9 +13,6 @@ export default function HomePage() {
 
     return (
         <>
-            <div className="fixed top-0 left-0 w-full bg-red-600 text-white text-center py-2 font-bold uppercase z-[100] border-b-2 border-yellow-400">
-                🚧 DEBUG MODE: Wersja 2 (Jeśli to widzisz, deployment działa) 🚧
-            </div>
             <main className="flex min-h-screen flex-col items-center justify-between p-24 relative overflow-hidden">
                 {/* Top Navigation */}
                 <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-6">
