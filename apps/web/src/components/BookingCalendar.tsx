@@ -368,11 +368,50 @@ export default function BookingCalendar() {
 
                                 {/* STEP 3: SUCCESS */}
                                 {step === 3 && (
-                                    <motion.div key="step3" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-12">
-                                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-5xl mb-6 shadow-sm">✓</div>
-                                        <h3 className="text-3xl font-bold text-gray-900 mb-2">Rezerwacja Potwierdzona!</h3>
-                                        <p className="text-gray-500 mb-8">Dziękujemy, {name}. Szczegóły wysłaliśmy na adres <strong>{email}</strong>.</p>
-                                        <Button variant="outline" onClick={() => window.location.reload()}>Wróć do strony głównej</Button>
+                                    <motion.div key="step3" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-8">
+                                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-6 shadow-sm">✓</div>
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Rezerwacja Potwierdzona!</h3>
+                                        <p className="text-gray-500 mb-8">Dziękujemy, {name}. Potwierdzenie wysłaliśmy na adres <strong>{email}</strong>.</p>
+
+                                        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 text-left max-w-md mx-auto space-y-4 shadow-inner">
+                                            <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-2 mb-2">Szczegóły Rezerwacji</h4>
+
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-500 text-sm">Termin:</span>
+                                                <span className="font-bold text-gray-900">
+                                                    {selectedTime && new Date(selectedTime).toLocaleDateString('pl-PL')}
+                                                    <span className="mx-1"> </span>
+                                                    {selectedTime && new Date(selectedTime).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-500 text-sm">Pakiet:</span>
+                                                <span className="font-bold text-gray-900">{bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</span>
+                                            </div>
+
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-500 text-sm">Liczba osób:</span>
+                                                <span className="font-bold text-gray-900">{people} os.</span>
+                                            </div>
+
+                                            {isGroup && (
+                                                <div className="border-t border-gray-200 pt-2 mt-2">
+                                                    <div className="text-xs font-bold text-red-600 uppercase mb-1">Dane do faktury (Grupa)</div>
+                                                    <div className="text-sm text-gray-700">{institutionName}</div>
+                                                    <div className="text-xs text-gray-500">{institutionAddress}</div>
+                                                </div>
+                                            )}
+
+                                            <div className="border-t border-gray-200 pt-4 mt-2 flex justify-between items-center">
+                                                <span className="text-gray-500 font-medium">Do zapłaty:</span>
+                                                <span className="text-2xl font-black text-red-600">{currentPrice * parseInt(people)} zł</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8">
+                                            <Button variant="outline" onClick={() => window.location.reload()}>Wróć do strony głównej</Button>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
