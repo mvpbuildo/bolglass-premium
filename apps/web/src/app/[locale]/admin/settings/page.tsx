@@ -1,7 +1,6 @@
-import { Link } from '@/i18n/navigation';
+
 import AdminSettings from '../../../../components/AdminSettings';
 import AdminEmailSettings from '../../../../components/AdminEmailSettings';
-import AdminContactSettings from '../../../../components/AdminContactSettings';
 import AdminNavigation from '../../../../components/AdminNavigation';
 
 export default function AdminSettingsPage() {
@@ -11,14 +10,13 @@ export default function AdminSettingsPage() {
                 <div>
                     <AdminNavigation />
 
-                    <h1 className="text-4xl font-black text-gray-900 mb-2 mt-8">Konfiguracja Systemu</h1>
-                    <p className="text-gray-500 mb-8 font-medium">Zarządzanie cenami i ustawieniami globalnymi</p>
+                    <h1 className="text-4xl font-black text-gray-900 mb-2 mt-8">Ustawienia Rezerwacji</h1>
+                    <p className="text-gray-500 mb-8 font-medium">Zarządzanie cenami i treścią powiadomień</p>
 
                     <AdminSettings />
                 </div>
 
                 <div className="space-y-12">
-                    <AdminContactSettings />
                     <AdminEmailSettings />
                 </div>
             </div>

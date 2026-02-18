@@ -53,6 +53,7 @@ export default function AdminNavigation() {
             bg: 'bg-gray-50',
             items: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: '👥' },
+                { name: 'Ustawienia Systemowe', path: '/admin/system/settings', icon: '🔧' },
             ]
         },
         {
