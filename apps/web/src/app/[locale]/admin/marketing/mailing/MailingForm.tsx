@@ -73,20 +73,20 @@ export default function MailingForm() {
                 {/* Main Content Column */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card className="p-6">
-                        <h2 className="text-xl font-bold mb-4">Treść Wiadomości</h2>
+                        <h2 className="text-xl font-bold mb-4 text-gray-900">Treść Wiadomości</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold mb-1">Temat</label>
+                                <label className="block text-sm font-bold mb-1 text-gray-900">Temat</label>
                                 <input
                                     type="text"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
-                                    className="w-full p-2 border rounded"
+                                    className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900"
                                     placeholder="Wpisz temat wiadomości..."
                                 />
                             </div>
                             <div className="h-96 pb-12">
-                                <label className="block text-sm font-bold mb-1">Treść</label>
+                                <label className="block text-sm font-bold mb-1 text-gray-900">Treść</label>
                                 <ReactQuill
                                     theme="snow"
                                     value={content}
@@ -103,14 +103,14 @@ export default function MailingForm() {
                 {/* Sidebar Column */}
                 <div className="space-y-6">
                     <Card className="p-6">
-                        <h2 className="text-xl font-bold mb-4">Odbiorcy</h2>
+                        <h2 className="text-xl font-bold mb-4 text-gray-900">Odbiorcy</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold mb-1">Język Odbiorców</label>
+                                <label className="block text-sm font-bold mb-1 text-gray-900">Język Odbiorców</label>
                                 <select
                                     value={targetLanguage}
                                     onChange={(e) => setTargetLanguage(e.target.value)}
-                                    className="w-full p-2 border rounded"
+                                    className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900"
                                 >
                                     <option value="pl">Polski (PL)</option>
                                     <option value="en">Angielski (EN)</option>
@@ -120,11 +120,11 @@ export default function MailingForm() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold mb-1">Grupa</label>
+                                <label className="block text-sm font-bold mb-1 text-gray-900">Grupa</label>
                                 <select
                                     value={recipientType}
                                     onChange={(e) => setRecipientType(e.target.value)}
-                                    className="w-full p-2 border rounded"
+                                    className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900"
                                 >
                                     <option value="all">Wszyscy Użytkownicy</option>
                                     <option value="newsletter">Tylko Newsletter (jeśli dostępny)</option>
@@ -135,8 +135,8 @@ export default function MailingForm() {
 
                     <Card className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold">Ustawienia SMTP</h2>
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <h2 className="text-xl font-bold text-gray-900">Ustawienia SMTP</h2>
+                            <label className="flex items-center gap-2 cursor-pointer text-gray-900">
                                 <input
                                     type="checkbox"
                                     checked={useCustomSmtp}
@@ -150,50 +150,50 @@ export default function MailingForm() {
                         {useCustomSmtp ? (
                             <div className="space-y-3">
                                 <div>
-                                    <label className="text-xs font-bold block">Host</label>
+                                    <label className="text-xs font-bold block text-gray-900">Host</label>
                                     <input
                                         type="text"
                                         value={smtpConfig.host}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, host: e.target.value })}
-                                        className="w-full p-2 border rounded text-sm"
+                                        className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
                                         placeholder="smtp.example.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold block">Port</label>
+                                    <label className="text-xs font-bold block text-gray-900">Port</label>
                                     <input
                                         type="text"
                                         value={smtpConfig.port}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, port: e.target.value })}
-                                        className="w-full p-2 border rounded text-sm"
+                                        className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
                                         placeholder="587"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold block">Użytkownik</label>
+                                    <label className="text-xs font-bold block text-gray-900">Użytkownik</label>
                                     <input
                                         type="text"
                                         value={smtpConfig.user}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, user: e.target.value })}
-                                        className="w-full p-2 border rounded text-sm"
+                                        className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold block">Hasło</label>
+                                    <label className="text-xs font-bold block text-gray-900">Hasło</label>
                                     <input
                                         type="password"
                                         value={smtpConfig.password}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, password: e.target.value })}
-                                        className="w-full p-2 border rounded text-sm"
+                                        className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold block">Od (Email)</label>
+                                    <label className="text-xs font-bold block text-gray-900">Od (Email)</label>
                                     <input
                                         type="text"
                                         value={smtpConfig.from}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, from: e.target.value })}
-                                        className="w-full p-2 border rounded text-sm"
+                                        className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
                                         placeholder="newsletter@bolglass.com"
                                     />
                                 </div>
