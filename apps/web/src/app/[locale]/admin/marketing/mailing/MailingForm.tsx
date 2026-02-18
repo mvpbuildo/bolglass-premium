@@ -87,6 +87,8 @@ export default function MailingForm() {
                             </div>
                             <div className="h-96 pb-12">
                                 <label className="block text-sm font-bold mb-1">Treść</label>
+                                {/* ReactQuill Temporarily Disabled due to React 19 Conflict */}
+                                {/*
                                 <ReactQuill
                                     theme="snow"
                                     value={content}
@@ -95,6 +97,16 @@ export default function MailingForm() {
                                     formats={formats}
                                     className="h-full"
                                 />
+                                */}
+                                <textarea
+                                    className="w-full h-full p-2 border rounded"
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    placeholder="Wpisz treść HTML lub zwykły tekst..."
+                                />
+                                <p className="text-xs text-red-500 mt-2">
+                                    * Edytor graficzny tymczasowo wyłączony (awaria po aktualizacji). Wpisz kod HTML ręcznie, jeśli potrzebujesz obrazków.
+                                </p>
                             </div>
                         </div>
                     </Card>
