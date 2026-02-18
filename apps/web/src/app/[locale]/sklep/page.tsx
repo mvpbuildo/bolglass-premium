@@ -14,7 +14,7 @@ export default async function ShopPage() {
     const products = await getProducts();
 
     return (
-        <main className="min-h-screen bg-[#050505] pt-20">
+        <main className="min-h-screen bg-[#050505] pt-28">
             {/* HERO SECTION */}
             <div className="relative h-[500px] w-full flex items-center justify-center overflow-hidden">
                 <div

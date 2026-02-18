@@ -119,7 +119,7 @@ export default async function AdminDashboardPage() {
     ];
 
     return (
-        <main className="min-h-screen bg-gray-50 py-12">
+        <main className="min-h-screen bg-gray-50 pt-28 pb-12">
             <div className="max-w-6xl mx-auto px-4">
                 <AdminNavigation />
 

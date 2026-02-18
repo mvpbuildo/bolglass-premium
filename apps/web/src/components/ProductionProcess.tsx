@@ -73,7 +73,7 @@ export default function ProductionProcess() {
     }, [activeStep]);
 
     return (
-        <section className="relative h-screen min-h-[800px] bg-[#050505] text-white flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-screen py-20 bg-[#050505] text-white flex items-center justify-center overflow-hidden">
             {/* Background Atmosphere - Bolglass Premium Theme */}
             <div className="absolute inset-0 bg-[#0a0500]" />
             <div className="relative w-full h-full">
@@ -86,7 +86,7 @@ export default function ProductionProcess() {
                 <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505]" />
             </div>
 
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center">
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-center min-h-[600px]">
                 {/* Auto-play Visualization */}
                 <div className="w-full flex flex-col md:flex-row items-center gap-12">
                     {/* Image Area */}
@@ -118,7 +118,7 @@ export default function ProductionProcess() {
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <h3 className="text-5xl md:text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-amber-100 to-amber-600 drop-shadow-sm">
+                                <h3 className="text-5xl md:text-7xl font-bold mb-8 pb-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-100 to-amber-600 drop-shadow-sm leading-tight">
                                     {steps[activeStep].title}
                                 </h3>
                                 <p className="text-xl md:text-2xl text-amber-100/80 leading-relaxed font-light bg-black/40 p-8 rounded-xl backdrop-blur-md border border-amber-500/10">
