@@ -13,7 +13,32 @@ export default function AdminBookingList() {
     const [slots, setSlots] = useState<any[]>([]);
     const [formData, setFormData] = useState({ date: '', time: '', name: '', email: '', people: '1', type: 'SIGHTSEEING', isGroup: false, institutionName: '', institutionAddress: '' });
 
-    // ... (filtering states unchanged)
+    // Filtering & Sorting States
+    const [filterSearch, setFilterSearch] = useState('');
+    const [filterType, setFilterType] = useState('ALL');
+    const [filterDateFrom, setFilterDateFrom] = useState('');
+    const [filterDateTo, setFilterDateTo] = useState('');
+    const [sortBy, setSortBy] = useState('date_desc'); // date_asc, date_desc, people_asc, people_desc, price_asc, price_desc
+
+    const fetchBookings = async () => {
+        setLoading(true);
+        const [bData, sData] = await Promise.all([getAllBookings(), getAdminSlots()]);
+        setBookings(bData);
+        setSlots(sData);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchBookings();
+    }, []);
+
+    const handleSendReminder = async (id: string) => {
+        const res = await sendBookingReminder(id);
+        if (res.success) {
+            alert('Przypomnienie wysłane (symulacja)!');
+            fetchBookings();
+        }
+    };
 
     const handleAddManual = async () => {
         if (!formData.date || !formData.time || !formData.name || !formData.email) return alert('Wypełnij wymagane pola (Data, Godzina, Imię, Email)!');
@@ -126,6 +151,7 @@ export default function AdminBookingList() {
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Szukaj</label>
                         <input
                             placeholder="Imię, email..."
+                            title="Szukaj po imieniu lub emailu"
                             className="w-full p-2 text-sm border rounded bg-white"
                             value={filterSearch}
                             onChange={(e) => setFilterSearch(e.target.value)}
@@ -135,6 +161,7 @@ export default function AdminBookingList() {
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Pakiet</label>
                         <select
                             className="w-full p-2 text-sm border rounded bg-white"
+                            title="Filtruj po typie pakietu"
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
                         >
@@ -147,6 +174,7 @@ export default function AdminBookingList() {
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Od Daty</label>
                         <input
                             type="date"
+                            title="Data od"
                             className="w-full p-2 text-sm border rounded bg-white"
                             value={filterDateFrom}
                             onChange={(e) => setFilterDateFrom(e.target.value)}
@@ -156,6 +184,7 @@ export default function AdminBookingList() {
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Do Daty</label>
                         <input
                             type="date"
+                            title="Data do"
                             className="w-full p-2 text-sm border rounded bg-white"
                             value={filterDateTo}
                             onChange={(e) => setFilterDateTo(e.target.value)}
@@ -165,6 +194,7 @@ export default function AdminBookingList() {
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Sortuj według</label>
                         <select
                             className="w-full p-2 text-sm border rounded bg-white"
+                            title="Sortowanie wyników"
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
                         >
