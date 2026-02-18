@@ -96,10 +96,13 @@ export async function getAvailableStartTimes(dateStr: string, type: BookingType,
     });
 
     // 2. Also fetch global blocks for this day
+    const monthStr = dateStr.slice(0, 7);
     const globalBlocks = await prisma.globalBlock.findMany({
         where: {
-            type: 'DATE',
-            value: dateStr
+            OR: [
+                { type: 'DATE', value: dateStr },
+                { type: 'MONTH', value: monthStr }
+            ]
         }
     });
 
@@ -224,16 +227,21 @@ export async function isBookingValid(date: Date, type: BookingType, peopleCount:
 
     // 1. Check Global Blocks
     const dateStr = date.toISOString().split('T')[0];
+    const monthStr = dateStr.slice(0, 7); // YYYY-MM
+
     const globalBlocks = await prisma.globalBlock.findMany({
         where: {
-            type: 'DATE',
-            value: dateStr
+            OR: [
+                { type: 'DATE', value: dateStr },
+                { type: 'MONTH', value: monthStr }
+            ]
         }
     });
 
     if (globalBlocks.length > 0) {
-        return { valid: false, error: 'Dzień jest zablokowany przez administratora.' };
+        return { valid: false, error: 'Wybrany termin jest zablokowany przez administratora.' };
     }
+
 
     // 2. Fetch existing bookings
     // Start of Day / End of Day
