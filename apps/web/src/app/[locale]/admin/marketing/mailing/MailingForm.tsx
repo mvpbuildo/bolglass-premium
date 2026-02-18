@@ -7,7 +7,7 @@ import { sendMailing } from './actions';
 import 'react-quill-new/dist/quill.snow.css';
 
 // Dynamic import for ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false }) as any;
 
 export default function MailingForm() {
     const quillRef = useRef<any>(null);
