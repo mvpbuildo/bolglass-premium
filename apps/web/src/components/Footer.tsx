@@ -64,7 +64,7 @@ export default async function Footer() {
                     <div className="space-y-6">
                         <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('about')}</h4>
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
-                            <li><Link href="/#about" className="hover:text-amber-500 transition-colors">{t('about')}</Link></li>
+                            <li><Link href="/o-nas" className="hover:text-amber-500 transition-colors">{t('about')}</Link></li>
                             <li><Link href="/galeria" className="hover:text-amber-500 transition-colors">{t('gallery')}</Link></li>
                             <li><Link href="/sklep" className="hover:text-amber-500 transition-colors">{t('shop')}</Link></li>
                             <li><Link href="/#booking" className="hover:text-amber-500 transition-colors">{t('workshops')}</Link></li>
