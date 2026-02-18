@@ -3,7 +3,7 @@
 import { Link } from '@/i18n/navigation';
 import { Button, Card } from '@bolglass/ui';
 import { Product } from '@prisma/client';
-import { deleteProduct } from './actions';
+import { deleteProduct, updateProductDiscount } from './actions';
 import { useState } from 'react';
 
 interface ProductCardProps {
@@ -11,19 +11,19 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [discount, setDiscount] = useState(product.discountPercent || 0);
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    const handleDelete = async () => {
-        if (confirm(`Czy na pewno chcesz usunąć produkt "${product.name}"? Tej operacji nie można cofnąć.`)) {
-            setIsDeleting(true);
-            const result = await deleteProduct(product.id);
-            if (result.error) {
-                alert(result.error);
-                setIsDeleting(false);
-            }
-            // If success, revalidatePath will refresh the list, so we don't need to do anything else.
+    const handleDiscountUpdate = async (newDiscount: number) => {
+        setIsUpdating(true);
+        const result = await updateProductDiscount(product.id, newDiscount);
+        setIsUpdating(false);
+        if (result.error) {
+            alert(result.error);
         }
     };
+
+    const discountedPrice = product.price * (1 - discount / 100);
 
     return (
         <Card className="overflow-hidden hover:shadow-md transition-shadow relative group">
@@ -38,11 +38,37 @@ export default function ProductCard({ product }: ProductCardProps) {
                         3D CONFIG
                     </span>
                 )}
+                {discount > 0 && (
+                    <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                        -{discount}%
+                    </span>
+                )}
             </div>
             <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
+                <div className="mb-2">
                     <h3 className="font-bold text-gray-900 line-clamp-1" title={product.name}>{product.name}</h3>
-                    <span className="font-mono text-green-600 font-bold whitespace-nowrap ml-2">{product.price.toFixed(2)} PLN</span>
+                    <div className="flex justify-between items-baseline mt-1">
+                        <div className="flex flex-col">
+                            {discount > 0 && (
+                                <span className="text-xs text-gray-400 line-through">{product.price.toFixed(2)} PLN</span>
+                            )}
+                            <span className={`font-mono font-bold whitespace-nowrap ${discount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                {discountedPrice.toFixed(2)} PLN
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <label className="text-[10px] text-gray-500 uppercase font-bold">Rabat %</label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={discount}
+                                onChange={(e) => setDiscount(Number(e.target.value))}
+                                onBlur={(e) => handleDiscountUpdate(Number(e.target.value))}
+                                className="w-12 text-center text-sm border border-gray-300 rounded bg-gray-50 focus:ring-1 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+                    </div>
                 </div>
                 <p className="text-xs text-gray-500 line-clamp-2 mb-4 h-8">{product.description}</p>
 
