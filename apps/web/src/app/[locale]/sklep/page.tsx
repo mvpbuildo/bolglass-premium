@@ -61,7 +61,8 @@ export default async function ShopPage() {
                                     slug: product.slug,
                                     image: (product.images && product.images[0]) || null,
                                     priceNet: (product as any).priceNet || 0,
-                                    vatRate: (product as any).vatRate || 23
+                                    vatRate: (product as any).vatRate || 23,
+                                    discountPercent: (product as any).discountPercent || 0
                                 }}
                             />
                         ))}
