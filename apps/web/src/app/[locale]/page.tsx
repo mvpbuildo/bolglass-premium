@@ -11,7 +11,7 @@ export default function HomePage() {
 
     return (
         <>
-            <main className="flex min-h-screen flex-col items-center justify-between p-24 relative overflow-hidden">
+            <main className="flex min-h-screen flex-col items-center justify-between px-4 py-20 lg:p-24 relative overflow-hidden">
                 {/* Navbar is now global in layout.tsx */}
 
                 {/* Background Image */}
