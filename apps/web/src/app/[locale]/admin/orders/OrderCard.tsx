@@ -68,7 +68,7 @@ export default function AdminOrderCard({ order }: OrderCardProps) {
             {/* Actions */}
             <div className="p-4 pt-0">
                 <Link href={`/admin/orders/${order.id}`}>
-                    <Button variant="outline" className="w-full text-xs font-bold py-2 border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-all">
+                    <Button variant="outline" className="w-full text-xs font-bold py-2 border-gray-200 text-gray-900 hover:bg-gray-50 hover:text-gray-900 transition-all">
                         SZCZEGÓŁY ZAMÓWIENIA
                     </Button>
                 </Link>

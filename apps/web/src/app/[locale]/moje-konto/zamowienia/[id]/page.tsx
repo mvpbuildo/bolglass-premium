@@ -66,7 +66,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="space-y-6">
             <div className="flex items-center gap-4">
                 <Link href="/moje-konto/zamowienia">
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-900 hover:bg-gray-100 hover:text-red-600">
                         <ChevronLeft className="w-4 h-4" />
                         Wróć do listy
                     </Button>

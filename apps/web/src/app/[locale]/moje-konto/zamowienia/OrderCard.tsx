@@ -73,7 +73,7 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             {/* Actions */}
             <div className="p-4 bg-gray-50/30 border-t border-gray-50">
                 <Link href={`/moje-konto/zamowienia/${order.id}`}>
-                    <Button variant="outline" className="w-full text-xs font-bold py-2.5 border-gray-200 hover:bg-white hover:text-red-600 hover:border-red-200 transition-all flex items-center justify-center gap-2">
+                    <Button variant="outline" className="w-full text-xs font-bold py-2.5 border-gray-200 text-gray-900 hover:bg-white hover:text-red-600 hover:border-red-200 transition-all flex items-center justify-center gap-2">
                         SZCZEGÓŁY
                         <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
