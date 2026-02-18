@@ -34,8 +34,7 @@ export default function AdminNavigation() {
             color: 'text-purple-600',
             bg: 'bg-purple-50',
             items: [
-                { name: 'Promocje', path: '/admin/marketing/promocje', icon: '🏷️' },
-                { name: 'Newsletter', path: '/admin/marketing/newsletter', icon: '📧' },
+                { name: 'Mailing', path: '/admin/marketing/mailing', icon: '📧' },
             ]
         },
         {

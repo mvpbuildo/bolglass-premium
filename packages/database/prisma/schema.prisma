@@ -26,6 +26,7 @@ model User {
   city          String?
   zipCode       String?
   country       String?   @default("PL")
+  locale        String    @default("pl") // "pl", "en", "de"
 
   // Company Data
   isCompany     Boolean   @default(false)
