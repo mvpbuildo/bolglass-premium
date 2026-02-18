@@ -4,7 +4,7 @@ export default function AboutPage() {
     const t = useTranslations('AboutPage');
 
     return (
-        <main className="min-h-screen relative flex items-start justify-center pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <main className="min-h-screen relative flex items-start justify-center pt-24 lg:pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
             {/* Background Image */}
             <div
                 className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"

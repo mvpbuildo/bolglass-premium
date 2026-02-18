@@ -29,7 +29,7 @@ export default function HomePage() {
                             {t('HomePage.title')}
                         </h1>
                     </div>
-                    <div className="mt-64 max-w-3xl">
+                    <div className="mt-32 lg:mt-64 max-w-3xl">
                         <h2 className="text-3xl font-semibold text-white drop-shadow-lg">{t('HomePage.hero.headline')}</h2>
                         <div className="mt-8">
                             <Link href="/sklep">
