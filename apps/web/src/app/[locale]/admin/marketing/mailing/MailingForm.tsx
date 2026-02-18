@@ -27,14 +27,67 @@ export default function MailingForm() {
         from: ''
     });
 
+    const imageHandler = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = async () => {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    // Save current cursor state
+                    // Note: We need a ref to the Quill instance to insert properly
+                    // But standard approach with modules is tricky without ref.
+                    // Let's use a simpler approach: upload then append or insert at cursor if possible.
+                    // Actually, with react-quill-new, getting the editor instance via ref is best.
+
+                    const res = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success && data.url) {
+                        // We need the quill instance content to insert. 
+                        // Since we don't have a ref set up easily in this functional component without breaking changes,
+                        // we might just append for now or try to use a ref.
+                        // Ideally: const quill = quillRef.current.getEditor();
+                        // quill.insertEmbed(range.index, 'image', data.url);
+
+                        // Re-implementing with Ref is safer.
+                        const fullUrl = `${window.location.origin}${data.url}`;
+                        const range = quillRef.current?.getEditor().getSelection();
+                        quillRef.current?.getEditor().insertEmbed(range ? range.index : 0, 'image', fullUrl);
+                    } else {
+                        alert('Błąd przesyłania zdjęcia.');
+                    }
+                } catch (e) {
+                    console.error('Upload failed', e);
+                    alert('Błąd przesyłania zdjęcia.');
+                }
+            }
+        };
+    };
+
     const modules = {
-        toolbar: [
-            [{ 'header': [1, 2, false] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
-            ['link', 'image'],
-            ['clean']
-        ],
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, false] }],
+                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+                ['link', 'image'],
+                ['clean']
+            ],
+            handlers: {
+                image: imageHandler
+            }
+        }
     };
 
     const formats = [
