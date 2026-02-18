@@ -6,8 +6,35 @@ import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAd
 
 export default function AdminBookingList() {
     const [bookings, setBookings] = useState<any[]>([]);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
+    const [editPeopleValue, setEditPeopleValue] = useState<number>(1);
+
+    const startEditing = (booking: any) => {
+        setEditingId(booking.id);
+        setEditPeopleValue(booking.people);
+    };
+
+    const cancelEditing = () => {
+        setEditingId(null);
+        setEditPeopleValue(1);
+    };
+
+    const savePeople = async (id: string) => {
+        if (editPeopleValue < 1) return alert('Liczba osób musi być min. 1');
+        // import dynamically or use pre-imported? actions are imported at top.
+        // We need updateBookingPeople in imports first.
+        const { updateBookingPeople } = await import('../app/[locale]/actions'); // Dynamic import if not in top
+        const res = await updateBookingPeople(id, editPeopleValue);
+
+        if (res.success) {
+            fetchBookings();
+            setEditingId(null);
+        } else {
+            alert('Błąd: ' + res.error);
+        }
+    };
 
     // Manual Form States
     const [slots, setSlots] = useState<any[]>([]);
@@ -145,22 +172,22 @@ export default function AdminBookingList() {
             </div>
 
             {/* Filters and Sorting Controls */}
-            <Card className="p-4 bg-white shadow-md border border-gray-200">
+            <Card className="p-4 bg-white shadow-md border border-gray-300">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Szukaj</label>
+                        <label className="text-[10px] font-bold text-gray-700 uppercase">Szukaj</label>
                         <input
                             placeholder="Imię, email..."
                             title="Szukaj po imieniu lub emailu"
-                            className="w-full p-2 text-sm border rounded bg-white"
+                            className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                             value={filterSearch}
                             onChange={(e) => setFilterSearch(e.target.value)}
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Pakiet</label>
+                        <label className="text-[10px] font-bold text-gray-700 uppercase">Pakiet</label>
                         <select
-                            className="w-full p-2 text-sm border rounded bg-white"
+                            className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                             title="Filtruj po typie pakietu"
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
@@ -171,29 +198,29 @@ export default function AdminBookingList() {
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Od Daty</label>
+                        <label className="text-[10px] font-bold text-gray-700 uppercase">Od Daty</label>
                         <input
                             type="date"
                             title="Data od"
-                            className="w-full p-2 text-sm border rounded bg-white"
+                            className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                             value={filterDateFrom}
                             onChange={(e) => setFilterDateFrom(e.target.value)}
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Do Daty</label>
+                        <label className="text-[10px] font-bold text-gray-700 uppercase">Do Daty</label>
                         <input
                             type="date"
                             title="Data do"
-                            className="w-full p-2 text-sm border rounded bg-white"
+                            className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                             value={filterDateTo}
                             onChange={(e) => setFilterDateTo(e.target.value)}
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase">Sortuj według</label>
+                        <label className="text-[10px] font-bold text-gray-700 uppercase">Sortuj według</label>
                         <select
-                            className="w-full p-2 text-sm border rounded bg-white"
+                            className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                             title="Sortowanie wyników"
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
@@ -210,82 +237,109 @@ export default function AdminBookingList() {
             </Card>
 
             {isAdding && (
-                <Card className="p-6 bg-red-50 border-red-100 animate-in fade-in slide-in-from-top-4">
-                    <h3 className="font-bold mb-4 text-red-900">Nowa Rezerwacja (Tryb Admin)</h3>
+                <Card className="p-6 bg-red-50 border border-red-200 shadow-lg animate-in fade-in slide-in-from-top-4">
+                    <h3 className="font-bold mb-4 text-red-900 border-b border-red-200 pb-2">Nowa Rezerwacja (Tryb Admin)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input
-                            type="date"
-                            title="Data rezerwacji"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.date}
-                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        />
-                        <input
-                            type="time"
-                            title="Godzina rezerwacji"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.time}
-                            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                        />
-                        <input
-                            placeholder="Imię i Nazwisko"
-                            title="Imię i Nazwisko klienta"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
-                        <input
-                            placeholder="Email"
-                            title="Email klienta"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        />
-                        <input
-                            placeholder="Liczba osób"
-                            title="Liczba osób"
-                            type="number"
-                            min="1"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.people}
-                            onChange={(e) => setFormData({ ...formData, people: e.target.value })}
-                        />
-                        <select
-                            title="Rodzaj rezerwacji"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.type}
-                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                        >
-                            <option value="SIGHTSEEING">👀 Zwiedzanie</option>
-                            <option value="WORKSHOP">🎨 Warsztaty</option>
-                        </select>
-                        <select
-                            title="Czy to grupa zorganizowana?"
-                            className="p-2 border rounded bg-white text-sm"
-                            value={formData.isGroup ? 'true' : 'false'}
-                            onChange={(e) => setFormData({ ...formData, isGroup: e.target.value === 'true' })}
-                        >
-                            <option value="false">👤 Indywidualna</option>
-                            <option value="true">🏫 Grupa</option>
-                        </select>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Data*</label>
+                            <input
+                                type="date"
+                                title="Data rezerwacji"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.date}
+                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Godzina*</label>
+                            <input
+                                type="time"
+                                title="Godzina rezerwacji"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.time}
+                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Imię i Nazwisko*</label>
+                            <input
+                                placeholder="Jan Kowalski"
+                                title="Imię i Nazwisko klienta"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Email*</label>
+                            <input
+                                placeholder="email@przyklad.pl"
+                                title="Email klienta"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Liczba osób*</label>
+                            <input
+                                placeholder="Liczba osób"
+                                title="Liczba osób"
+                                type="number"
+                                min="1"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.people}
+                                onChange={(e) => setFormData({ ...formData, people: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Typ</label>
+                            <select
+                                title="Rodzaj rezerwacji"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.type}
+                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                            >
+                                <option value="SIGHTSEEING">👀 Zwiedzanie</option>
+                                <option value="WORKSHOP">🎨 Warsztaty</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-red-800">Grupa?</label>
+                            <select
+                                title="Czy to grupa zorganizowana?"
+                                className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                value={formData.isGroup ? 'true' : 'false'}
+                                onChange={(e) => setFormData({ ...formData, isGroup: e.target.value === 'true' })}
+                            >
+                                <option value="false">👤 Indywidualna</option>
+                                <option value="true">🏫 Grupa</option>
+                            </select>
+                        </div>
                         {formData.isGroup && (
                             <>
-                                <input
-                                    placeholder="Nazwa Instytucji"
-                                    className="p-2 border rounded bg-white text-sm"
-                                    value={formData.institutionName}
-                                    onChange={(e) => setFormData({ ...formData, institutionName: e.target.value })}
-                                />
-                                <input
-                                    placeholder="Adres Instytucji"
-                                    className="p-2 border rounded bg-white text-sm"
-                                    value={formData.institutionAddress}
-                                    onChange={(e) => setFormData({ ...formData, institutionAddress: e.target.value })}
-                                />
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-red-800">Nazwa Instytucji</label>
+                                    <input
+                                        placeholder="Nazwa Instytucji"
+                                        className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                        value={formData.institutionName}
+                                        onChange={(e) => setFormData({ ...formData, institutionName: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-red-800">Adres Instytucji</label>
+                                    <input
+                                        placeholder="Adres Instytucji"
+                                        className="w-full p-2 border border-red-300 rounded bg-white text-sm text-gray-900 focus:ring-2 focus:ring-red-500 outline-none"
+                                        value={formData.institutionAddress}
+                                        onChange={(e) => setFormData({ ...formData, institutionAddress: e.target.value })}
+                                    />
+                                </div>
                             </>
                         )}
                     </div>
-                    <Button className="mt-4" onClick={handleAddManual}>Zapisz Rezerwację</Button>
+                    <Button className="mt-4 w-full md:w-auto" onClick={handleAddManual}>Zapisz Rezerwację</Button>
                 </Card>
             )}
 
@@ -343,13 +397,34 @@ export default function AdminBookingList() {
                                             </span>
                                         </td>
                                         <td className="px-3 py-2 text-center not-italic">
-                                            <div className="flex flex-col items-center">
-                                                <span className="font-bold text-red-600 text-sm">{booking.people} os.</span>
-                                                <span className="text-[10px] text-gray-400">({booking.priceBase} zł/os)</span>
-                                                <span className="text-xs font-black text-gray-900 border-t border-gray-100 mt-0.5 pt-0.5">
-                                                    {booking.people * booking.priceBase} zł
-                                                </span>
-                                            </div>
+                                            {editingId === booking.id ? (
+                                                <div className="flex flex-col items-center gap-1 z-50 relative">
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        title="Edytuj liczbę osób"
+                                                        className="w-16 p-1 text-center border-2 border-blue-400 rounded bg-white text-gray-900 font-bold focus:ring-2 focus:ring-blue-500 text-sm"
+                                                        value={editPeopleValue}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        onChange={(e) => setEditPeopleValue(parseInt(e.target.value) || 0)}
+                                                    />
+                                                    <div className="flex gap-1">
+                                                        <button onClick={() => savePeople(booking.id)} className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded hover:bg-green-600 font-bold shadow-sm">OK</button>
+                                                        <button onClick={cancelEditing} className="text-[10px] bg-gray-200 text-gray-600 px-2 py-0.5 rounded hover:bg-gray-300 font-bold shadow-sm">X</button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center group/people cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors" onClick={() => startEditing(booking)} title="Kliknij, aby edytować liczbę osób">
+                                                    <span className="font-bold text-red-600 text-sm flex items-center gap-1">
+                                                        {booking.people} os.
+                                                        <span className="opacity-0 group-hover/people:opacity-100 text-gray-400 text-[10px]">✏️</span>
+                                                    </span>
+                                                    <span className="text-[10px] text-gray-400">({booking.priceBase} zł/os)</span>
+                                                    <span className="text-xs font-black text-gray-900 border-t border-gray-100 mt-0.5 pt-0.5">
+                                                        {booking.people * booking.priceBase} zł
+                                                    </span>
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-3 py-2 not-italic">
                                             <input

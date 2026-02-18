@@ -13,6 +13,60 @@ export default function AdminCalendar() {
     const [dayBookings, setDayBookings] = useState<any[]>([]);
     const [loadingDay, setLoadingDay] = useState(false);
 
+    const handlePrint = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const html = `
+            <html>
+            <head>
+                <title>Plan Dnia - ${selectedDay} ${viewDate.toLocaleString('pl-PL', { month: 'long' })}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .summary { margin-top: 20px; font-weight: bold; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <h2>Plan Dnia: ${selectedDay} ${viewDate.toLocaleString('pl-PL', { month: 'long', year: 'numeric' })}</h2>
+                <div class="summary">Liczba rezerwacji: ${dayBookings.length} | Łącznie osób: ${dayBookings.reduce((sum: any, b: any) => sum + b.people, 0)}</div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Godzina</th>
+                            <th>Klient</th>
+                            <th>Typ</th>
+                            <th>Osób</th>
+                            <th>Notatki</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dayBookings.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((b: any) => `
+                            <tr>
+                                <td>${new Date(b.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</td>
+                                <td>${b.name} ${b.isGroup ? '(Grupa)' : ''}<br><small>${b.email}</small></td>
+                                <td>${b.type === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</td>
+                                <td>${b.people}</td>
+                                <td>${b.adminNotes || ''}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <script>
+                    window.onload = function() { window.print(); }
+                </script>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
     const handleDayClick = async (day: number) => {
         if (selectedDay === day) {
             setSelectedDay(null);
@@ -86,22 +140,6 @@ export default function AdminCalendar() {
         fetchData();
     };
 
-    const handlePriceUpdate = async (slotId: string, currentPrice: number | null) => {
-        const newPrice = prompt('Podaj nową cenę (lub zostaw puste dla domyślnej 150 zł):', currentPrice?.toString() || '');
-        if (newPrice === null) return;
-        const price = newPrice === '' ? null : parseInt(newPrice);
-        await updateSlotPrice(slotId, price);
-        fetchData();
-    };
-
-    const handleCapacityUpdate = async (slotId: string, currentCapacity: number) => {
-        const newCap = prompt('Podaj nową pojemność (ilość osób):', currentCapacity.toString());
-        if (newCap === null || newCap === '') return;
-        const capacity = parseInt(newCap);
-        if (isNaN(capacity)) return;
-        await updateSlotCapacity(slotId, capacity);
-        fetchData();
-    };
 
     const getDayStatus = (day: number) => {
         const dateStr = `${currentMonthStr}-${day.toString().padStart(2, '0')}`;
@@ -195,6 +233,10 @@ export default function AdminCalendar() {
                             </p>
                         </div>
                         <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={handlePrint} className="flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2-4h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6a2 2 0 012-2zm-2-2h6a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm4 4h2m-6 0h2" /></svg>
+                                Drukuj
+                            </Button>
                             <Button variant="outline" size="sm" onClick={() => handleBlockDay(selectedDay)}>
                                 {blocks.some(b => b.type === 'DATE' && b.value === `${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`) ? 'Odblokuj Dzień' : 'Zablokuj Dzień'}
                             </Button>

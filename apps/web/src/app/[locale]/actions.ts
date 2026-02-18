@@ -418,6 +418,19 @@ export async function deleteBooking(id: string) {
     }
 }
 
+export async function updateBookingPeople(id: string, people: number) {
+    try {
+        await prisma.booking.update({
+            where: { id },
+            data: { people }
+        });
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
 export async function updateSlotCapacity(id: string, capacity: number) {
     try {
         await prisma.slot.update({
