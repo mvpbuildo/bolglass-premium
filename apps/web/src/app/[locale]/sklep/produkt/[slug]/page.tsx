@@ -66,7 +66,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                         <div className="mt-3">
                             <h2 className="sr-only">Product information</h2>
-                            <p className="text-3xl text-gray-900">{product.price.toFixed(2)} PLN</p>
+                            {product.discountPercent > 0 ? (
+                                <div className="flex items-baseline gap-3">
+                                    <p className="text-3xl font-black text-red-600">
+                                        {(product.price * (1 - product.discountPercent / 100)).toFixed(2)} PLN
+                                    </p>
+                                    <p className="text-xl text-gray-400 line-through">
+                                        {product.price.toFixed(2)} PLN
+                                    </p>
+                                    <span className="bg-red-100 text-red-600 px-2 py-1 rounded text-sm font-bold">
+                                        -{product.discountPercent}%
+                                    </span>
+                                </div>
+                            ) : (
+                                <p className="text-3xl text-gray-900">{product.price.toFixed(2)} PLN</p>
+                            )}
                             <p className="text-sm text-gray-500 mt-1">Cena brutto (zawiera VAT)</p>
                         </div>
 

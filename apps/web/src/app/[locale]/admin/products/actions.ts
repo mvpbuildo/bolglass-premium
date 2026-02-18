@@ -4,6 +4,181 @@ import { prisma } from '@bolglass/database';
 import { revalidatePath } from 'next/cache';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
+// import { writeFile } from 'fs/promises'; // Not used in this version but kept for ref
+import { mkdir } from 'fs/promises';
+import { writeFile } from 'fs/promises';
+
+export async function createProduct(formData: FormData) {
+    try {
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        const ean = formData.get('ean') as string || null;
+        const manufacturerCode = formData.get('manufacturerCode') as string || null;
+
+        const priceNet = parseFloat(formData.get('priceNet') as string);
+        const vatRate = parseInt(formData.get('vatRate') as string);
+        const discountPercent = parseInt(formData.get('discountPercent') as string || '0');
+        const stock = parseInt(formData.get('stock') as string || '0');
+
+        // Calculate Gross
+        const price = priceNet * (1 + vatRate / 100);
+
+        const weight = parseFloat(formData.get('weight') as string || '0');
+        const height = parseFloat(formData.get('height') as string || '0');
+        const width = parseFloat(formData.get('width') as string || '0');
+        const depth = parseFloat(formData.get('depth') as string || '0');
+        const packaging = formData.get('packaging') as string || null;
+
+        const isConfigurable = formData.get('isConfigurable') === 'on';
+
+        // --- Image Upload Logic ---
+        const imageFiles = formData.getAll('images') as File[];
+        const imageUrls: string[] = [];
+
+        if (imageFiles && imageFiles.length > 0) {
+            // Determine uploads directory
+            // In Next.js monorepo, process.cwd() is usually the root of the running app (apps/web)
+            // But we need to ensure ./public/uploads exists
+            const uploadDir = join(process.cwd(), 'public', 'uploads');
+            await mkdir(uploadDir, { recursive: true });
+
+            for (const file of imageFiles) {
+                if (file.size > 0 && file.name !== 'undefined') {
+                    const bytes = await file.arrayBuffer();
+                    const buffer = Buffer.from(bytes);
+
+                    // Generate safe unique filename
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                    const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                    const filename = `${uniqueSuffix}-${safeName}`;
+                    const filepath = join(uploadDir, filename);
+
+                    await writeFile(filepath, buffer);
+                    imageUrls.push(`/uploads/${filename}`);
+                }
+            }
+        }
+
+        // Generate Slug
+        const slug = name.toLowerCase()
+            .replace(/ /g, '-')
+            .replace(/[^\w-]+/g, '');
+
+        await prisma.product.create({
+            data: {
+                name,
+                slug: `${slug}-${Date.now()}`, // Ensure uniqueness
+                description,
+                price, // Gross
+                priceNet,
+                vatRate,
+                discountPercent,
+                stock,
+                ean,
+                manufacturerCode,
+                weight,
+                height,
+                width,
+                depth,
+                packaging,
+                isConfigurable,
+                images: imageUrls
+            }
+        });
+
+        revalidatePath('/admin/products');
+        return { success: true };
+
+    } catch (error) {
+        console.error("Create product failed:", error);
+        return { error: "Błąd podczas tworzenia produktu. Sprawdź poprawność danych." };
+    }
+}
+
+
+export async function updateProduct(id: string, formData: FormData) {
+    try {
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        const ean = formData.get('ean') as string || null;
+        const manufacturerCode = formData.get('manufacturerCode') as string || null;
+
+        const priceNet = parseFloat(formData.get('priceNet') as string);
+        const vatRate = parseInt(formData.get('vatRate') as string);
+        const discountPercent = parseInt(formData.get('discountPercent') as string || '0');
+        const stock = parseInt(formData.get('stock') as string || '0');
+
+        const price = priceNet * (1 + vatRate / 100);
+
+        const weight = parseFloat(formData.get('weight') as string || '0');
+        const height = parseFloat(formData.get('height') as string || '0');
+        const width = parseFloat(formData.get('width') as string || '0');
+        const depth = parseFloat(formData.get('depth') as string || '0');
+        const packaging = formData.get('packaging') as string || null;
+
+        const isConfigurable = formData.get('isConfigurable') === 'on';
+
+        // --- Image Logic ---
+        // 1. Existing images (JSON string)
+        const existingImagesStr = formData.get('existingImages') as string;
+        const existingImages = existingImagesStr ? JSON.parse(existingImagesStr) : [];
+
+        // 2. New images
+        const newImageFiles = formData.getAll('newImages') as File[];
+        const newImageUrls: string[] = [];
+
+        if (newImageFiles && newImageFiles.length > 0) {
+            const uploadDir = join(process.cwd(), 'public', 'uploads');
+            await mkdir(uploadDir, { recursive: true });
+
+            for (const file of newImageFiles) {
+                if (file.size > 0 && file.name !== 'undefined') {
+                    const bytes = await file.arrayBuffer();
+                    const buffer = Buffer.from(bytes);
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                    const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                    const filename = `${uniqueSuffix}-${safeName}`;
+                    const filepath = join(uploadDir, filename);
+
+                    await writeFile(filepath, buffer);
+                    newImageUrls.push(`/uploads/${filename}`);
+                }
+            }
+        }
+
+        const finalImages = [...existingImages, ...newImageUrls];
+
+        await prisma.product.update({
+            where: { id },
+            data: {
+                name,
+                description,
+                price,
+                priceNet,
+                vatRate,
+                discountPercent,
+                stock,
+                ean,
+                manufacturerCode,
+                weight,
+                height,
+                width,
+                depth,
+                packaging,
+                isConfigurable,
+                images: finalImages
+            }
+        });
+
+        revalidatePath('/admin/products');
+        revalidatePath(`/sklep/produkt`); // Revalidate all products since we don't have slug easily here without fetching
+        return { success: true };
+
+    } catch (error) {
+        console.error("Update product failed:", error);
+        return { error: "Błąd podczas edycji produktu." };
+    }
+}
 
 export async function deleteProduct(id: string) {
     try {

@@ -84,42 +84,46 @@ export default function NewProductForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="col-span-2">
                             <label className="block text-sm font-bold text-gray-700 mb-1">Nazwa Produktu</label>
-                            <input name="name" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. Bombka Czerwona 10cm" />
+                            <input name="name" required className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. Bombka Czerwona 10cm" />
                         </div>
                         <div className="col-span-2">
                             <label className="block text-sm font-bold text-gray-700 mb-1">Opis</label>
-                            <textarea name="description" required rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="Opisz produkt..." />
+                            <textarea name="description" required rows={3} className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="Opisz produkt..." />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Kod EAN (Opcjonalnie)</label>
-                            <input name="ean" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 590..." />
+                            <input name="ean" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 590..." />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Kod Producenta (MPN)</label>
-                            <input name="manufacturerCode" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. BG-2024-X" />
+                            <input name="manufacturerCode" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. BG-2024-X" />
                         </div>
                     </div>
                 </div>
 
-                {/* SECTION 2: PRICING */}
+                {/* SECTION 2: PRICING & INVENTORY */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-gray-900 border-b pb-2">2. Ceny</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <h3 className="text-lg font-bold text-gray-900 border-b pb-2">2. Ceny i Magazyn</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Cena Netto (PLN)</label>
-                            <input name="priceNet" type="number" step="0.01" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 45.00" />
+                            <input name="priceNet" type="number" step="0.01" required className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 45.00" />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Stawka VAT (%)</label>
-                            <select name="vatRate" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
+                            <select name="vatRate" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none">
                                 <option value="23">23% (Standard)</option>
                                 <option value="8">8%</option>
                                 <option value="0">0%</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-1">Cena Brutto (Auto)</label>
-                            <input disabled className="w-full px-4 py-2 bg-gray-100 border rounded-lg text-gray-500 cursor-not-allowed" placeholder="Wyliczona automatycznie" />
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Rabat (%)</label>
+                            <input name="discountPercent" type="number" min="0" max="99" defaultValue="0" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-1 text-blue-600">Ilość w Magazynie</label>
+                            <input name="stock" type="number" min="0" defaultValue="0" className="w-full px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none font-bold" />
                         </div>
                     </div>
                 </div>
@@ -130,23 +134,23 @@ export default function NewProductForm() {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Waga (kg)</label>
-                            <input name="weight" type="number" step="0.001" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 0.250" />
+                            <input name="weight" type="number" step="0.001" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. 0.250" />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Wysokość (cm)</label>
-                            <input name="height" type="number" step="0.1" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="cm" />
+                            <input name="height" type="number" step="0.1" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="cm" />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Szerokość (cm)</label>
-                            <input name="width" type="number" step="0.1" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="cm" />
+                            <input name="width" type="number" step="0.1" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="cm" />
                         </div>
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">Głębokość (cm)</label>
-                            <input name="depth" type="number" step="0.1" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="cm" />
+                            <input name="depth" type="number" step="0.1" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="cm" />
                         </div>
                         <div className="col-span-2">
                             <label className="block text-sm font-bold text-gray-700 mb-1">Opakowanie</label>
-                            <input name="packaging" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. Kartonik ozdobny" />
+                            <input name="packaging" className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-red-500 outline-none" placeholder="np. Kartonik ozdobny" />
                         </div>
                     </div>
                 </div>

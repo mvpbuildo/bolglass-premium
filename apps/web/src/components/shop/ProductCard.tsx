@@ -14,16 +14,18 @@ type ProductProps = {
     slug: string;
     priceNet: number;
     vatRate: number;
+    discountPercent: number; // Add this
 };
 
 export default function ProductCard({ product }: { product: ProductProps }) {
     const { addItem } = useCart();
 
     const handleAddToCart = () => {
+        const effectivePrice = product.price * (1 - (product.discountPercent || 0) / 100);
         addItem({
             id: product.id,
             name: product.name,
-            price: product.price,
+            price: effectivePrice,
             image: product.image || undefined,
             quantity: 1,
             slug: product.slug
@@ -56,11 +58,28 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 </div>
 
                 <div className="mt-auto flex items-center justify-between">
+
                     <div className="flex flex-col">
-                        <span className="text-2xl font-black text-white tracking-tighter">
-                            {product.price.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
-                        </span>
-                        <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">Cena Brutto</span>
+                        {product.discountPercent > 0 ? (
+                            <>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl font-black text-red-500 tracking-tighter">
+                                        {(product.price * (1 - product.discountPercent / 100)).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                                    </span>
+                                    <span className="text-sm text-gray-400 line-through decoration-red-500/50">
+                                        {product.price.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                                    </span>
+                                </div>
+                                <span className="text-[10px] text-red-400/80 font-medium uppercase tracking-tight">Promocja -{product.discountPercent}%</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-2xl font-black text-white tracking-tighter">
+                                    {product.price.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                                </span>
+                                <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">Cena Brutto</span>
+                            </>
+                        )}
                     </div>
                     <Button
                         onClick={handleAddToCart}

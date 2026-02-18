@@ -12,6 +12,7 @@ type Product = {
     images: string[];
     slug: string;
     stock: number;
+    discountPercent?: number; // Add this
     // Add other fields if needed for cart logic
 };
 
@@ -21,10 +22,12 @@ export default function AddToCartButton({ product }: { product: Product }) {
     const [isAdded, setIsAdded] = useState(false);
 
     const handleAddToCart = () => {
+        const effectivePrice = product.price * (1 - (product.discountPercent || 0) / 100);
+
         addItem({
             id: product.id,
             name: product.name,
-            price: product.price,
+            price: effectivePrice,
             image: product.images[0],
             quantity: quantity,
             slug: product.slug

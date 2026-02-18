@@ -104,6 +104,7 @@ model Product {
   price          Float     @default(0) // Gross Price (Brutto) - kept for compatibility
   priceNet       Float?    @default(0) // Net Price (Netto)
   vatRate        Int       @default(23)// VAT % (e.g. 23)
+  discountPercent Int      @default(0) // Percentage discount (0-100)
   images         String[]  // Array of image URLs
   
   // Inventory
