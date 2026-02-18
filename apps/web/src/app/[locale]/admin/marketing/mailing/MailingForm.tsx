@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, Button } from '@bolglass/ui';
 import { sendMailing } from './actions';
 import 'react-quill-new/dist/quill.snow.css';
@@ -10,6 +10,7 @@ import 'react-quill-new/dist/quill.snow.css';
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
 export default function MailingForm() {
+    const quillRef = useRef<any>(null);
     const [subject, setSubject] = useState('');
     const [content, setContent] = useState('');
     const [targetLanguage, setTargetLanguage] = useState('pl');
@@ -141,6 +142,7 @@ export default function MailingForm() {
                             <div className="h-96 pb-12 text-gray-900">
                                 <label className="block text-sm font-bold mb-1 text-gray-900">Treść</label>
                                 <ReactQuill
+                                    ref={quillRef}
                                     theme="snow"
                                     value={content}
                                     onChange={setContent}
