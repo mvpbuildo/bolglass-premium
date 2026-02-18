@@ -85,7 +85,7 @@ export default function MailingForm() {
                                     placeholder="Wpisz temat wiadomości..."
                                 />
                             </div>
-                            <div className="h-96 pb-12">
+                            <div className="h-96 pb-12 text-gray-900">
                                 <label className="block text-sm font-bold mb-1 text-gray-900">Treść</label>
                                 <ReactQuill
                                     theme="snow"
@@ -93,7 +93,7 @@ export default function MailingForm() {
                                     onChange={setContent}
                                     modules={modules}
                                     formats={formats}
-                                    className="h-full"
+                                    className="h-full bg-white text-gray-900"
                                 />
                             </div>
                         </div>
