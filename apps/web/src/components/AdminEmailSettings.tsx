@@ -96,7 +96,7 @@ export default function AdminEmailSettings() {
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-gray-700 mb-1">Treść wiadomości</label>
                             <textarea
-                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 bg-white"
                                 value={settings[EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING] || ''}
                                 onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING, e.target.value)}
                                 placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{total}}, {{type}}"
@@ -115,7 +115,7 @@ export default function AdminEmailSettings() {
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-gray-700 mb-1">Treść wiadomości</label>
                             <textarea
-                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-orange-500 outline-none transition-all text-gray-900 bg-white"
                                 value={settings[EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP] || ''}
                                 onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP, e.target.value)}
                                 placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{total}}, {{type}}"
@@ -134,7 +134,7 @@ export default function AdminEmailSettings() {
                         <div className="flex flex-col gap-1">
                             <label className="text-sm font-medium text-gray-700 mb-1">Treść wiadomości</label>
                             <textarea
-                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-purple-500 outline-none transition-all text-gray-900 bg-white"
                                 value={settings[EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER] || ''}
                                 onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER, e.target.value)}
                                 placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{total}}, {{type}}"

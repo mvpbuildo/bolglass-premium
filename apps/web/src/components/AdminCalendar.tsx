@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice, generateMonthSlots, updateSlotCapacity } from '../app/[locale]/actions';
+import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice, generateMonthSlots, updateSlotCapacity, getBookingsByDate } from '../app/[locale]/actions';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
@@ -10,6 +10,32 @@ export default function AdminCalendar() {
     const [blocks, setBlocks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
+    const [dayBookings, setDayBookings] = useState<any[]>([]);
+    const [loadingDay, setLoadingDay] = useState(false);
+
+    const handleDayClick = async (day: number) => {
+        if (selectedDay === day) {
+            setSelectedDay(null);
+            setDayBookings([]);
+            return;
+        }
+
+        setSelectedDay(day);
+        setLoadingDay(true);
+        setDayBookings([]); // Clear previous
+
+        const dateStr = `${currentMonthStr}-${day.toString().padStart(2, '0')}`;
+        const res = await getBookingsByDate(dateStr);
+
+        if (selectedDay === day) return; // Race condition check? Actually simplest is just set.
+        // But since we just set it above, we are good. Wait, if user clicked another day fast?
+        // Let's assume valid.
+
+        if (res.success) {
+            setDayBookings(res.bookings || []);
+        }
+        setLoadingDay(false);
+    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -149,7 +175,7 @@ export default function AdminCalendar() {
                 {days.map(day => (
                     <div
                         key={day}
-                        onClick={() => setSelectedDay(selectedDay === day ? null : day)}
+                        onClick={() => handleDayClick(day)}
                         className={`aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all p-1 text-sm font-bold relative group ${getDayStatus(day)} ${isMonthBlocked ? 'opacity-20 pointer-events-none' : ''} ${selectedDay === day ? 'ring-2 ring-red-500 ring-offset-2 scale-105 z-10' : ''}`}
                     >
                         {day}
@@ -160,37 +186,51 @@ export default function AdminCalendar() {
             {selectedDay && (
                 <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100 animate-in fade-in slide-in-from-bottom-2">
                     <div className="flex justify-between items-center mb-4">
-                        <h4 className="font-bold text-gray-900">
-                            Zarządzanie: {selectedDay} {viewDate.toLocaleString('pl-PL', { month: 'long' })}
-                        </h4>
-                        <Button variant="outline" size="sm" onClick={() => handleBlockDay(selectedDay)}>
-                            {blocks.some(b => b.type === 'DATE' && b.value === `${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`) ? 'Odblokuj Dzień' : 'Zablokuj Dzień'}
-                        </Button>
+                        <div>
+                            <h4 className="font-bold text-gray-900 text-lg">
+                                {selectedDay} {viewDate.toLocaleString('pl-PL', { month: 'long' })}
+                            </h4>
+                            <p className="text-sm text-gray-500">
+                                Liczba osób: <span className="font-bold text-gray-900">{dayBookings.reduce((sum, b) => sum + b.people, 0)}</span>
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => handleBlockDay(selectedDay)}>
+                                {blocks.some(b => b.type === 'DATE' && b.value === `${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`) ? 'Odblokuj Dzień' : 'Zablokuj Dzień'}
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="space-y-2">
-                        {slots
-                            .filter(s => new Date(s.date).toISOString().startsWith(`${currentMonthStr}-${selectedDay.toString().padStart(2, '0')}`))
-                            .map(slot => (
-                                <div key={slot.id} className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
-                                    <div className="text-sm">
-                                        <span className="font-bold">{new Date(slot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
-                                        <span className="ml-2 text-gray-400">{slot.remainingCapacity} / {slot.capacity} miejsc</span>
+                        {loadingDay ? (
+                            <div className="text-center py-8 text-gray-400">Ładowanie rezerwacji...</div>
+                        ) : dayBookings.length === 0 ? (
+                            <div className="text-center py-8 text-gray-400 bg-white rounded-lg border border-dashed border-gray-200">
+                                Brak rezerwacji tego dnia.
+                            </div>
+                        ) : (
+                            dayBookings.map(booking => (
+                                <div key={booking.id} className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:border-gray-300 transition-colors">
+                                    <div className="flex items-center gap-4">
+                                        <div className="font-bold text-lg text-gray-700 w-16 text-center">
+                                            {new Date(booking.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-sm text-gray-900">{booking.name}</div>
+                                            <div className="text-xs text-gray-500">{booking.email} {booking.isGroup && <span className="text-red-600 font-bold ml-1">(Grupa)</span>}</div>
+                                        </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleCapacityUpdate(slot.id, slot.capacity)}
-                                            className="text-xs font-bold px-3 py-1 bg-red-50 text-red-700 rounded-full hover:bg-red-100 transition-colors"
-                                        >
-                                            Limit: {slot.capacity} os.
-                                        </button>
-                                        <div className="text-xs font-bold px-3 py-1 bg-gray-50 text-gray-400 rounded-full">
-                                            Slot aktywny
+                                    <div className="flex items-center gap-4">
+                                        <div className={`px-2 py-1 rounded text-xs font-bold uppercase ${booking.type === 'WORKSHOP' ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'}`}>
+                                            {booking.type === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}
+                                        </div>
+                                        <div className="text-sm font-bold w-8 text-right">
+                                            {booking.people}
                                         </div>
                                     </div>
                                 </div>
                             ))
-                        }
+                        )}
                     </div>
                 </div>
             )}

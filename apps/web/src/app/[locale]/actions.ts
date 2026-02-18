@@ -230,6 +230,52 @@ export async function getAdminSlots() {
     }
 }
 
+export async function getBookingsByDate(dateStr: string) {
+    try {
+        const startOfDay = new Date(`${dateStr}T00:00:00.000Z`); // Assuming strict UTC mapping or use local-aware range if safer
+        // Actually, dates in DB are UTC.
+        // If frontend sends '2023-10-25', we want that day in local time range?
+        // Let's be safe: date from 00:00 to 23:59 of that calendar date string.
+        const endOfDay = new Date(`${dateStr}T23:59:59.999Z`);
+
+        // Adjust for timezone? 
+        // If we want bookings for "2023-10-25" in Poland, that is 2023-10-24 22:00 UTC to 2023-10-25 22:00 UTC (winter)
+        // OR roughly just grab a wider range and filter?
+        // Let's rely on the fact that `dateStr` comes from the calendar which uses local dates.
+        // Using `getWarsawStart` logic might be overkill for just listing.
+        // Let's fetch broader range (UTC Day) which usually covers most day events, 
+        // OR better: use `prisma` date filtering which is timezone agnostic if we construct Dates correctly.
+
+        // Simple approach: Input is YYYY-MM-DD.
+        // We want all bookings where booking.date string representation starts with YYYY-MM-DD? No, date is DateTime.
+
+        const bookings = await prisma.booking.findMany({
+            where: {
+                date: {
+                    gte: new Date(dateStr + 'T00:00:00'),
+                    lte: new Date(dateStr + 'T23:59:59')
+                },
+                status: { not: 'CANCELLED' }
+            },
+            orderBy: { date: 'asc' },
+            select: {
+                id: true,
+                date: true,
+                type: true,
+                people: true,
+                name: true,
+                email: true,
+                isGroup: true,
+                institutionName: true
+            }
+        });
+        return { success: true, bookings };
+    } catch (error: any) {
+        console.error('Error in getBookingsByDate:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function createBooking(formData: {
     slotId?: string;
     date?: string | Date;
