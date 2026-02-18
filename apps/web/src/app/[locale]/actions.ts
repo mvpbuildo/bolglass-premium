@@ -492,24 +492,23 @@ export async function getBookingAvailability(date: string, type: BookingType, pe
 
 export async function generateMonthSlots(year: number, month: number) {
     try {
+        const { getWarsawStart } = await import('@/lib/booking-engine');
         const startHour = 8;
-        const endHour = 16; // Last slot starts at 16:00? Or shifts end at 16:00? User said "Open 8-16". 
-        // Usually means last entry around 15:xx or closing at 16. 
-        // Let's assume operation until 16:00, so last 80min workshop starts 14:40.
-        // But for generic slots, let's generate until 16:00.
-        const capacity = 100; // This capacity is now less relevant for "Resource" logic, but kept for Admin compatibility.
+        const endHour = 16;
+        const capacity = 100; // Legacy generic capacity
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
+            // We construct the date string manually to avoid local timezone issues
+            const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 
             for (let hour = startHour; hour <= endHour; hour++) {
                 for (let min = 0; min < 60; min += 15) {
                     // Don't generate slots after 16:00
                     if (hour === endHour && min > 0) continue;
 
-                    const slotDate = new Date(date);
-                    slotDate.setHours(hour, min, 0, 0);
+                    // Use the helper to get the correct UTC timestamp for Warsaw Time
+                    const slotDate = getWarsawStart(dateStr, hour, min);
 
                     await prisma.slot.upsert({
                         where: { date: slotDate },

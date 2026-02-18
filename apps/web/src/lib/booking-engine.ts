@@ -16,13 +16,67 @@ export const DURATION_MINUTES: Record<BookingType, number> = {
  * Checks availability for a specific date and group size.
  * Returns a list of valid start times (ISODates).
  */
+/**
+ * Helper to construct a Date object that represents a specific time in Warsaw (Europe/Warsaw).
+ * Useful because the server might be UTC, but we want "8:00" to mean "8:00 PL".
+ */
+export function getWarsawStart(dateStr: string, hour: number, minute: number): Date {
+    // Parse the input date string locally to get components
+    // We assume dateStr is YYYY-MM-DD
+    const [y, m, d] = dateStr.split('-').map(Number);
+
+    // We want to find a UTC timestamp X such that X in 'Europe/Warsaw' is y-m-d h:m
+    // We start with a guess: UTC time = Request Time (i.e. assuming UTC+0)
+    // Then we check the difference and adjust.
+    // Warsaw is UTC+1 or UTC+2. 
+    // So if we want 8:00 PL, we expect 7:00 or 6:00 UTC.
+    // Our guess 8:00 UTC will be 9:00 or 10:00 PL.
+
+    let candidate = new Date(Date.UTC(y, m - 1, d, hour, minute));
+
+    // Check what time this candidate is in Warsaw
+    const formatter = new Intl.DateTimeFormat('pl-PL', {
+        timeZone: 'Europe/Warsaw',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+    });
+
+    // Loop to adjust (max a few iterations)
+    for (let i = 0; i < 3; i++) {
+        const parts = formatter.formatToParts(candidate);
+        const plHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+        const plMin = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+
+        // Calculate difference in minutes
+        // We want (hour, minute). We have (plHour, plMin).
+        // Diff = (plHour * 60 + plMin) - (hour * 60 + minute)
+        // If we want 8:00 and got 9:00, Diff is +60.
+        // We need to SUBTRACT Diff from candidate.
+
+        const diffMinutes = (plHour * 60 + plMin) - (hour * 60 + minute);
+
+        // Handle day wrap scenario (e.g. 23:00 vs 00:00) generally not an issue for 8-16 range
+        // unless offset pushes across midnight. 8-16 safe.
+
+        if (diffMinutes === 0) break;
+
+        candidate = new Date(candidate.getTime() - diffMinutes * 60000);
+    }
+
+    return candidate;
+}
+
+/**
+ * Checks availability for a specific date and group size.
+ * Returns a list of valid start times (ISODates).
+ */
 export async function getAvailableStartTimes(dateStr: string, type: BookingType, peopleCount: number): Promise<string[]> {
     const requestedDuration = DURATION_MINUTES[type];
 
     // 1. Fetch all bookings for this day
-    // We fetch a bit wider range to catch workshops starting before 8:00 but ending after
-    const startOfDay = new Date(`${dateStr}T00:00:00`);
-    const endOfDay = new Date(`${dateStr}T23:59:59`);
+    const startOfDay = new Date(`${dateStr}T00:00:00Z`); // Use Z to force UTC range for search
+    const endOfDay = new Date(`${dateStr}T23:59:59Z`);
 
     const existingBookings = await prisma.booking.findMany({
         where: {
@@ -54,33 +108,35 @@ export async function getAvailableStartTimes(dateStr: string, type: BookingType,
     }
 
     // 3. Generate all potential start slots (8:00 to 16:00 - duration)
-    // convert opening hours to minutes from midnight
-    const openMin = OPENING_HOUR * 60;
-    const closeMin = CLOSING_HOUR * 60;
-    // The last possible start time is when functionality ends exactly at closing
-    // e.g. if close is 16:00 (960 min) and duration is 80, last start is 14:40 (880 min)
-    const latestStartMin = closeMin - requestedDuration;
-
     const validStartTimes: string[] = [];
 
-    // Loop through every 15 mins
-    for (let time = openMin; time <= latestStartMin; time += SLOT_INTERVAL_MINUTES) {
-        const potentialStart = new Date(startOfDay);
-        potentialStart.setMinutes(time);
+    // Loop from OPENING_HOUR to CLOSING_HOUR - duration
+    // We verify strict OPEN-CLOSE window.
+    // e.g. Open 8:00, Close 16:00.
+    // Workshop (80min): Last start 14:40 (ends 16:00). 14:45 ends 16:05 (Invalid).
 
+    // Iterate in 15 min steps
+    // We start at 8:00 Warsaw Time
+    let currentTime = getWarsawStart(dateStr, OPENING_HOUR, 0);
+
+    // We need to determine the End Limit (16:00 Warsaw)
+    const closingTime = getWarsawStart(dateStr, CLOSING_HOUR, 0);
+    // Adjust closing time by removing duration
+    const latestStartTime = new Date(closingTime.getTime() - requestedDuration * 60000);
+
+    while (currentTime <= latestStartTime) {
+        const potentialStart = new Date(currentTime);
         const potentialEnd = new Date(potentialStart.getTime() + requestedDuration * 60000);
 
         // Check 1: Capacity Constraint (The "Tetris" check)
-        // We must ensure that at ANY point during our proposed duration, the room capacity isn't exceeded.
-        // Simplified: Check capacity at start, and every 15 min interval of our duration.
-        // Actually, we should check against all existing bookings to see if their time intervals overlap with ours.
-
-        // Let's verify resource usage for this specific proposed interval [potentialStart, potentialEnd]
         const isOverbooked = checkResourceOverlap(potentialStart, potentialEnd, peopleCount, existingBookings);
 
         if (!isOverbooked) {
             validStartTimes.push(potentialStart.toISOString());
         }
+
+        // Increment by 15 mins
+        currentTime = new Date(currentTime.getTime() + SLOT_INTERVAL_MINUTES * 60000);
     }
 
     return validStartTimes;
