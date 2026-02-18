@@ -24,13 +24,35 @@ export async function getAdminEmailSettings() {
             [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP]: 'Potwierdzenie rezerwacji warsztatów - Bolglass',
             [EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP]: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
             [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
-            [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł'
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE]: 'Aktualizacja Twojej rezerwacji w Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}'
         };
 
         // Initialize with defaults
         keys.forEach(k => settingsMap[k] = defaults[k] || '');
 
         settings.forEach((s: any) => {
+            // ... existing code ...
+            export async function updateBookingPeople(id: string, people: number) {
+                try {
+                    // Update first
+                    const booking = await prisma.booking.update({
+                        where: { id },
+                        data: { people }
+                    });
+
+                    revalidatePath('/', 'layout');
+
+                    // Send email asynchronously
+                    const { sendBookingUpdateEmail } = await import('@/lib/mail');
+                    sendBookingUpdateEmail(booking).catch(err => console.error('Failed to send update email:', err));
+
+                    return { success: true };
+                } catch (error: any) {
+                    return { success: false, error: error.message };
+                }
+            }
             // If the database has a value, but it's an email body and it's too short, 
             // we ignore it and keep our professional default.
             const isBody = s.key.includes('body');
@@ -420,11 +442,16 @@ export async function deleteBooking(id: string) {
 
 export async function updateBookingPeople(id: string, people: number) {
     try {
-        await prisma.booking.update({
+        const booking = await prisma.booking.update({
             where: { id },
             data: { people }
         });
         revalidatePath('/', 'layout');
+
+        // Send email asynchronously
+        const { sendBookingUpdateEmail } = await import('@/lib/mail');
+        sendBookingUpdateEmail(booking).catch(err => console.error('Failed to send update email:', err));
+
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };

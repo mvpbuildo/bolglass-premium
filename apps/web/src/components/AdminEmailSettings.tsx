@@ -141,6 +141,25 @@ export default function AdminEmailSettings() {
                             />
                         </div>
                     </div>
+
+                    <div className="p-6 border rounded-xl bg-green-50/30 border-green-100">
+                        <h3 className="font-bold text-lg mb-4 text-green-800">✏️ Aktualizacja (Booking Update)</h3>
+                        <Input
+                            label="Temat wiadomości"
+                            className="mb-4"
+                            value={settings[EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE] || ''}
+                            onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE, e.target.value)}
+                        />
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium text-gray-700 mb-1">Treść wiadomości</label>
+                            <textarea
+                                className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-green-500 outline-none transition-all text-gray-900 bg-white"
+                                value={settings[EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE] || ''}
+                                onChange={(e) => handleChange(EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE, e.target.value)}
+                                placeholder="Dostępne tagi: {{name}}, {{date}}, {{people}}, {{total}}, {{type}}"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="mt-8 flex justify-between items-center text-xs text-gray-400">

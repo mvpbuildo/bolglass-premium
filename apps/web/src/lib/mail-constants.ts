@@ -9,5 +9,7 @@ export const EMAIL_SETTING_KEYS = {
     EMAIL_SUBJECT_WORKSHOP: 'email_subject_workshop',
     EMAIL_BODY_WORKSHOP: 'email_body_workshop',
     EMAIL_SUBJECT_REMINDER: 'email_subject_reminder',
-    EMAIL_BODY_REMINDER: 'email_body_reminder'
+    EMAIL_BODY_REMINDER: 'email_body_reminder',
+    EMAIL_SUBJECT_UPDATE: 'email_subject_update',
+    EMAIL_BODY_UPDATE: 'email_body_update'
 };
