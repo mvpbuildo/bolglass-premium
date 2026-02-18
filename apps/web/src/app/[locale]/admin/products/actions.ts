@@ -225,3 +225,18 @@ export async function deleteProduct(id: string) {
         return { error: "Wystąpił błąd podczas usuwania produktu." };
     }
 }
+
+export async function updateProductDiscount(id: string, discountPercent: number) {
+    try {
+        await prisma.product.update({
+            where: { id },
+            data: { discountPercent }
+        });
+        revalidatePath('/admin/products');
+        revalidatePath(`/sklep/produkt`);
+        return { success: true };
+    } catch (error) {
+        console.error("Update discount failed:", error);
+        return { error: "Błąd aktualizacji rabatu." };
+    }
+}
