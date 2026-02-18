@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getSystemSettings } from "@/app/[locale]/actions";
+import MainLayoutSpacer from "@/components/MainLayoutSpacer";
 
 export default async function LocaleLayout({
     children,
@@ -47,12 +48,15 @@ export default async function LocaleLayout({
         messages = {};
     }
 
+    // ... (existing code)
+
     return (
         <html lang={locale}>
             <body className={`${inter.variable} antialiased font-sans bg-black text-white`}>
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <Providers>
                         <Navbar logoUrl={settings.contact_logo} />
+                        <MainLayoutSpacer />
                         {children}
                         <Footer />
                     </Providers>
