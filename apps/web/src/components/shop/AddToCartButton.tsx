@@ -44,7 +44,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
                 >
                     -
                 </button>
-                <span className="w-12 text-center font-medium">{quantity}</span>
+                <span className="w-12 text-center font-medium text-gray-900">{quantity}</span>
                 <button
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg"

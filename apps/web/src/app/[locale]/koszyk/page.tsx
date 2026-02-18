@@ -114,7 +114,7 @@ export default function CheckoutPage() {
                                         onClick={() => setDocumentType('RECEIPT')}
                                         className={`py-3 px-4 rounded-xl border-2 transition-all font-bold ${documentType === 'RECEIPT'
                                             ? 'border-red-600 bg-red-50 text-red-600'
-                                            : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-gray-200'
+                                            : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'
                                             }`}
                                     >
                                         📄 Paragon
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
                                         type="email"
                                         required
                                         defaultValue={session?.user?.email || ''}
-                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900"
                                         title="Adres e-mail"
                                     />
                                 </div>
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
                                             <input
                                                 name="nip"
                                                 required={documentType === 'INVOICE'}
-                                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900"
                                                 placeholder="PL0000000000"
                                                 title="NIP"
                                             />
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
                                             <input
                                                 name="companyName"
                                                 required={documentType === 'INVOICE'}
-                                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900"
                                                 title="Nazwa Firmy"
                                             />
                                         </div>
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
                                             <input
                                                 name="companyAddress"
                                                 required={documentType === 'INVOICE'}
-                                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900"
                                                 placeholder="ul. Wspólna 1, 00-001 Warszawa"
                                                 title="Adres Firmy"
                                             />
@@ -184,27 +184,27 @@ export default function CheckoutPage() {
                                         name="name"
                                         required
                                         defaultValue={session?.user?.name || ''}
-                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900"
                                         title="Imię i Nazwisko"
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Adres Dostawy (Ulica i nr)</label>
-                                    <input name="address" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" title="Adres" />
+                                    <input name="address" required className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900" title="Adres" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Kod Pocztowy</label>
-                                        <input name="zip" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" title="Kod Pocztowy" />
+                                        <input name="zip" required className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900" title="Kod Pocztowy" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Miasto</label>
-                                        <input name="city" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" title="Miasto" />
+                                        <input name="city" required className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900" title="Miasto" />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Telefon</label>
-                                    <input name="phone" type="tel" required className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none" title="Telefon" />
+                                    <input name="phone" type="tel" required className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900" title="Telefon" />
                                 </div>
                                 {!session && (
                                     <div className="mb-8 p-6 bg-amber-500/5 border border-amber-500/10 text-amber-200/60 rounded-2xl text-sm italic">
