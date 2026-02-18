@@ -34,6 +34,9 @@ export async function createProduct(formData: FormData) {
         console.log("Logistics:", { weight, height, width, depth, packaging });
 
         const isConfigurable = formData.get('isConfigurable') === 'on';
+
+        const discountPercent = parseInt(formData.get('discountPercent') as string || '0');
+        const stock = parseInt(formData.get('stock') as string || '0');
         console.log("isConfigurable:", isConfigurable);
 
         // Handle Multiple Images
@@ -108,10 +111,11 @@ export async function createProduct(formData: FormData) {
                 depth,
                 packaging,
                 isConfigurable,
+                discountPercent,
+                stock,
                 images: imageUrls, // Mapping internal imageUrls to schema field 'images'
                 slug: `${slug}-${Date.now()}`, // Keep the unique slug generation
                 sku,
-                stock: 100
             }
         });
 

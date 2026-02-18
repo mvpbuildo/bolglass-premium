@@ -30,6 +30,9 @@ export async function updateProduct(id: string, formData: FormData) {
 
         const isConfigurable = formData.get('isConfigurable') === 'on';
 
+        const discountPercent = parseInt(formData.get('discountPercent') as string || '0');
+        const stock = parseInt(formData.get('stock') as string || '0');
+
         // Existing Images (passed as JSON string array)
         const existingImagesStr = formData.get('existingImages') as string;
         const existingImages: string[] = existingImagesStr ? JSON.parse(existingImagesStr) : [];
@@ -87,6 +90,8 @@ export async function updateProduct(id: string, formData: FormData) {
                 depth,
                 packaging,
                 isConfigurable,
+                discountPercent,
+                stock,
                 images: finalImages,
             }
         });
