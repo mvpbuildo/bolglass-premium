@@ -176,30 +176,52 @@ export async function getAdminSlots() {
     try {
         const slots = await prisma.slot.findMany({
             include: {
-                bookings: { select: { people: true, type: true } }
+                bookings: { select: { people: true, type: true, date: true } }
             },
             orderBy: { date: 'asc' },
         });
 
+        // We need all bookings to check overlaps efficiently.
+        // Since we are iterating slots, let's just fetch all confirmed bookings in the relevant range?
+        // Or simpler: Iterate slots, and for each slot, filter the bookings from the *overall* list?
+        // Optimisation: define a range for the slots usually fetched (current month?)
+        // But getAdminSlots fetches *all* slots in DB currently. That might be heavy eventually.
+        // For now, let's keep it simple.
+
+        // Better: For each slot, we want "People currently in room".
+        // A booking B (date, type, people) occupies room from [B.date] to [B.date + duration].
+        // Occupancy at Slot S (time T) is sum(B.people) where B.start <= T < B.end.
+
+        // Let's create a list of all active bookings expanded with start/end times.
+        const allBookings = await prisma.booking.findMany({
+            where: { status: { not: 'CANCELLED' } },
+            select: { date: true, type: true, people: true }
+        });
+
+        const expandedBookings = allBookings.map(b => {
+            const duration = b.type === 'WORKSHOP' ? 80 : 30; // Hardcoded constants from logic
+            return {
+                start: b.date.getTime(),
+                end: b.date.getTime() + (duration * 60000),
+                people: b.people
+            };
+        });
+
         return slots.map(slot => {
             const slotTime = slot.date.getTime();
-            const prevSlotTime = slotTime - (60 * 60 * 1000);
 
-            const directBookings = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
-
-            // Shadow logic for Admin too
-            const prevSlot = slots.find(s => s.date.getTime() === prevSlotTime);
-            let shadowOccupancy = 0;
-            if (prevSlot) {
-                shadowOccupancy = prevSlot.bookings
-                    .filter((b: any) => b.type === 'WORKSHOP')
-                    .reduce((sum: number, b: any) => sum + b.people, 0);
-            }
+            // Calculate total people currently in the room at this slot time
+            const currentOccupancy = expandedBookings
+                .filter(b => b.start <= slotTime && b.end > slotTime)
+                .reduce((sum, b) => sum + b.people, 0);
 
             const { bookings: _bookings, ...slotData } = slot;
             return {
                 ...slotData,
-                remainingCapacity: Math.max(0, slot.capacity - (directBookings + shadowOccupancy))
+                // Capacity is 92 fixed for calculation, or slot.capacity if we want to honor overrides?
+                // Let's rely on slot.capacity as the "Room Limit" (usually 92 or 100).
+                // Remaining is Limit - Current Occupancy.
+                remainingCapacity: Math.max(0, slot.capacity - currentOccupancy)
             };
         });
     } catch (error: unknown) {
@@ -209,7 +231,8 @@ export async function getAdminSlots() {
 }
 
 export async function createBooking(formData: {
-    slotId: string;
+    slotId?: string;
+    date?: string | Date;
     name: string;
     email: string;
     people: number;
@@ -219,87 +242,60 @@ export async function createBooking(formData: {
     institutionAddress?: string;
 }, isAdminOverride = false) {
     console.log('--- SERVER ACTION: createBooking ---', { formData, isAdminOverride });
-    console.log('--- START createBooking ---', formData);
     try {
-        const slot = await (prisma as any).slot.findUnique({
-            where: { id: formData.slotId },
-            include: {
-                bookings: { select: { people: true, type: true } }
-            },
-        });
+        let bookingDate: Date;
+        let slotId = formData.slotId;
 
-        if (!slot) throw new Error('Slot not found');
-
-        // 1. Calculate Current Occupancy (Direct + Shadow)
-        const slotTime = slot.date.getTime();
-        const prevSlotTime = slotTime - (60 * 60 * 1000);
-
-        // We need to fetch previous slot to check for shadows occupancy
-        // Optimization: Find prev slot from DB
-        const prevSlot = await (prisma as any).slot.findFirst({
-            where: { date: new Date(prevSlotTime) },
-            include: { bookings: { select: { people: true, type: true } } }
-        });
-
-        const directUsage = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
-        let shadowUsage = 0;
-        if (prevSlot) {
-            shadowUsage = prevSlot.bookings
-                .filter((b: any) => b.type === 'WORKSHOP')
-                .reduce((sum: number, b: any) => sum + b.people, 0);
-        }
-
-        const totalUsage = directUsage + shadowUsage;
-
-        // Validation for the current slot
-        if (!isAdminOverride && (totalUsage + formData.people > slot.capacity)) {
-            console.log('Capacity exceeded for current slot:', { totalUsage, requested: formData.people, capacity: slot.capacity });
-            throw new Error(`Brak wolnych miejsc w wybranej godzinie. Pozostało: ${slot.capacity - totalUsage}`);
-        }
-
-        // Additional validation for Workshops (Approach B: Blocks next slot too)
-        if (formData.type === 'WORKSHOP' && !isAdminOverride) {
-            const nextTime = slotTime + (60 * 60 * 1000);
-            const nextSlot = await (prisma as any).slot.findFirst({
-                where: { date: new Date(nextTime) },
-                include: { bookings: { select: { people: true, type: true } } }
-            });
-
-            if (nextSlot) {
-                const nDirect = nextSlot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
-                const nShadow = slot.bookings
-                    .filter((b: any) => b.type === 'WORKSHOP')
-                    .reduce((sum: number, b: any) => sum + b.people, 0);
-
-                const nTotal = nDirect + nShadow;
-                if (nTotal + formData.people > nextSlot.capacity) {
-                    throw new Error(`Brak wolnych miejsc w kolejnej godzinie (warsztaty wymagają dłuższego czasu). Pozostało: ${nextSlot.capacity - nTotal}`);
-                }
+        // 1. Determine Date and Slot
+        if (slotId) {
+            const slot = await prisma.slot.findUnique({ where: { id: slotId } });
+            if (!slot) throw new Error('Slot not found');
+            bookingDate = slot.date;
+        } else if (formData.date) {
+            bookingDate = new Date(formData.date);
+            // Try to find matching slot
+            const slot = await prisma.slot.findUnique({ where: { date: bookingDate } });
+            if (slot) {
+                slotId = slot.id;
             } else {
-                console.warn('Workshop requested but next slot does not exist. Allowing booking based on current slot only.');
+                // If slot doesn't exist (e.g. generated yet?), we could create it or error.
+                // For robustness, let's create it on the fly if legal time
+                // Or just error. Let's error for now to enforce generation.
+                // Actually, if we want robust 15-min support, we should probably ensure it exists.
+                // But let's assume generateMonthSlots was run.
+                throw new Error('Wybrany termin nie ma zdefiniowanego slotu w systemie. Skontaktuj się z administratorem.');
+            }
+        } else {
+            throw new Error('Missing date or slotId');
+        }
+
+        // 2. Validate Resource Availability (The "Tetris" Check)
+        if (!isAdminOverride) {
+            // Import dynamically to avoid circular deps if any (though imports are top level)
+            const { isBookingValid } = await import('@/lib/booking-engine');
+            const validation = await isBookingValid(bookingDate, formData.type as BookingType, formData.people);
+
+            if (!validation.valid) {
+                throw new Error(validation.error || 'Termin niedostępny.');
             }
         }
 
-        // 2. Fetch Pricing from Settings
+        // 3. Fetch Pricing
         const key = formData.type === 'WORKSHOP' ? 'price_workshop' : 'price_sightseeing';
         const setting = await prisma.systemSetting.findUnique({ where: { key } });
 
-        // Fallbacks
         let finalPrice = 150;
         if (formData.type === 'WORKSHOP') finalPrice = 60;
         else if (formData.type === 'SIGHTSEEING') finalPrice = 35;
 
-        // Apply setting if exists
         if (setting) {
             finalPrice = parseInt(setting.value);
         }
 
-        // Slot specific price override (highest priority if set? Or maybe keep it simpler)
-        // Let's say: System Setting is base. Slot.price overrides everything?
-        // User asked for "Admin sets price 35/60". 
-        // Logic: If slot has specific price, use it. Else use Global Setting based on Type.
-        if (slot.price) {
-            finalPrice = slot.price;
+        // Check if slot has override price
+        if (slotId) {
+            const slot = await prisma.slot.findUnique({ where: { id: slotId } });
+            if (slot?.price) finalPrice = slot.price;
         }
 
         const booking = await prisma.booking.create({
@@ -307,8 +303,8 @@ export async function createBooking(formData: {
                 name: formData.name,
                 email: formData.email,
                 people: formData.people,
-                date: slot.date,
-                slotId: slot.id,
+                date: bookingDate,
+                slotId: slotId, // Can be null? Schema says slot Slot? So yes. But we try to link.
                 type: formData.type,
                 status: 'CONFIRMED',
                 priceBase: finalPrice,
@@ -478,31 +474,52 @@ export async function removeGlobalBlock(id: string) {
     }
 }
 
+// --- Booking Engine Integration ---
+
+import { getAvailableStartTimes, BookingType } from '@/lib/booking-engine';
+
+export async function getBookingAvailability(date: string, type: BookingType, people: number) {
+    try {
+        const slots = await getAvailableStartTimes(date, type, people);
+        return { success: true, slots };
+    } catch (error: any) {
+        console.error('Error in getBookingAvailability:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// ... existing code ...
+
 export async function generateMonthSlots(year: number, month: number) {
     try {
         const startHour = 8;
-        const endHour = 17;
-        const capacity = 100;
+        const endHour = 16; // Last slot starts at 16:00? Or shifts end at 16:00? User said "Open 8-16". 
+        // Usually means last entry around 15:xx or closing at 16. 
+        // Let's assume operation until 16:00, so last 80min workshop starts 14:40.
+        // But for generic slots, let's generate until 16:00.
+        const capacity = 100; // This capacity is now less relevant for "Resource" logic, but kept for Admin compatibility.
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
 
-            // Skip past days? Maybe not needed for admin generation, but good practice.
-            // if (date < new Date()) continue; 
-
             for (let hour = startHour; hour <= endHour; hour++) {
-                const slotDate = new Date(date);
-                slotDate.setHours(hour, 0, 0, 0);
+                for (let min = 0; min < 60; min += 15) {
+                    // Don't generate slots after 16:00
+                    if (hour === endHour && min > 0) continue;
 
-                await prisma.slot.upsert({
-                    where: { date: slotDate },
-                    update: { capacity }, // Ensure capacity is set/updated
-                    create: {
-                        date: slotDate,
-                        capacity,
-                    },
-                });
+                    const slotDate = new Date(date);
+                    slotDate.setHours(hour, min, 0, 0);
+
+                    await prisma.slot.upsert({
+                        where: { date: slotDate },
+                        update: { capacity },
+                        create: {
+                            date: slotDate,
+                            capacity,
+                        },
+                    });
+                }
             }
         }
         revalidatePath('/', 'layout');

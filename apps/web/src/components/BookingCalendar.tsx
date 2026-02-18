@@ -2,29 +2,37 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button, Input, Select, Card } from '@bolglass/ui';
-import { getAvailableSlots, createBooking, getSystemSettings } from '../app/[locale]/actions';
+import { getAvailableSlots, createBooking, getSystemSettings, getBookingAvailability } from '../app/[locale]/actions';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BookingCalendar() {
-    const [slots, setSlots] = useState<any[]>([]);
-    const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-    const [step, setStep] = useState(0); // 0: Type Selection, 1: Date, 2: Form, 3: Success
+    // Wizard State
+    const [step, setStep] = useState(0);
+    // 0: Type & People Selection
+    // 1: Date & Time Selection
+    // 2: Details Form
+    // 3: Success
+
     const [loading, setLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Settings / Pricing
+    // Data State
     const [prices, setPrices] = useState({ sightseeing: 35, workshop: 60 });
-    const [bookingType, setBookingType] = useState<'SIGHTSEEING' | 'WORKSHOP'>('SIGHTSEEING');
+    const [monthAvailability, setMonthAvailability] = useState<any[]>([]); // For calendar dots (heuristic)
+    const [daySlots, setDaySlots] = useState<string[]>([]); // Specific start times for selected day
 
-    // Form States
+    // User Selection State
+    const [bookingType, setBookingType] = useState<'SIGHTSEEING' | 'WORKSHOP'>('SIGHTSEEING');
+    const [people, setPeople] = useState('1'); // Input is string, parsed to number
+    const [selectedDate, setSelectedDate] = useState<string | null>(null); // YYYY-MM-DD
+    const [selectedTime, setSelectedTime] = useState<string | null>(null); // ISO String of start time
+
+    // Contact Form State
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [people, setPeople] = useState('1');
     const [isGroup, setIsGroup] = useState(false);
     const [institutionName, setInstitutionName] = useState('');
     const [institutionAddress, setInstitutionAddress] = useState('');
-
-    const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
     useEffect(() => {
         async function init() {
@@ -32,7 +40,7 @@ export default function BookingCalendar() {
                 getAvailableSlots(),
                 getSystemSettings()
             ]);
-            setSlots(availableSlots);
+            setMonthAvailability(availableSlots);
 
             if (settings.price_sightseeing) setPrices(p => ({ ...p, sightseeing: parseInt(settings.price_sightseeing) }));
             if (settings.price_workshop) setPrices(p => ({ ...p, workshop: parseInt(settings.price_workshop) }));
@@ -40,36 +48,43 @@ export default function BookingCalendar() {
         init();
     }, []);
 
-    // Grouping slots by date
-    const groupedSlots = slots.reduce((acc: any, slot: any) => {
-        const dateKey = new Date(slot.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
-        if (!acc[dateKey]) acc[dateKey] = [];
-        acc[dateKey].push(slot);
-        return acc;
-    }, {});
-
-    const availableDates = Object.keys(groupedSlots).sort((a, b) => {
-        return new Date(groupedSlots[a][0].date).getTime() - new Date(groupedSlots[b][0].date).getTime();
-    });
-
-    // Scroll to top of calendar when step changes
+    // Scroll to top on step change
     useEffect(() => {
         if (step > 0 && containerRef.current) {
             containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }, [step]);
 
-    const handleNextStep = () => {
-        setStep(2);
-    };
+    // Fetch slots when date is selected
+    useEffect(() => {
+        async function fetchDailySlots() {
+            if (!selectedDate) return;
+            setLoading(true);
+            setDaySlots([]);
+            setSelectedTime(null);
+
+            const res = await getBookingAvailability(selectedDate, bookingType, parseInt(people) || 1);
+            setLoading(false);
+
+            if (res.success && res.slots) {
+                setDaySlots(res.slots);
+            } else {
+                alert('Błąd pobierania terminów: ' + res.error);
+            }
+        }
+
+        if (step === 1 && selectedDate) {
+            fetchDailySlots();
+        }
+    }, [selectedDate, step, bookingType, people]);
 
     const handleBooking = async () => {
-        if (!selectedSlotId || !name || !email) return;
+        if (!selectedTime || !name || !email) return;
 
         setLoading(true);
         try {
             const result = await createBooking({
-                slotId: selectedSlotId,
+                date: selectedTime, // New: Passing exact ISO time
                 name,
                 email,
                 people: parseInt(people) || 1,
@@ -91,28 +106,19 @@ export default function BookingCalendar() {
         }
     };
 
-    const selectedSlot = slots.find(s => s.id === selectedSlotId);
-
-    // Generate people options based on selected slot capacity (and next slot for workshops)
-    const selectedSlotData = slots.find(s => s.id === selectedSlotId);
-    let maxPeople = selectedSlotData ? selectedSlotData.remainingCapacity : 10;
-
-    // If it's a workshop, we must also respect the next slot's capacity
-    if (bookingType === 'WORKSHOP' && selectedSlotData) {
-        const nextTime = new Date(selectedSlotData.date).getTime() + (60 * 60 * 1000);
-        const nextSlot = slots.find(s => new Date(s.date).getTime() === nextTime);
-        if (nextSlot) {
-            maxPeople = Math.min(maxPeople, nextSlot.remainingCapacity);
-        }
-    }
-
-    const peopleOptions = Array.from({ length: Math.max(1, Math.min(100, maxPeople)) }, (_, i) => ({
-        label: `${i + 1} ${i === 0 ? 'osoba' : (i < 4 ? 'osoby' : 'osób')}`,
-        value: (i + 1).toString()
-    }));
+    // Helper to get unique dates from monthAvailability for calendar viz
+    // Actually, monthAvailability comes from old `getAvailableSlots` which depends on old logic.
+    // It might show days as available even if fully booked by new logic.
+    // But better than nothing. Alternatively, we generate simple calendar list for next 30 days.
+    // Let's generate next 30 days and mark them based on basics.
+    const today = new Date();
+    const next30Days = Array.from({ length: 45 }, (_, i) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() + i);
+        return d.toISOString().split('T')[0];
+    });
 
     const currentPrice = bookingType === 'WORKSHOP' ? prices.workshop : prices.sightseeing;
-    const currentDuration = bookingType === 'WORKSHOP' ? 'ok. 80 min' : 'ok. 30 min';
 
     return (
         <section ref={containerRef} className="py-24 bg-white text-black scroll-mt-20">
@@ -122,169 +128,172 @@ export default function BookingCalendar() {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                    {/* Steps Visualizer - Sidebar */}
+                    {/* Steps Sidebar */}
                     <div className="md:col-span-4 space-y-4">
-                        <div
-                            className={`p-4 border rounded-xl transition-all cursor-pointer ${step === 0 ? 'border-red-500 bg-red-50 shadow-md' : 'border-gray-100 opacity-60'}`}
-                            onClick={() => setStep(0)}
-                        >
-                            <h3 className="font-bold text-lg flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs">1</span>
-                                Wybierz Pakiet
-                            </h3>
-                            {step > 0 && (
-                                <p className="text-red-600 text-sm font-medium mt-1 ml-8">
-                                    {bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}
-                                </p>
-                            )}
-                        </div>
-
-                        <div className={`p-4 border rounded-xl transition-all ${step === 1 ? 'border-red-500 bg-red-50 shadow-md' : 'border-gray-100 opacity-60'}`}>
-                            <h3 className="font-bold text-lg flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs">2</span>
-                                Termin
-                            </h3>
-                            {selectedSlot && step > 1 && (
-                                <div className="mt-1 ml-8 text-sm text-gray-600">
-                                    {new Date(selectedSlot.date).toLocaleDateString('pl-PL')} <br />
-                                    godz. {new Date(selectedSlot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className={`p-4 border rounded-xl transition-all ${step === 2 ? 'border-red-500 bg-red-50 shadow-md' : 'border-gray-100 opacity-60'}`}>
-                            <h3 className="font-bold text-lg flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs">3</span>
-                                Dane
-                            </h3>
-                        </div>
+                        <StepCard
+                            step={0}
+                            currentStep={step}
+                            label="Pakiet i Liczba Osób"
+                            setStep={setStep}
+                            subText={step > 0 ? `${bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'} (${people} os.)` : ''}
+                        />
+                        <StepCard
+                            step={1}
+                            currentStep={step}
+                            label="Wybór Terminu"
+                            setStep={setStep}
+                            subText={step > 1 && selectedTime ? new Date(selectedTime).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' }) : ''}
+                        />
+                        <StepCard
+                            step={2}
+                            currentStep={step}
+                            label="Twoje Dane"
+                            setStep={setStep}
+                        />
                     </div>
 
                     {/* Interactive Area */}
                     <div className="md:col-span-8">
-                        <Card className="bg-white border border-gray-100 shadow-2xl p-8 relative overflow-hidden min-h-[400px]">
+                        <Card className="bg-white border border-gray-100 shadow-xl p-8 relative overflow-hidden min-h-[500px]">
                             <AnimatePresence mode="wait">
 
-                                {/* STEP 0: PACKAGE SELECTION */}
+                                {/* STEP 0: TYPE & PEOPLE */}
                                 {step === 0 && (
-                                    <motion.div
-                                        key="step0"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="space-y-6"
-                                    >
-                                        <h3 className="text-xl font-bold mb-6">Na co masz ochotę?</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <button
-                                                onClick={() => { setBookingType('SIGHTSEEING'); setStep(1); }}
-                                                className="group relative p-6 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all text-left flex flex-col h-full"
-                                            >
-                                                <div className="text-2xl mb-2">👀</div>
-                                                <h4 className="font-bold text-lg mb-1">Zwiedzanie Fabryki</h4>
-                                                <p className="text-sm text-gray-500 mb-4 flex-grow">
-                                                    Zobacz proces dmuchania szkła z przewodnikiem. Otrzymasz bombkę imienną lub zestaw 6 bombek.
-                                                </p>
-                                                <div className="mt-auto pt-4 border-t border-gray-200 w-full flex justify-between items-center group-hover:border-red-200">
-                                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">30 min</span>
-                                                    <span className="text-xl font-bold text-red-600">{prices.sightseeing} zł</span>
-                                                </div>
-                                            </button>
+                                    <motion.div key="step0" {...fadeIn} className="space-y-8">
+                                        <h3 className="text-xl font-bold">1. Wybierz pakiet i wielkość grupy</h3>
 
-                                            <button
-                                                onClick={() => { setBookingType('WORKSHOP'); setStep(1); }}
-                                                className="group relative p-6 border-2 border-red-100 rounded-2xl bg-gradient-to-br from-white to-red-50/30 hover:border-red-600 hover:shadow-lg transition-all text-left flex flex-col h-full"
-                                            >
-                                                <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded-full">Polecane</div>
-                                                <div className="text-2xl mb-2">🎨</div>
-                                                <h4 className="font-bold text-lg mb-1">Zwiedzanie + Warsztaty</h4>
-                                                <p className="text-sm text-gray-500 mb-4 flex-grow">
-                                                    Wszystko co w zwiedzaniu + <strong>własnoręczne malowanie 2 bombek</strong> pod okiem artysty.
-                                                </p>
-                                                <div className="mt-auto pt-4 border-t border-gray-200 w-full flex justify-between items-center group-hover:border-red-200">
-                                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">80 min</span>
-                                                    <span className="text-xl font-bold text-red-600">{prices.workshop} zł</span>
+                                        {/* Type Selection */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <TypeButton
+                                                selected={bookingType === 'SIGHTSEEING'}
+                                                onClick={() => setBookingType('SIGHTSEEING')}
+                                                icon="👀"
+                                                title="Zwiedzanie Fabryki"
+                                                desc="Przejście ścieżką edukacyjną z przewodnikiem. Zobacz proces dmuchania i dekorowania."
+                                                price={prices.sightseeing}
+                                                duration="30 min"
+                                            />
+                                            <TypeButton
+                                                selected={bookingType === 'WORKSHOP'}
+                                                onClick={() => setBookingType('WORKSHOP')}
+                                                icon="🎨"
+                                                title="Zwiedzanie + Warsztaty"
+                                                desc="Zwiedzanie oraz własnoręczne malowanie bombek pod okiem artystki."
+                                                price={prices.workshop}
+                                                duration="80 min"
+                                                badge="Polecane"
+                                            />
+                                        </div>
+
+                                        {/* People Input */}
+                                        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                                Dla ilu osób chcesz zarezerwować wejście?
+                                            </label>
+                                            <div className="flex items-center gap-4">
+                                                <input
+                                                    type="range"
+                                                    min="1"
+                                                    max="92"
+                                                    value={people}
+                                                    onChange={(e) => setPeople(e.target.value)}
+                                                    className="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+                                                />
+                                                <div className="w-20 text-center">
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        max="92"
+                                                        value={people}
+                                                        onChange={(e) => setPeople(e.target.value)}
+                                                        className="w-full text-center text-xl font-bold border-b-2 border-red-600 bg-transparent focus:outline-none"
+                                                    />
                                                 </div>
-                                            </button>
+                                            </div>
+                                            <p className="text-xs text-center md:text-left text-gray-400 mt-2">
+                                                Maksymalna pojemność sali warsztatowej to 92 osoby.
+                                            </p>
+                                        </div>
+
+                                        <div className="flex justify-end">
+                                            <Button variant="primary" size="lg" onClick={() => setStep(1)}>
+                                                Sprawdź Terminy &rarr;
+                                            </Button>
                                         </div>
                                     </motion.div>
                                 )}
 
-                                {/* STEP 1: DATE SELECTION */}
+                                {/* STEP 1: CALENDAR */}
                                 {step === 1 && (
-                                    <motion.div
-                                        key="step1"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="space-y-6"
-                                    >
+                                    <motion.div key="step1" {...fadeIn} className="space-y-6">
                                         <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-xl font-bold">Wybierz Termin</h3>
-                                            <button onClick={() => setStep(0)} className="text-sm text-gray-400 hover:text-red-600 underline">Zmień pakiet</button>
+                                            <h3 className="text-xl font-bold">2. Wybierz termin</h3>
+                                            <button onClick={() => setStep(0)} className="text-sm text-gray-400 hover:text-red-600 underline">Zmień parametry</button>
                                         </div>
 
-                                        {slots.length === 0 ? (
-                                            <div className="text-center py-12 bg-gray-50 rounded-xl">
-                                                <p className="text-gray-500">Brak wolnych terminów w tym miesiącu.</p>
-                                                <p className="text-sm text-gray-400 mt-2">Zadzwoń do nas, aby zapytać o grupy indywidualne.</p>
-                                            </div>
-                                        ) : (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                {/* Date List */}
-                                                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                                    {availableDates.map(dateKey => (
-                                                        <button
-                                                            key={dateKey}
-                                                            onClick={() => {
-                                                                setSelectedDate(dateKey);
-                                                                setSelectedSlotId(null);
-                                                            }}
-                                                            className={`w-full p-4 rounded-xl border text-left transition-all ${selectedDate === dateKey ? 'border-red-500 bg-red-600 text-white shadow-lg transform scale-[1.02]' : 'border-gray-100 bg-white hover:border-red-200 hover:bg-red-50'}`}
-                                                        >
-                                                            <span className="font-bold block">{dateKey.split(',')[0]}</span>
-                                                            <span className="text-sm opacity-80">{dateKey.split(',').slice(1).join(',')}</span>
-                                                        </button>
-                                                    ))}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[400px]">
+                                            {/* Date List */}
+                                            <div className="border-r border-gray-100 pr-4 overflow-y-auto custom-scrollbar">
+                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 sticky top-0 bg-white z-10 py-2">Dostępne dni:</p>
+                                                <div className="space-y-2">
+                                                    {next30Days.map(dateStr => {
+                                                        const date = new Date(dateStr);
+                                                        const dateLabel = date.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
+                                                        return (
+                                                            <button
+                                                                key={dateStr}
+                                                                onClick={() => { setSelectedDate(dateStr); setSelectedTime(null); }}
+                                                                className={`w-full p-3 rounded-lg text-left text-sm transition-all ${selectedDate === dateStr ? 'bg-red-600 text-white shadow-md' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}
+                                                            >
+                                                                {dateLabel}
+                                                            </button>
+                                                        )
+                                                    })}
                                                 </div>
+                                            </div>
 
-                                                {/* Hours List */}
-                                                <div>
-                                                    {selectedDate ? (
-                                                        <div className="space-y-2 animate-in fade-in slide-in-from-right-4 duration-300">
-                                                            <p className="text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider">Dostępne godziny:</p>
-                                                            <div className="grid grid-cols-2 gap-2">
-                                                                {groupedSlots[selectedDate].map((slot: any) => (
-                                                                    <button
-                                                                        key={slot.id}
-                                                                        onClick={() => setSelectedSlotId(slot.id)}
-                                                                        className={`p-3 rounded-lg border-2 text-center transition-all relative ${selectedSlotId === slot.id ? 'border-red-600 bg-red-50 text-red-700' : 'border-gray-100 bg-white hover:border-red-200'}`}
-                                                                    >
-                                                                        <div className="font-bold text-lg">
-                                                                            {new Date(slot.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                                                                        </div>
-                                                                        <div className="text-xs text-gray-400 mt-1">
-                                                                            {slot.remainingCapacity} miejsc
-                                                                        </div>
-                                                                    </button>
-                                                                ))}
+                                            {/* Time Slots */}
+                                            <div className="overflow-y-auto custom-scrollbar relative">
+                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 sticky top-0 bg-white z-10 py-2 relative">
+                                                    {selectedDate ? `Godziny (${new Date(selectedDate).toLocaleDateString('pl-PL')}):` : 'Wybierz dzień...'}
+                                                </p>
+
+                                                {loading && <div className="absolute inset-0 bg-white/80 z-20 flex items-center justify-center"><div className="animate-spin text-red-600 text-2xl">⚡</div></div>}
+
+                                                {!selectedDate ? (
+                                                    <div className="h-full flex items-center justify-center text-gray-300 italic text-sm border-2 border-dashed border-gray-100 rounded-xl">
+                                                        &larr; Wybierz dzień z listy
+                                                    </div>
+                                                ) : (
+                                                    <div className="grid grid-cols-2 gap-3 pb-4">
+                                                        {daySlots.length === 0 && !loading ? (
+                                                            <div className="col-span-2 text-center py-8 text-gray-400 text-xs">
+                                                                Brak wolnych godzin dla grupy {people} os.
                                                             </div>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="h-full flex items-center justify-center text-gray-300 text-sm italic border-2 border-dashed border-gray-100 rounded-xl">
-                                                            &larr; Wybierz dzień z listy
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                        ) : (
+                                                            daySlots.map(timeStr => (
+                                                                <button
+                                                                    key={timeStr}
+                                                                    onClick={() => setSelectedTime(timeStr)}
+                                                                    className={`p-3 rounded-xl border text-center transition-all ${selectedTime === timeStr ? 'border-red-600 bg-red-50 text-red-800 ring-2 ring-red-200' : 'border-gray-200 hover:border-red-300 hover:bg-red-50'}`}
+                                                                >
+                                                                    <div className="font-bold text-lg">
+                                                                        {new Date(timeStr).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                                                                    </div>
+                                                                </button>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
 
-                                        <div className="pt-6 border-t border-gray-100 flex justify-end">
+                                        <div className="pt-4 border-t border-gray-100 flex justify-end">
                                             <Button
                                                 variant="primary"
                                                 size="lg"
-                                                disabled={!selectedSlotId}
-                                                onClick={handleNextStep}
+                                                disabled={!selectedTime}
+                                                onClick={() => setStep(2)}
                                             >
                                                 Dalej
                                             </Button>
@@ -294,143 +303,78 @@ export default function BookingCalendar() {
 
                                 {/* STEP 2: FORM */}
                                 {step === 2 && (
-                                    <motion.div
-                                        key="step2"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="space-y-6"
-                                    >
-                                        <div className="bg-gradient-to-r from-red-50 to-white p-6 rounded-xl border border-red-100">
-                                            <h4 className="font-bold text-red-800 text-sm uppercase tracking-wider mb-2">Podsumowanie</h4>
-                                            <div className="flex justify-between items-end">
+                                    <motion.div key="step2" {...fadeIn} className="space-y-6">
+                                        <div className="bg-gradient-to-r from-red-50 to-white p-6 rounded-xl border border-red-100 shadow-sm">
+                                            <h4 className="font-bold text-red-900 text-xs uppercase tracking-wider mb-4">Podsumowanie Rezerwacji</h4>
+                                            <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
                                                 <div>
-                                                    <p className="text-lg font-bold text-black">{bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</p>
-                                                    <p className="text-gray-600">
-                                                        {selectedDate} godz. {new Date(selectedSlot?.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                                                    </p>
+                                                    <span className="text-gray-500 block text-xs">Pakiet</span>
+                                                    <strong className="text-gray-900 text-lg">{bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</strong>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="text-2xl font-black text-red-600">{currentPrice} zł</div>
-                                                    <div className="text-xs text-gray-400">za osobę</div>
+                                                <div>
+                                                    <span className="text-gray-500 block text-xs">Termin</span>
+                                                    <strong className="text-gray-900 text-lg">
+                                                        {selectedTime && new Date(selectedTime).toLocaleDateString('pl-PL')}
+                                                        <span className="mx-2 text-gray-300">|</span>
+                                                        {selectedTime && new Date(selectedTime).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                                                    </strong>
+                                                </div>
+                                                <div>
+                                                    <span className="text-gray-500 block text-xs">Uczestnicy</span>
+                                                    <strong className="text-gray-900 text-lg">{people} os.</strong>
+                                                </div>
+                                                <div className="ml-auto text-right">
+                                                    <span className="text-gray-500 block text-xs">Do zapłaty</span>
+                                                    <strong className="text-red-600 text-2xl font-black">{currentPrice * parseInt(people)} zł</strong>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <Input
-                                                label="Imię i Nazwisko"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                placeholder="np. Jan Kowalski"
-                                            />
-                                            <Input
-                                                label="Adres Email"
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                placeholder="jan@example.com"
-                                            />
-                                            <Select
-                                                label="Liczba osób"
-                                                value={people}
-                                                onChange={(e) => setPeople(e.target.value)}
-                                                options={peopleOptions}
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input label="Imię i Nazwisko" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jan Kowalski" />
+                                            <Input label="Adres Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jan@przykład.pl" />
+                                        </div>
 
-                                            <div className="pt-4 mt-4 border-t border-gray-100">
-                                                <label className="flex items-center gap-3 cursor-pointer group">
-                                                    <div className={`relative w-12 h-6 rounded-full transition-colors ${isGroup ? 'bg-red-600' : 'bg-gray-200'}`}>
-                                                        <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isGroup ? 'translate-x-6' : ''}`} />
-                                                        <input
-                                                            type="checkbox"
-                                                            className="sr-only"
-                                                            checked={isGroup}
-                                                            onChange={(e) => setIsGroup(e.target.checked)}
-                                                        />
-                                                    </div>
-                                                    <span className="font-bold text-sm text-gray-700 group-hover:text-red-600 transition-colors">
-                                                        Grupa zorganizowana (szkoły, instytucje)
-                                                    </span>
-                                                </label>
-                                            </div>
+                                        <div className="border-t border-gray-100 pt-4">
+                                            <label className="flex items-center gap-3 cursor-pointer group w-fit">
+                                                <div className={`relative w-12 h-6 rounded-full transition-colors ${isGroup ? 'bg-red-600' : 'bg-gray-200'}`}>
+                                                    <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isGroup ? 'translate-x-6' : ''}`} />
+                                                    <input type="checkbox" className="sr-only" checked={isGroup} onChange={(e) => setIsGroup(e.target.checked)} />
+                                                </div>
+                                                <span className="font-bold text-sm text-gray-700 group-hover:text-red-600 transition-colors">Rezerwacja Grupowa (Faktura)</span>
+                                            </label>
 
                                             <AnimatePresence>
                                                 {isGroup && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, height: 0 }}
-                                                        animate={{ opacity: 1, height: 'auto' }}
-                                                        exit={{ opacity: 0, height: 0 }}
-                                                        className="space-y-4 pt-4 overflow-hidden"
-                                                    >
-                                                        <Input
-                                                            label="Nazwa Instytucji / Szkoły"
-                                                            value={institutionName}
-                                                            onChange={(e) => setInstitutionName(e.target.value)}
-                                                            placeholder="np. Szkoła Podstawowa nr 1"
-                                                            required={isGroup}
-                                                        />
-                                                        <Input
-                                                            label="Adres Instytucji"
-                                                            value={institutionAddress}
-                                                            onChange={(e) => setInstitutionAddress(e.target.value)}
-                                                            placeholder="Ulica, kod pocztowy, miasto"
-                                                            required={isGroup}
-                                                        />
+                                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4 pt-4 overflow-hidden">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                            <Input label="Nazwa Instytucji" value={institutionName} onChange={(e) => setInstitutionName(e.target.value)} placeholder="np. Szkoła Podstawowa nr 1" required={isGroup} />
+                                                            <Input label="Adres Instytucji (do faktury)" value={institutionAddress} onChange={(e) => setInstitutionAddress(e.target.value)} placeholder="Ulica, Miasto, NIP" required={isGroup} />
+                                                        </div>
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
                                         </div>
 
-                                        <div className="pt-6 flex gap-4">
-                                            <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
-                                                Wróć
-                                            </Button>
-                                            <Button
-                                                variant="primary"
-                                                onClick={handleBooking}
-                                                disabled={loading || !name || !email}
-                                                className="flex-[2]"
-                                            >
-                                                {loading ? 'Rezerwowanie...' : `Rezerwuję z obowiązkiem zapłaty (${currentPrice * (parseInt(people) || 1)} zł)`}
+                                        <div className="flex gap-4 pt-4">
+                                            <Button variant="outline" onClick={() => setStep(1)} className="w-1/3">Wróć</Button>
+                                            <Button variant="primary" onClick={handleBooking} disabled={loading || !name || !email} className="w-2/3">
+                                                {loading ? 'Przetwarzanie...' : 'Potwierdź Rezerwację'}
                                             </Button>
                                         </div>
-                                        <p className="text-xs text-center text-gray-400">
-                                            Płatność na miejscu lub przelewem (otrzymasz dane w mailu).
-                                        </p>
+                                        <p className="text-xs text-center text-gray-400 mt-2">Płatność na miejscu (gotówka/karta) lub przelewem (dane w mailu).</p>
                                     </motion.div>
                                 )}
 
                                 {/* STEP 3: SUCCESS */}
                                 {step === 3 && (
-                                    <motion.div
-                                        key="step3"
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="text-center py-12 space-y-6"
-                                    >
-                                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-4">
-                                            ✓
-                                        </div>
-                                        <h3 className="text-2xl font-bold text-gray-900">Rezerwacja przyjęta!</h3>
-                                        <p className="text-gray-600 max-w-md mx-auto">
-                                            Dziękujemy <strong>{name}</strong>! Potwierdzenie wysłaliśmy na <strong>{email}</strong>.
-                                        </p>
-                                        <div className="bg-gray-50 p-6 rounded-xl max-w-sm mx-auto text-left space-y-2 border border-dashed border-gray-200">
-                                            <p className="flex justify-between"><span>Typ:</span> <strong>{bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</strong></p>
-                                            <p className="flex justify-between"><span>Termin:</span> <strong>{selectedDate}</strong></p>
-                                            <p className="flex justify-between"><span>Do zapłaty:</span> <strong className="text-red-600">{currentPrice * parseInt(people)} zł</strong></p>
-                                        </div>
-
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => window.location.reload()}
-                                        >
-                                            Wróć do strony głównej
-                                        </Button>
+                                    <motion.div key="step3" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-12">
+                                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-5xl mb-6 shadow-sm">✓</div>
+                                        <h3 className="text-3xl font-bold text-gray-900 mb-2">Rezerwacja Potwierdzona!</h3>
+                                        <p className="text-gray-500 mb-8">Dziękujemy, {name}. Szczegóły wysłaliśmy na adres <strong>{email}</strong>.</p>
+                                        <Button variant="outline" onClick={() => window.location.reload()}>Wróć do strony głównej</Button>
                                     </motion.div>
                                 )}
-
                             </AnimatePresence>
                         </Card>
                     </div>
@@ -439,3 +383,49 @@ export default function BookingCalendar() {
         </section>
     );
 }
+
+// UI Components
+function StepCard({ step, currentStep, label, setStep, subText }: any) {
+    const isActive = currentStep === step;
+    const isCompleted = currentStep > step;
+
+    return (
+        <div
+            onClick={() => isCompleted ? setStep(step) : null}
+            className={`p-4 border rounded-xl transition-all ${isActive ? 'border-red-500 bg-red-50 shadow-md transform scale-[1.02]' : 'border-gray-100'} ${isCompleted ? 'bg-white opacity-80 hover:opacity-100 cursor-pointer' : 'opacity-60'}`}
+        >
+            <h3 className="font-bold text-lg flex items-center gap-3">
+                <span className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shadow-sm ${isActive || isCompleted ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    {isCompleted ? '✓' : step + 1}
+                </span>
+                <span className={isActive ? 'text-gray-900' : 'text-gray-500'}>{label}</span>
+            </h3>
+            {subText && <p className="text-xs text-red-600 font-medium mt-1 ml-11">{subText}</p>}
+        </div>
+    )
+}
+
+function TypeButton({ selected, onClick, icon, title, desc, price, duration, badge }: any) {
+    return (
+        <button
+            onClick={onClick}
+            className={`relative p-5 rounded-2xl border-2 text-left transition-all h-full flex flex-col ${selected ? 'border-red-600 bg-red-50 shadow-lg scale-[1.02]' : 'border-gray-100 bg-white hover:border-red-200 hover:bg-red-50/30'}`}
+        >
+            {badge && <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">{badge}</div>}
+            <div className="text-3xl mb-3">{icon}</div>
+            <h4 className="font-bold text-lg mb-1">{title}</h4>
+            <div className="text-xs text-gray-500 mb-4 leading-relaxed flex-grow">{desc}</div>
+            <div className="flex justify-between items-center pt-3 border-t border-gray-200/50 w-full mt-auto">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-100 px-2 py-1 rounded">{duration}</span>
+                <span className="text-lg font-black text-red-600">{price} zł</span>
+            </div>
+        </button>
+    )
+}
+
+const fadeIn = {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 },
+    transition: { duration: 0.3 }
+};
