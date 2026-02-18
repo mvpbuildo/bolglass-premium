@@ -34,8 +34,6 @@ export default function Navbar({ logoUrl }: { logoUrl?: string }) {
 
     const navLinks = [
         { href: '/#about', label: t('about'), isHash: true },
-        { href: '/#production', label: t('manufactory'), isHash: true },
-        { href: '/#offer', label: t('offer'), isHash: true },
         { href: '/#booking', label: t('workshops'), isHash: true },
         { href: '/#studio-3d', label: t('studio3d'), isHash: true },
         { href: '/galeria', label: t('gallery'), isHash: false },
