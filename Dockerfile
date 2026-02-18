@@ -19,7 +19,9 @@ COPY packages/database/package.json ./packages/database/
 RUN npm install
 
 # Copy source code
+# Copy source code
 COPY . .
+COPY update-capacity.js promote-admin.js ./
 
 # Generate Prisma Client
 RUN npm run db:generate
