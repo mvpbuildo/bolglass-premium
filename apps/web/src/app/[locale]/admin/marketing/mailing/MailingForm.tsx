@@ -4,10 +4,10 @@ import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { Card, Button } from '@bolglass/ui';
 import { sendMailing } from './actions';
-import 'react-quill/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.snow.css';
 
 // Dynamic import for ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
 export default function MailingForm() {
     const [subject, setSubject] = useState('');
@@ -87,8 +87,6 @@ export default function MailingForm() {
                             </div>
                             <div className="h-96 pb-12">
                                 <label className="block text-sm font-bold mb-1">Treść</label>
-                                {/* ReactQuill Temporarily Disabled due to React 19 Conflict */}
-                                {/*
                                 <ReactQuill
                                     theme="snow"
                                     value={content}
@@ -97,16 +95,6 @@ export default function MailingForm() {
                                     formats={formats}
                                     className="h-full"
                                 />
-                                */}
-                                <textarea
-                                    className="w-full h-full p-2 border rounded"
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    placeholder="Wpisz treść HTML lub zwykły tekst..."
-                                />
-                                <p className="text-xs text-red-500 mt-2">
-                                    * Edytor graficzny tymczasowo wyłączony (awaria po aktualizacji). Wpisz kod HTML ręcznie, jeśli potrzebujesz obrazków.
-                                </p>
                             </div>
                         </div>
                     </Card>
