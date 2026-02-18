@@ -13,6 +13,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
     const [discount, setDiscount] = useState(product.discountPercent || 0);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDiscountUpdate = async (newDiscount: number) => {
         setIsUpdating(true);
@@ -20,6 +21,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         setIsUpdating(false);
         if (result.error) {
             alert(result.error);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (confirm(`Czy na pewno chcesz usunąć produkt "${product.name}"? Tej operacji nie można cofnąć.`)) {
+            setIsDeleting(true);
+            const result = await deleteProduct(product.id);
+            if (result.error) {
+                alert(result.error);
+                setIsDeleting(false);
+            }
         }
     };
 
