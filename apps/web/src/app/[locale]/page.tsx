@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import ProductionProcess from '@/components/ProductionProcess';
 import BookingCalendar from '@/components/BookingCalendar';
 import BaubleConfigurator from '@/components/BaubleConfigurator';
@@ -30,11 +31,15 @@ export default function HomePage() {
                     </div>
                     <div className="mt-8 max-w-2xl">
                         <h2 className="text-3xl font-semibold text-white drop-shadow-lg">{t('HomePage.hero.headline')}</h2>
-                        <p className="mt-6 text-lg text-gray-100 drop-shadow-md leading-relaxed">{t('HomePage.hero.subheadline')}</p>
-                        <div className="mt-6">
-                            <Button size="lg" variant="primary" className="rounded-full">
-                                {t('HomePage.hero.cta')}
-                            </Button>
+                        <p className="mt-6 text-2xl font-light text-white drop-shadow-md leading-relaxed italic">
+                            {t('HomePage.hero.subheadline')}
+                        </p>
+                        <div className="mt-8">
+                            <Link href="/sklep">
+                                <Button size="lg" className="rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                                    {t('HomePage.hero.cta')}
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>
