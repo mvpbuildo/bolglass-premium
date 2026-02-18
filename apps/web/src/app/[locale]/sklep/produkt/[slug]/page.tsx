@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@bolglass/ui';
 import AddToCartButton from '@/components/shop/AddToCartButton';
+import ProductGallery from '@/components/shop/ProductGallery';
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic';
@@ -28,36 +29,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
                     {/* Image Gallery */}
                     <div className="flex flex-col-reverse">
-                        <div className="aspect-square w-full relative bg-gray-100 rounded-lg overflow-hidden">
-                            {product.images && product.images.length > 0 ? (
-                                <Image
-                                    src={product.images[0]}
-                                    alt={product.name}
-                                    fill
-                                    className="object-cover object-center"
-                                    priority
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                    <span className="text-6xl">📦</span>
-                                </div>
-                            )}
-                        </div>
-                        {/* Thumbnails could go here if we had more logic for browsing images */}
-                        {product.images && product.images.length > 1 && (
-                            <div className="hidden mt-6 w-full max-w-2xl mx-auto sm:block lg:max-w-none">
-                                <div className="grid grid-cols-4 gap-6">
-                                    {product.images.map((image, idx) => (
-                                        <div key={idx} className="relative h-24 bg-white rounded-md flex items-center justify-center text-sm font-medium uppercase text-gray-900 cursor-pointer hover:bg-gray-50">
-                                            <span className="sr-only">Image {idx + 1}</span>
-                                            <span className="absolute inset-0 rounded-md overflow-hidden">
-                                                <Image src={image} alt="" fill className="object-cover object-center" />
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        <ProductGallery images={product.images} productName={product.name} />
                     </div>
 
                     {/* Product Info */}

@@ -77,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                                 value={discount}
                                 onChange={(e) => setDiscount(Number(e.target.value))}
                                 onBlur={(e) => handleDiscountUpdate(Number(e.target.value))}
-                                className="w-12 text-center text-sm border border-gray-300 rounded bg-gray-50 focus:ring-1 focus:ring-blue-500 outline-none"
+                                className="w-12 text-center text-sm border border-gray-300 rounded bg-gray-50 text-gray-900 focus:ring-1 focus:ring-blue-500 outline-none"
                             />
                         </div>
                     </div>
