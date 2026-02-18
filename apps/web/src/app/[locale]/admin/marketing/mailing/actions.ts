@@ -32,7 +32,7 @@ export async function sendMailing(formData: FormData) {
             transporter = nodemailer.createTransport({
                 host: config.host,
                 port: parseInt(config.port),
-                secure: parseInt(config.port) === 465, // true for 465, false for other ports
+                secure: parseInt(config.port) === 465,
                 auth: {
                     user: config.user,
                     pass: config.password,
@@ -40,10 +40,44 @@ export async function sendMailing(formData: FormData) {
             });
             fromAddress = config.from;
         } else {
-            // Fallback to system envs (if any) or existing system settings
-            // For now assuming envs or existing logic
-            // TODO: Fetch from SystemSettings if implemented
-            return { error: 'Brak konfiguracji SMTP. Skonfiguruj własne SMTP lub upewnij się, że systemowe działają.' };
+            // Use System Settings (DB)
+            // We import dynamic to avoid build-time issues if simple import fails, though here it's checking logic.
+            const { getTransporter } = await import('@/lib/mail');
+            const { EMAIL_SETTING_KEYS } = await import('@/lib/mail-constants');
+
+            transporter = await getTransporter();
+
+            if (!transporter) {
+                // Fallback to minimal ENV if DB fails - usually for dev
+                if (process.env.SMTP_HOST) {
+                    transporter = nodemailer.createTransport({
+                        host: process.env.SMTP_HOST,
+                        port: parseInt(process.env.SMTP_PORT || '587'),
+                        auth: {
+                            user: process.env.SMTP_USER,
+                            pass: process.env.SMTP_PASSWORD,
+                        }
+                    });
+                    fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER;
+                } else {
+                    return { error: 'Brak konfiguracji SMTP (Systemowej). Skonfiguruj własne SMTP.' };
+                }
+            } else {
+                // Fetch 'from' address from DB
+                const fromSetting = await prisma.systemSetting.findUnique({
+                    where: { key: EMAIL_SETTING_KEYS.SMTP_FROM }
+                });
+                // fallback to user if from is missing
+                if (fromSetting) {
+                    fromAddress = fromSetting.value;
+                } else {
+                    // If we have transporter but no from, try to guess or fetch user
+                    const userSetting = await prisma.systemSetting.findUnique({
+                        where: { key: EMAIL_SETTING_KEYS.SMTP_USER }
+                    });
+                    fromAddress = userSetting?.value || 'noreply@bolglass.com';
+                }
+            }
         }
 
         // 2. Fetch Recipients
