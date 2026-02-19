@@ -1,39 +1,11 @@
-import AnalyticsTracker from "@/components/AnalyticsTracker";
-
-// ... (existing imports)
-
-export default async function LocaleLayout({
-    children,
-    params
-}: {
-    children: React.ReactNode;
-    params: Promise<{ locale: string }>;
-}) {
-    // ... (existing code)
-
-    return (
-        <html lang={locale}>
-            <body className={`${inter.variable} antialiased font-sans bg-black text-white`}>
-                <NextIntlClientProvider messages={messages} locale={locale}>
-                    <Providers>
-                        <AnalyticsTracker />
-                        <Navbar logoUrl={settings.contact_logo} />
-                        <MainLayoutSpacer />
-                        {children}
-                        <Footer />
-                    </Providers>
-                </NextIntlClientProvider>
-            </body>
-        </html>
-    );
-}
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Providers } from "@/components/Providers";
-
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -76,13 +48,12 @@ export default async function LocaleLayout({
         messages = {};
     }
 
-    // ... (existing code)
-
     return (
         <html lang={locale}>
             <body className={`${inter.variable} antialiased font-sans bg-black text-white`}>
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <Providers>
+                        <AnalyticsTracker />
                         <Navbar logoUrl={settings.contact_logo} />
                         <MainLayoutSpacer />
                         {children}
