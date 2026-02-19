@@ -45,6 +45,7 @@ model User {
   
   orders        Order[]   // Order history
   bookings      Booking[] // Booking history (workshops)
+  cart          Cart?     // Shopping Cart
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -160,6 +161,7 @@ model Product {
   technicalSpecs Json?     // Flexible storage for extra technical data
 
   orderItems     OrderItem[]
+  cartItems      CartItem[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
