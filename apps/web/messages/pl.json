@@ -79,5 +79,14 @@
     "p1": "Nasza fabryka istnieje na rynku od 78 lat. Jesteśmy producentem szklanych ozdób choinkowych. W naszej ofercie posiadamy bombki własnych projektów, które są niepowtarzalne i jedyne w swoim rodzaju.",
     "p2": "Wykonujemy też wzory zaproponowane przez klienta, bombki okolicznościowe oraz bombki reklamowe na życzenie firm. Wszystkie wykonane są ręcznie przez doświadczonych rzemieślników artystycznych.",
     "p3": "Nasze wyroby charakteryzują się wysoką jakością, w dobrej cenie."
+  },
+  "Checkout": {
+    "orderPlaced": "Dziękujemy za złożenie zamówienia!",
+    "orderNumber": "Numer zamówienia",
+    "total": "Razem",
+    "status": "Status",
+    "paymentMethod": "Metoda płatności",
+    "confirmationEmailSent": "Na Twój adres email wysłaliśmy potwierdzenie zamówienia wraz z instrukcją płatności.",
+    "backToShop": "Wróć do sklepu"
   }
 }
