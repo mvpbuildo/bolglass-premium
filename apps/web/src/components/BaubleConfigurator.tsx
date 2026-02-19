@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, Text, Float, Decal, RenderTexture, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button, Input } from '@bolglass/ui';
@@ -107,12 +107,26 @@ function Bauble({ color, text, scale }: { color: string, text: string, scale: nu
     );
 }
 
+
+// Helper to capture screenshot from inside Canvas
+function ScreenshotHandler({ onCapture }: { onCapture: (fn: () => string) => void }) {
+    const { gl, scene, camera } = useThree();
+    useEffect(() => {
+        onCapture(() => {
+            gl.render(scene, camera);
+            return gl.domElement.toDataURL('image/png', 0.8); // 0.8 quality
+        });
+    }, [gl, scene, camera, onCapture]);
+    return null;
+}
+
 export default function BaubleConfigurator() {
     const [config, setConfig] = useState<BaubleConfig | null>(null);
     const [selectedSizeId, setSelectedSizeId] = useState<string>('');
     const [color, setColor] = useState('#D91A1A'); // Default Red
     const [text, setText] = useState('');
     const { addItem } = useCart();
+    const captureRef = useRef<() => string>(() => ''); // Ref to hold capture function
 
     useEffect(() => {
         getConfiguratorSettings().then(data => {
@@ -142,13 +156,16 @@ export default function BaubleConfigurator() {
     const handleAddToCart = () => {
         if (!selectedSize || !selectedColor) return;
 
+        // Capture screenshot
+        const screenshot = captureRef.current ? captureRef.current() : '/bauble-placeholder.png';
+
         addItem({
             id: `config-${Date.now()}`,
             name: `Bombka ${selectedSize.label} (${selectedColor.name})`,
             price: totalPrice,
             slug: 'bombka-personalizowana',
             quantity: 1,
-            image: '/bauble-placeholder.png',
+            image: screenshot, // Use captured screenshot
             configuration: JSON.stringify({
                 size: selectedSize.label,
                 color: selectedColor.name,
@@ -263,8 +280,10 @@ export default function BaubleConfigurator() {
 
             {/* Right Panel - 3D Canvas */}
             <div className="flex-grow h-[50vh] md:h-full relative bg-gradient-to-b from-neutral-800 to-neutral-950 cursor-grab active:cursor-grabbing">
-                <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 4.5], fov: 45 }}>
+                <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }} camera={{ position: [0, 0, 4.5], fov: 45 }}>
                     <Suspense fallback={null}>
+                        <ScreenshotHandler onCapture={fn => captureRef.current = fn} />
+
                         {/* Studio Lighting Environment */}
                         <Environment preset="studio" blur={1} background={false} />
 

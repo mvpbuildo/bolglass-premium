@@ -115,6 +115,22 @@ export default function CheckoutPage() {
                                         </div>
                                         <div className="flex-grow">
                                             <h3 className="font-serif text-lg text-amber-50 mb-1">{item.name}</h3>
+                                            {item.configuration && (
+                                                <div className="text-xs text-gray-400 mb-2 space-y-1">
+                                                    {(() => {
+                                                        try {
+                                                            const config = JSON.parse(item.configuration);
+                                                            return Object.entries(config).map(([key, val]) => (
+                                                                <div key={key}>
+                                                                    <span className="capitalize">{key === 'size' ? 'Rozmiar' : key === 'color' ? 'Kolor' : key === 'text' ? 'Dedykacja' : key}:</span> <span className="text-white">{String(val)}</span>
+                                                                </div>
+                                                            ));
+                                                        } catch (e) {
+                                                            return <span>{item.configuration}</span>;
+                                                        }
+                                                    })()}
+                                                </div>
+                                            )}
                                             <p className="text-amber-500 font-black text-sm">{item.price.toFixed(2)} zł</p>
                                         </div>
                                         <div className="flex items-center gap-2">

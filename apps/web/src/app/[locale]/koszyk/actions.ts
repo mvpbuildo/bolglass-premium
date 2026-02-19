@@ -55,7 +55,8 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
             productId: dbProduct.id,
             name: dbProduct.name,
             price: dbProduct.price,
-            quantity: item.quantity
+            quantity: item.quantity,
+            configuration: item.configuration
         });
     }
 
@@ -106,6 +107,7 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,
+                    configuration: item.configuration // Save configuration snapshot
                 }))
             }
         }
