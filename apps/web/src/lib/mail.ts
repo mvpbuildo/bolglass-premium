@@ -91,14 +91,12 @@ export async function sendBookingConfirmation(booking: any) {
         });
 
         // Simple HTML wrap
-        const html = `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #333;">${subject}</h2>
-                <div style="white-space: pre-wrap; line-height: 1.6; color: #555;">${body}</div>
-                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
-                <p style="font-size: 12px; color: #999;">Wiadomość wysłana automatycznie przez system Bolglass. Nie odpowiadaj na ten e-mail.</p>
-            </div>
-        `;
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #ffffff;" >
+            <h2 style="color: #333333;" > ${ subject } </h2>
+                < div style = "white-space: pre-wrap; line-height: 1.6; color: #333333;" > ${ body } </div>
+                    < hr style = "margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
+                        <p style="font-size: 12px; color: #999999;" > Wiadomość wysłana automatycznie przez system Bolglass.Nie odpowiadaj na ten e - mail.</p>
+                            </div>
 
         const info = await transporter.sendMail({
             from: `"Bolglass" <${from}>`,
