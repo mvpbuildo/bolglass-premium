@@ -6,6 +6,7 @@ import { sendBookingConfirmation } from '@/lib/mail';
 import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { auth } from '@/auth';
 
 // --- System Settings API ---
 
