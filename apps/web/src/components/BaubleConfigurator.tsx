@@ -48,15 +48,16 @@ function Bauble({ color, text, scale }: { color: string, text: string, scale: nu
                             transparent
                             polygonOffset
                             polygonOffsetFactor={-1}
-                            roughness={0}
+                        <meshStandardMaterial
+                            transparent
+                            polygonOffset
+                            polygonOffsetFactor={-1}
+                            roughness={1}
                             metalness={0}
-                            color="#d4af37" // Gold text
-                            alphaTest={0.5}
                             depthWrite={false}
                         >
                             <RenderTexture attach="map">
                                 <PerspectiveCamera makeDefault manual aspect={2 / 1} position={[0, 0, 5]} />
-                                <color attach="background" args={['#00000000']} />
                                 <Text
                                     fontSize={1.5}
                                     color="#d4af37"
