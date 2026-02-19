@@ -1,3 +1,5 @@
+'use client';
+
 import { useCart } from '@/context/CartContext';
 import { Button, Card } from '@bolglass/ui';
 import { Link, useRouter } from '@/i18n/navigation';

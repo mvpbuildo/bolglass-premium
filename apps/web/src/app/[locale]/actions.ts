@@ -159,44 +159,46 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
         paymentUrl: paymentResult.paymentUrl
     };
 }
-try {
-    const keys = Object.values(EMAIL_SETTING_KEYS);
-    const settings = await prisma.systemSetting.findMany({
-        where: { key: { in: keys } }
-    });
-    const settingsMap: Record<string, string> = {};
 
-    // Define defaults for all keys
-    const defaults: Record<string, string> = {
-        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_SIGHTSEEING]: 'Potwierdzenie rezerwacji zwiedzania - Bolglass',
-        [EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING]: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
-        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP]: 'Potwierdzenie rezerwacji warsztatów - Bolglass',
-        [EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP]: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
-        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
-        [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
-        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE]: 'Aktualizacja Twojej rezerwacji w Bolglass',
-        [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}'
-    };
+export async function getEmailSettings() {
+    try {
+        const keys = Object.values(EMAIL_SETTING_KEYS);
+        const settings = await prisma.systemSetting.findMany({
+            where: { key: { in: keys } }
+        });
+        const settingsMap: Record<string, string> = {};
 
-    // Initialize with defaults
-    keys.forEach(k => settingsMap[k] = defaults[k] || '');
+        // Define defaults for all keys
+        const defaults: Record<string, string> = {
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_SIGHTSEEING]: 'Potwierdzenie rezerwacji zwiedzania - Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING]: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP]: 'Potwierdzenie rezerwacji warsztatów - Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP]: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE]: 'Aktualizacja Twojej rezerwacji w Bolglass',
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}'
+        };
 
-    settings.forEach((s: any) => {
+        // Initialize with defaults
+        keys.forEach(k => settingsMap[k] = defaults[k] || '');
 
-        // If the database has a value, but it's an email body and it's too short, 
-        // we ignore it and keep our professional default.
-        const isBody = s.key.includes('body');
-        const isTooShort = isBody && s.value.trim().length < 20;
+        settings.forEach((s: any) => {
 
-        if (s.value && !isTooShort) {
-            settingsMap[s.key] = s.value;
-        }
-    });
-    return settingsMap;
-} catch (error) {
-    console.error('Error fetching email settings:', error);
-    return {};
-}
+            // If the database has a value, but it's an email body and it's too short, 
+            // we ignore it and keep our professional default.
+            const isBody = s.key.includes('body');
+            const isTooShort = isBody && s.value.trim().length < 20;
+
+            if (s.value && !isTooShort) {
+                settingsMap[s.key] = s.value;
+            }
+        });
+        return settingsMap;
+    } catch (error) {
+        console.error('Error fetching email settings:', error);
+        return {};
+    }
 }
 
 export async function updateAdminEmailSettings(settings: Record<string, string>) {
