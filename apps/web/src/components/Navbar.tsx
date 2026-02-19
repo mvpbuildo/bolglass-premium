@@ -48,7 +48,7 @@ export default function Navbar({ logoUrl }: { logoUrl?: string }) {
                 : 'py-6 bg-transparent'
                 }`}
         >
-            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between">
                 {/* Logo Section */}
                 <Link href="/" className="relative group flex items-center">
                     <div className={`relative transition-all duration-500 rounded-lg hover:scale-105 ${isScrolled || !isHome ? 'w-24 h-12' : 'w-40 h-20'
