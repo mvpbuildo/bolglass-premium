@@ -134,7 +134,7 @@ export default function ConfiguratorSettings() {
                                 <Input value={size.id} onChange={(e) => updateSize(index, 'id', e.target.value)} />
                             </div>
                             <div className="col-span-1 flex justify-end">
-                                <Button size="icon" variant="destructive" onClick={() => removeSize(index)}>
+                                <Button size="sm" variant="outline" className="w-8 h-8 p-0 border-red-900/30 hover:bg-red-900/20 text-red-500" onClick={() => removeSize(index)}>
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
                             </div>
@@ -163,7 +163,7 @@ export default function ConfiguratorSettings() {
                                     <Input type="number" value={color.price} onChange={(e) => updateColor(index, 'price', parseFloat(e.target.value))} placeholder="0" />
                                 </div>
                             </div>
-                            <Button size="icon" variant="ghost" className="text-red-500" onClick={() => removeColor(index)}>
+                            <Button size="sm" variant="ghost" className="text-red-500 w-8 h-8 p-0" onClick={() => removeColor(index)}>
                                 <Trash2 className="w-4 h-4" />
                             </Button>
                         </div>
