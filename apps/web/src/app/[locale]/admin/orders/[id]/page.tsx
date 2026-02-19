@@ -20,8 +20,9 @@ async function getOrder(id: string) {
     });
 }
 
-export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+export default async function OrderDetailsPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
+    const { id } = params;
     const order = await getOrder(id);
 
     if (!order) {
@@ -42,45 +43,45 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                 <Link href="/admin/orders">
                     <Button variant="outline" size="sm">← Powrót</Button>
                 </Link>
-                <h1 className="text-3xl font-bold text-gray-900">Zamówienie #{order.id.substring(0, 8)}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Zamówienie #{order.id.substring(0, 8)}</h1>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Info */}
-                <Card className="p-6 space-y-4">
-                    <h3 className="text-lg font-bold border-b pb-2">Dane Klienta i Rozliczenie</h3>
+                <Card className="p-6 space-y-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-lg font-bold border-b pb-2 text-gray-900 dark:text-gray-100">Dane Klienta i Rozliczenie</h3>
                     <div className="space-y-4 text-sm">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="text-gray-500">Imię i Nazwisko:</div>
-                            <div className="font-medium">{customerName}</div>
-                            <div className="text-gray-500">Email:</div>
-                            <div className="font-medium">{order.email}</div>
-                            <div className="text-gray-500">Telefon:</div>
-                            <div className="font-medium">{customerPhone}</div>
-                            <div className="text-gray-500">Adres Dostawy:</div>
-                            <div className="font-medium whitespace-pre-line">{customerAddress}</div>
+                            <div className="text-gray-600 dark:text-gray-400">Imię i Nazwisko:</div>
+                            <div className="font-medium text-gray-900 dark:text-gray-200">{customerName}</div>
+                            <div className="text-gray-600 dark:text-gray-400">Email:</div>
+                            <div className="font-medium text-gray-900 dark:text-gray-200">{order.email}</div>
+                            <div className="text-gray-600 dark:text-gray-400">Telefon:</div>
+                            <div className="font-medium text-gray-900 dark:text-gray-200">{customerPhone}</div>
+                            <div className="text-gray-600 dark:text-gray-400">Adres Dostawy:</div>
+                            <div className="font-medium whitespace-pre-line text-gray-900 dark:text-gray-200">{customerAddress}</div>
                         </div>
 
                         <div className="pt-4 mt-4 border-t space-y-3">
                             <div className="flex justify-between items-center">
-                                <span className="text-gray-500">Rodzaj dokumentu:</span>
+                                <span className="text-gray-600 dark:text-gray-400">Rodzaj dokumentu:</span>
                                 <span className={`px-2 py-1 rounded text-xs font-bold ${order.documentType === 'INVOICE'
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : 'bg-green-100 text-green-700'
+                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                                    : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                     }`}>
                                     {order.documentType === 'INVOICE' ? 'FAKTURA VAT' : 'PARAGON'}
                                 </span>
                             </div>
 
                             {order.documentType === 'INVOICE' && order.invoiceData && (
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 space-y-2">
+                                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700 space-y-2">
                                     <div className="grid grid-cols-2 gap-2">
-                                        <div className="text-gray-400 text-xs">NIP:</div>
-                                        <div className="font-bold">{(order.invoiceData as any).nip}</div>
-                                        <div className="text-gray-400 text-xs">Firma:</div>
-                                        <div className="font-medium">{(order.invoiceData as any).companyName}</div>
-                                        <div className="text-gray-400 text-xs">Adres:</div>
-                                        <div className="font-medium text-xs whitespace-pre-line">{(order.invoiceData as any).companyAddress}</div>
+                                        <div className="text-gray-500 dark:text-gray-400 text-xs">NIP:</div>
+                                        <div className="font-bold text-gray-900 dark:text-gray-200">{(order.invoiceData as any).nip}</div>
+                                        <div className="text-gray-500 dark:text-gray-400 text-xs">Firma:</div>
+                                        <div className="font-medium text-gray-900 dark:text-gray-200">{(order.invoiceData as any).companyName}</div>
+                                        <div className="text-gray-500 dark:text-gray-400 text-xs">Adres:</div>
+                                        <div className="font-medium text-xs whitespace-pre-line text-gray-900 dark:text-gray-200">{(order.invoiceData as any).companyAddress}</div>
                                     </div>
                                 </div>
                             )}
@@ -89,21 +90,21 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                 </Card>
 
                 {/* Order Status & Summary */}
-                <Card className="p-6 space-y-4">
-                    <h3 className="text-lg font-bold border-b pb-2">Status i Płatność</h3>
+                <Card className="p-6 space-y-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-lg font-bold border-b pb-2 text-gray-900 dark:text-gray-100">Status i Płatność</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm items-center">
-                        <div className="text-gray-500">Data złożenia:</div>
-                        <div className="font-medium">{format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</div>
-                        <div className="text-gray-500">Metoda płatności:</div>
-                        <div className="font-medium">{order.paymentProvider || 'Nieznana'}</div>
-                        <div className="text-gray-500">Status:</div>
+                        <div className="text-gray-600 dark:text-gray-400">Data złożenia:</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-200">{format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</div>
+                        <div className="text-gray-600 dark:text-gray-400">Metoda płatności:</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-200">{order.paymentProvider || 'Nieznana'}</div>
+                        <div className="text-gray-600 dark:text-gray-400">Status:</div>
                         <div>
                             <form action={updateOrderStatus} className="flex gap-2">
                                 <input type="hidden" name="id" value={order.id} />
                                 <select
                                     name="status"
                                     defaultValue={order.status}
-                                    className="border rounded px-2 py-1 text-sm bg-white text-gray-900"
+                                    className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
                                     aria-label="Zmień status zamówienia"
                                 >
                                     <option value="PENDING">Oczekujące</option>
@@ -119,39 +120,39 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
             </div>
 
             {/* Order Items */}
-            <Card>
-                <div className="p-6 border-b">
-                    <h3 className="text-lg font-bold">Pozycje Zamówienia</h3>
+            <Card className="bg-white dark:bg-gray-900">
+                <div className="p-6 border-b dark:border-gray-800">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Pozycje Zamówienia</h3>
                 </div>
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Produkt</TableHead>
-                            <TableHead>SKU</TableHead>
-                            <TableHead className="text-center">Ilość</TableHead>
-                            <TableHead className="text-right">Cena jedn.</TableHead>
-                            <TableHead className="text-right">Suma</TableHead>
+                        <TableRow className="dark:border-gray-800">
+                            <TableHead className="text-gray-600 dark:text-gray-400">Produkt</TableHead>
+                            <TableHead className="text-gray-600 dark:text-gray-400">SKU</TableHead>
+                            <TableHead className="text-center text-gray-600 dark:text-gray-400">Ilość</TableHead>
+                            <TableHead className="text-right text-gray-600 dark:text-gray-400">Cena jedn.</TableHead>
+                            <TableHead className="text-right text-gray-600 dark:text-gray-400">Suma</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {order.items.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell className="font-medium">
+                            <TableRow key={item.id} className="dark:border-gray-800">
+                                <TableCell className="font-medium text-gray-900 dark:text-gray-200">
                                     <div className="flex flex-col">
                                         <span>{item.name}</span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-xs text-gray-500">{item.product?.sku || '-'}</TableCell>
-                                <TableCell className="text-center">{item.quantity}</TableCell>
-                                <TableCell className="text-right">{item.price.toFixed(2)} PLN</TableCell>
-                                <TableCell className="text-right font-bold">
+                                <TableCell className="text-xs text-gray-500 dark:text-gray-400">{item.product?.sku || '-'}</TableCell>
+                                <TableCell className="text-center text-gray-900 dark:text-gray-200">{item.quantity}</TableCell>
+                                <TableCell className="text-right text-gray-900 dark:text-gray-200">{item.price.toFixed(2)} PLN</TableCell>
+                                <TableCell className="text-right font-bold text-gray-900 dark:text-gray-100">
                                     {(item.price * item.quantity).toFixed(2)} PLN
                                 </TableCell>
                             </TableRow>
                         ))}
-                        <TableRow className="bg-gray-50 font-bold">
-                            <TableCell colSpan={4} className="text-right text-lg">Łącznie do zapłaty:</TableCell>
-                            <TableCell className="text-right text-lg text-green-600">{order.total.toFixed(2)} PLN</TableCell>
+                        <TableRow className="bg-gray-50 dark:bg-gray-800 font-bold">
+                            <TableCell colSpan={4} className="text-right text-lg text-gray-900 dark:text-gray-100">Łącznie do zapłaty:</TableCell>
+                            <TableCell className="text-right text-lg text-green-600 dark:text-green-400">{order.total.toFixed(2)} PLN</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
