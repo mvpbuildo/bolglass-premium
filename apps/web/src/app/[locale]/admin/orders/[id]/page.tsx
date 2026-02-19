@@ -125,8 +125,11 @@ export default async function OrderDetailsPage(props: { params: Promise<{ id: st
                                 >
                                     <option value="PENDING">Oczekujące</option>
                                     <option value="PROCESSING">W trakcie</option>
+                                    <option value="SHIPPED">Wysłane</option>
                                     <option value="COMPLETED">Zakończone</option>
                                     <option value="CANCELLED">Anulowane</option>
+                                    <option value="RETURN_REQUESTED">Zgłoszono zwrot</option>
+                                    <option value="RETURNED">Zwrócono</option>
                                 </select>
                                 <Button type="submit" size="sm" variant="primary">Zmień</Button>
                             </form>

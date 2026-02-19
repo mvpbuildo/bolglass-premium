@@ -7,7 +7,15 @@ import { Link } from '@/i18n/navigation';
 export const dynamic = 'force-dynamic';
 
 async function getOrders(status?: string) {
-    const where = status && status !== 'ALL' ? { status } : {};
+    let where: any = {};
+    if (status && status !== 'ALL') {
+        if (status === 'RETURNS') {
+            where = { status: { in: ['RETURN_REQUESTED', 'RETURNED'] } };
+        } else {
+            where = { status };
+        }
+    }
+
     return await prisma.order.findMany({
         where,
         orderBy: { createdAt: 'desc' },
@@ -45,29 +53,31 @@ export default async function AdminOrdersPage(props: { searchParams: Promise<{ s
         { id: 'ALL', label: 'Wszystkie', count: totalOrders },
         { id: 'PENDING', label: 'Oczekujące', count: counts['PENDING'] || 0 },
         { id: 'PROCESSING', label: 'W trakcie', count: counts['PROCESSING'] || 0 },
+        { id: 'SHIPPED', label: 'Wysłane', count: counts['SHIPPED'] || 0 },
         { id: 'COMPLETED', label: 'Zakończone', count: counts['COMPLETED'] || 0 },
         { id: 'CANCELLED', label: 'Anulowane', count: counts['CANCELLED'] || 0 },
+        { id: 'RETURNS', label: 'Zwroty', count: (counts['RETURN_REQUESTED'] || 0) + (counts['RETURNED'] || 0) },
     ];
 
     return (
         <div className="space-y-6">
             <AdminNavigation />
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Zamówienia</h1>
+                <h1 className="text-3xl font-bold text-white">Zamówienia</h1>
             </div>
 
             {/* Status Tabs */}
             <div className="flex space-x-2 overflow-x-auto pb-2">
                 {statuses.map((status) => (
                     <Link key={status.id} href={`/admin/orders?status=${status.id}`}>
-                        <div className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-2 transition-colors ${currentStatus === status.id
-                                ? 'bg-black text-white border-black dark:bg-white dark:text-black'
-                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700'
+                        <div className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-2 transition-colors whitespace-nowrap ${currentStatus === status.id
+                            ? 'bg-white text-black border-white'
+                            : 'bg-transparent text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200'
                             }`}>
                             {status.label}
                             <span className={`px-1.5 py-0.5 rounded-full text-xs ${currentStatus === status.id
-                                    ? 'bg-white/20'
-                                    : 'bg-gray-100 dark:bg-gray-700'
+                                ? 'bg-black/10'
+                                : 'bg-gray-800'
                                 }`}>
                                 {status.count}
                             </span>

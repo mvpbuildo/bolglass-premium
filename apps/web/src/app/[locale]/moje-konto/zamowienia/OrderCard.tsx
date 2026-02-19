@@ -7,6 +7,8 @@ interface ClientOrderCardProps {
     order: any;
 }
 
+import { requestReturn } from './actions';
+
 export default function ClientOrderCard({ order }: ClientOrderCardProps) {
     const getStatusLabel = (status: string) => {
         const labels: Record<string, string> = {
@@ -16,7 +18,9 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             'CANCELLED': 'Anulowane',
             'PAID': 'Opłacone',
             'SHIPPED': 'Wysłane',
-            'DELIVERED': 'Dostarczone'
+            'DELIVERED': 'Dostarczone',
+            'RETURN_REQUESTED': 'Zwrot zgłoszony',
+            'RETURNED': 'Zwrócono'
         };
         return labels[status] || status;
     };
@@ -27,7 +31,10 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             'PROCESSING': 'bg-blue-100 text-blue-800 border-blue-200',
             'COMPLETED': 'bg-green-100 text-green-800 border-green-200',
             'CANCELLED': 'bg-red-100 text-red-800 border-red-200',
-            'PAID': 'bg-purple-100 text-purple-800 border-purple-200'
+            'PAID': 'bg-purple-100 text-purple-800 border-purple-200',
+            'SHIPPED': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+            'RETURN_REQUESTED': 'bg-orange-100 text-orange-800 border-orange-200',
+            'RETURNED': 'bg-gray-100 text-gray-800 border-gray-200'
         };
         return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
     };
@@ -40,9 +47,11 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
                     <Package className="w-4 h-4 text-red-600" />
                     <span>Zamówienie #{order.id.substring(0, 8)}</span>
                 </div>
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(order.status)}`}>
-                    {getStatusLabel(order.status)}
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(order.status)}`}>
+                        {getStatusLabel(order.status)}
+                    </span>
+                </div>
             </div>
 
             {/* Content */}
@@ -71,13 +80,21 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             </div>
 
             {/* Actions */}
-            <div className="p-4 bg-gray-50/30 border-t border-gray-50">
-                <Link href={`/moje-konto/zamowienia/${order.id}`}>
+            <div className="p-4 bg-gray-50/30 border-t border-gray-50 grid grid-cols-2 gap-2">
+                <Link href={`/moje-konto/zamowienia/${order.id}`} className="w-full">
                     <Button variant="outline" className="w-full text-xs font-bold py-2.5 border-gray-200 text-gray-900 hover:bg-white hover:text-red-600 hover:border-red-200 transition-all flex items-center justify-center gap-2">
                         SZCZEGÓŁY
-                        <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
                 </Link>
+                {order.status === 'COMPLETED' ? (
+                    <form action={requestReturn.bind(null, order.id)} className="w-full">
+                        <Button type="submit" variant="secondary" className="w-full text-xs font-bold py-2.5 bg-gray-200 text-gray-800 hover:bg-gray-300 border-none transition-all">
+                            ZWRÓĆ
+                        </Button>
+                    </form>
+                ) : (
+                    <div />
+                )}
             </div>
         </Card>
     );
