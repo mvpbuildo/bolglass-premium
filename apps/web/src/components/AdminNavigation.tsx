@@ -2,140 +2,153 @@
 
 import { Link } from '@/i18n/navigation';
 import { usePathname } from 'next/navigation';
+import {
+    LayoutDashboard,
+    Calendar,
+    ShoppingCart,
+    TrendingUp,
+    Image as ImageIcon,
+    Settings,
+    Phone,
+    Files,
+    LogOut
+} from 'lucide-react';
 
 export default function AdminNavigation() {
     const pathname = usePathname();
 
     const isActive = (path: string) => pathname.includes(path);
-
     const checkActiveGroup = (paths: string[]) => paths.some(path => pathname.includes(path));
 
     const modules = [
         {
-            title: 'WARSZTATY',
-            color: 'text-blue-600',
-            bg: 'bg-blue-50',
-            items: [
-                { name: 'Rezerwacje', path: '/admin/bookings', icon: '📅' },
-                { name: 'Ustawienia Rezerwacji', path: '/admin/settings', icon: '⚙️' },
-            ]
+            title: 'Warsztaty',
+            path: '/admin/bookings',
+            icon: <Calendar className="w-4 h-4" />,
+            groupPaths: ['/admin/bookings', '/admin/settings'],
+            color: 'text-blue-600 group-hover:text-blue-600',
         },
         {
-            title: 'SKLEP',
-            color: 'text-green-600',
-            bg: 'bg-green-50',
-            items: [
-                { name: 'Produkty', path: '/admin/products', icon: '📦' },
-                { name: 'Zamówienia', path: '/admin/orders', icon: '🛒' },
-            ]
+            title: 'Sklep',
+            path: '/admin/orders',
+            icon: <ShoppingCart className="w-4 h-4" />,
+            groupPaths: ['/admin/products', '/admin/orders'],
+            color: 'text-green-600 group-hover:text-green-600',
         },
         {
-            title: 'MARKETING',
-            color: 'text-purple-600',
-            bg: 'bg-purple-50',
-            items: [
-                { name: 'Mailing', path: '/admin/marketing/mailing', icon: '📧' },
-                { name: 'Analityka', path: '/admin/marketing/analityka', icon: '📈' },
-            ]
+            title: 'Marketing',
+            path: '/admin/marketing/analityka', // Changed to analytics as main entry
+            icon: <TrendingUp className="w-4 h-4" />,
+            groupPaths: ['/admin/marketing'],
+            color: 'text-purple-600 group-hover:text-purple-600',
         },
         {
-            title: 'GALERIA',
-            color: 'text-orange-600',
-            bg: 'bg-orange-50',
-            items: [
-                { name: 'Zdjęcia', path: '/admin/gallery', icon: '🖼️' },
-                { name: 'Realizacje', path: '/admin/gallery/realizacje', icon: '✨' },
-            ]
+            title: 'Galeria',
+            path: '/admin/gallery',
+            icon: <ImageIcon className="w-4 h-4" />,
+            groupPaths: ['/admin/gallery'],
+            color: 'text-orange-600 group-hover:text-orange-600',
         },
         {
-            title: 'SYSTEM',
-            color: 'text-gray-600',
-            bg: 'bg-gray-50',
-            items: [
-                { name: 'Użytkownicy', path: '/admin/users', icon: '👥' },
-                { name: 'Ustawienia Systemowe', path: '/admin/system/settings', icon: '🔧' },
-            ]
+            title: 'System',
+            path: '/admin/users',
+            icon: <Settings className="w-4 h-4" />,
+            groupPaths: ['/admin/users', '/admin/system'],
+            color: 'text-gray-600 group-hover:text-gray-900',
         },
         {
-            title: 'KONTAKT',
-            color: 'text-pink-600',
-            bg: 'bg-pink-50',
-            items: [
-                { name: 'Konfiguracja', path: '/admin/system/settings', icon: '📞' },
-            ]
+            title: 'Kontakt',
+            path: '/admin/system/settings',
+            icon: <Phone className="w-4 h-4" />,
+            groupPaths: ['/admin/system/settings'], // Shared with System in practice but conceptually distinct
+            color: 'text-pink-600 group-hover:text-pink-600',
         },
         {
-            title: 'ZASOBY',
-            color: 'text-blue-600',
-            bg: 'bg-blue-50',
-            items: [
-                { name: 'Pliki', path: '/admin/files', icon: '📁' },
-            ]
+            title: 'Zasoby',
+            path: '/admin/files',
+            icon: <Files className="w-4 h-4" />,
+            groupPaths: ['/admin/files'],
+            color: 'text-cyan-600 group-hover:text-cyan-600',
         }
     ];
 
     // Hide navigation grid on the main admin dashboard to avoid duplication with the main tiles
     const isMainDashboard = /\/admin\/?$/.test(pathname);
 
-    return (
-        <nav className="mb-8 space-y-4">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3">
-                    <Link href="/admin">
-                        <div className="p-2 bg-red-600 rounded-lg text-white hover:bg-red-700 transition-colors cursor-pointer">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+    if (isMainDashboard) {
+        return (
+            <nav className="mb-8">
+                <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-red-600 rounded-lg text-white">
+                            <LayoutDashboard className="w-5 h-5" />
                         </div>
-                    </Link>
-                    <div>
-                        <Link href="/admin">
-                            <h1 className="text-lg font-black text-gray-900 leading-none hover:text-red-600 transition-colors">Panel Administratora</h1>
+                        <div>
+                            <h1 className="text-lg font-black text-gray-900 leading-none">Panel Administratora</h1>
+                            <p className="text-xs text-gray-500 mt-1">Bolglass Premium</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
+                            Strona Główna ↗
                         </Link>
-                        <p className="text-xs text-gray-500 mt-1">Bolglass Premium</p>
+                        <Link href="/api/auth/signout" className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-200 transition-colors">
+                            <LogOut className="w-4 h-4" />
+                            Wyloguj
+                        </Link>
                     </div>
                 </div>
+            </nav>
+        );
+    }
 
-                <div className="flex items-center gap-4">
-                    <Link href="/" className="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
-                        Strona Główna ↗
-                    </Link>
-                    <Link href="/api/auth/signout" className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-200 transition-colors">
-                        Wyloguj
-                    </Link>
-                </div>
+    return (
+        <nav className="mb-8 bg-white rounded-xl shadow-sm border border-gray-100 p-2 overflow-x-auto">
+            <div className="flex items-center gap-1 min-w-max">
+                {/* Main Dashboard Link */}
+                <Link
+                    href="/admin"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all"
+                >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>Panel Główny</span>
+                </Link>
+
+                <div className="w-px h-6 bg-gray-200 mx-1"></div>
+
+                {/* Modules Links */}
+                {modules.map((module) => {
+                    const isActiveGroup = checkActiveGroup(module.groupPaths);
+
+                    return (
+                        <Link
+                            key={module.title}
+                            href={module.path}
+                            className={`
+                                flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold transition-all group whitespace-nowrap
+                                ${isActiveGroup
+                                    ? 'bg-gray-900 text-white shadow-md'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}
+                            `}
+                        >
+                            <span className={`${isActiveGroup ? 'text-white' : module.color}`}>
+                                {module.icon}
+                            </span>
+                            <span>{module.title}</span>
+                        </Link>
+                    );
+                })}
+
+                <div className="w-px h-6 bg-gray-200 mx-1 ml-auto"></div>
+
+                {/* Utils */}
+                <Link href="/" className="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Strona Główna">
+                    <span className="text-sm font-bold">WWW ↗</span>
+                </Link>
+                <Link href="/api/auth/signout" className="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Wyloguj">
+                    <LogOut className="w-4 h-4" />
+                </Link>
             </div>
-
-            {!isMainDashboard && (
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {modules.map((module) => (
-                        <div key={module.title} className={`bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition-all ${checkActiveGroup(module.items.map(i => i.path)) ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:shadow-md'}`}>
-                            <h3 className={`text-xs font-black tracking-wider mb-3 flex items-center gap-2 ${module.color}`}>
-                                <span className={`w-2 h-2 rounded-full ${module.bg}`}></span>
-                                {module.title}
-                            </h3>
-                            <div className="space-y-1">
-                                {module.items.map((item) => (
-                                    <Link
-                                        key={item.path}
-                                        href={item.path}
-                                        className={`
-                                            w-full px-3 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-between group
-                                            ${isActive(item.path)
-                                                ? 'bg-gray-900 text-white shadow-md'
-                                                : 'text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-100'}
-                                        `}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <span>{item.icon}</span>
-                                            {item.name}
-                                        </div>
-                                        {isActive(item.path) && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
         </nav>
     );
 }
