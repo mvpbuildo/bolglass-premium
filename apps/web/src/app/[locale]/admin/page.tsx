@@ -1,6 +1,6 @@
 import AdminNavigation from '@/components/AdminNavigation';
 import { Link } from '@/i18n/navigation';
-import { Card, Button } from '@bolglass/ui';
+import { Card } from '@bolglass/ui';
 import {
     Calendar,
     ShoppingBag,
@@ -165,10 +165,8 @@ export default async function AdminDashboardPage() {
                             <h2 className="text-2xl font-black text-gray-900 tracking-tight">Ostatnie Zamówienia</h2>
                             <p className="text-gray-500 text-sm mt-1">Szybki podgląd najnowszej aktywności w sklepie.</p>
                         </div>
-                        <Link href="/admin/orders">
-                            <Button variant="outline" size="sm" className="font-bold gap-2">
-                                Wszystkie Zamówienia <ChevronRight className="w-4 h-4" />
-                            </Button>
+                        <Link href="/admin/orders" className="inline-flex items-center justify-center rounded-xl font-bold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 px-4 py-2 text-sm gap-2">
+                            Wszystkie Zamówienia <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
 
@@ -205,10 +203,8 @@ export default async function AdminDashboardPage() {
                                                 <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Suma</p>
                                                 <p className="text-lg font-black text-gray-900">{order.total.toFixed(2)} PLN</p>
                                             </div>
-                                            <Link href={`/admin/orders/${order.id}`}>
-                                                <Button size="sm" variant="ghost" className="p-2 h-auto hover:bg-gray-100 rounded-lg group">
-                                                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-all group-hover:translate-x-1" />
-                                                </Button>
+                                            <Link href={`/admin/orders/${order.id}`} className="inline-flex items-center justify-center rounded-xl font-bold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 bg-transparent hover:bg-gray-100 text-gray-700 dark:text-gray-300 px-4 py-2 text-sm h-auto p-2 group">
+                                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-all group-hover:translate-x-1" />
                                             </Link>
                                         </div>
                                     </div>
