@@ -3,6 +3,8 @@ import { Card } from '@bolglass/ui';
 import { AreaChart, BarChart, TrendingUp, Users, ShoppingCart, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 
+import AdminNavigation from '@/components/AdminNavigation';
+
 export default async function AnalyticsPage() {
     const stats = await getDashboardStats();
 
@@ -12,6 +14,7 @@ export default async function AnalyticsPage() {
 
     return (
         <div className="space-y-8">
+            <AdminNavigation />
             <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-8">Analityka i Statystyki</h1>
 
             {/* KPI Cards */}
@@ -58,7 +61,7 @@ export default async function AnalyticsPage() {
             <Card className="p-8">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-gray-400" />
+                        <TrendingUp className="w-5 h-5 text-gray-600" />
                         Trend Sprzedaży i Wizyt (30 dni)
                     </h2>
                     <div className="flex gap-4 text-xs font-bold">
@@ -87,7 +90,7 @@ export default async function AnalyticsPage() {
                         );
                     })}
                 </div>
-                <div className="flex justify-between mt-2 text-xs text-gray-400 font-mono">
+                <div className="flex justify-between mt-2 text-xs text-gray-600 font-bold font-mono">
                     <span>{stats.chartData[0]?.date}</span>
                     <span>{stats.chartData[Math.floor(stats.chartData.length / 2)]?.date}</span>
                     <span>{stats.chartData[stats.chartData.length - 1]?.date}</span>

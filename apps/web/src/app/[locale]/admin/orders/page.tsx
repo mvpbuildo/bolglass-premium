@@ -1,25 +1,13 @@
 import { prisma } from '@bolglass/database';
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@bolglass/ui';
-import { Link } from '@/i18n/navigation';
-import { format } from 'date-fns';
 import OrderCard from './OrderCard';
-
-export const dynamic = 'force-dynamic';
-
-async function getOrders() {
-    return await prisma.order.findMany({
-        orderBy: { createdAt: 'desc' },
-        include: {
-            items: true
-        }
-    });
-}
+import AdminNavigation from '@/components/AdminNavigation';
 
 export default async function AdminOrdersPage() {
     const orders = await getOrders();
 
     return (
         <div className="space-y-6">
+            <AdminNavigation />
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-900">Zamówienia</h1>
             </div>

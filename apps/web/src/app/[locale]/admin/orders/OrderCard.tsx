@@ -24,8 +24,8 @@ export default function AdminOrderCard({ order }: OrderCardProps) {
     return (
         <Card className="overflow-hidden hover:shadow-md transition-shadow relative group border-gray-200 flex flex-col h-full">
             {/* Header: Icon & Status */}
-            <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center gap-2 text-gray-500">
+            <div className="p-4 bg-gray-50 dark:bg-neutral-800/50 border-b border-gray-100 dark:border-neutral-800 flex justify-between items-center">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                     <Package className="w-4 h-4" />
                     <span className="text-xs font-mono font-bold">#{order.id.substring(0, 8)}</span>
                 </div>
@@ -37,7 +37,7 @@ export default function AdminOrderCard({ order }: OrderCardProps) {
             {/* Content */}
             <div className="p-4 flex-grow space-y-3">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-gray-900 font-bold">
+                    <div className="flex items-center gap-2 text-gray-900 dark:text-gray-100 font-bold">
                         <span className="text-lg">{order.total.toFixed(2)} PLN</span>
                     </div>
                     <div className="text-xs text-gray-400 flex items-center gap-1">
@@ -47,19 +47,19 @@ export default function AdminOrderCard({ order }: OrderCardProps) {
                 </div>
 
                 <div className="space-y-1.5 pt-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                         <User className="w-3.5 h-3.5 text-gray-400" />
                         <span className="truncate" title={order.email}>{order.email}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
                         <span>{format(new Date(order.createdAt), 'dd.MM.yyyy')}</span>
                     </div>
                 </div>
 
-                <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 mt-2">
-                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-1">Pozycje ({itemCount})</p>
-                    <div className="text-xs text-gray-700 truncate">
+                <div className="bg-gray-50 dark:bg-neutral-800/50 p-2 rounded-lg border border-gray-100 dark:border-neutral-800 mt-2">
+                    <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Pozycje ({itemCount})</p>
+                    <div className="text-xs text-gray-700 dark:text-gray-300 truncate">
                         {order.items?.map((i: any) => i.name).join(', ') || 'Brak pozycji'}
                     </div>
                 </div>
@@ -68,7 +68,7 @@ export default function AdminOrderCard({ order }: OrderCardProps) {
             {/* Actions */}
             <div className="p-4 pt-0">
                 <Link href={`/admin/orders/${order.id}`}>
-                    <Button variant="outline" className="w-full text-xs font-bold py-2 border-gray-200 text-gray-900 hover:bg-gray-50 hover:text-gray-900 transition-all">
+                    <Button variant="outline" className="w-full text-xs font-bold py-2 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-neutral-800 hover:text-gray-900 transition-all">
                         SZCZEGÓŁY ZAMÓWIENIA
                     </Button>
                 </Link>
