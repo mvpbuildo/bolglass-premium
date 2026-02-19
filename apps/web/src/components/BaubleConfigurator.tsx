@@ -53,13 +53,12 @@ function Bauble({ color, text }: { color: string, text: string }) {
                         >
                             <RenderTexture attach="map">
                                 <PerspectiveCamera makeDefault manual aspect={2 / 1} position={[0, 0, 5]} />
-                                <color attach="background" args={['transparent']} />
+                                <color attach="background" args={['#00000000']} />
                                 <Text
                                     fontSize={1.5}
                                     color="#d4af37"
                                     anchorX="center"
                                     anchorY="middle"
-                                    font="/fonts/Inter-Bold.woff" // Ensure font exists or use default
                                 >
                                     {text}
                                 </Text>
