@@ -48,9 +48,11 @@ function Bauble({ color, text, scale }: { color: string, text: string, scale: nu
                             transparent
                             polygonOffset
                             polygonOffsetFactor={-1}
-                            roughness={0.5}
-                            metalness={0.8}
+                            roughness={0}
+                            metalness={0}
                             color="#d4af37" // Gold text
+                            alphaTest={0.5}
+                            depthWrite={false}
                         >
                             <RenderTexture attach="map">
                                 <PerspectiveCamera makeDefault manual aspect={2 / 1} position={[0, 0, 5]} />
@@ -184,8 +186,8 @@ export default function BaubleConfigurator() {
                                     key={size.id}
                                     onClick={() => setSelectedSizeId(size.id)}
                                     className={`px-4 py-2 rounded-lg text-sm font-bold border transition-all ${selectedSizeId === size.id
-                                            ? 'bg-amber-500 text-black border-amber-500'
-                                            : 'bg-transparent text-gray-400 border-white/10 hover:border-white/30'
+                                        ? 'bg-amber-500 text-black border-amber-500'
+                                        : 'bg-transparent text-gray-400 border-white/10 hover:border-white/30'
                                         }`}
                                 >
                                     {size.label}
