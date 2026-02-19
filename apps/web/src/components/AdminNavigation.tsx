@@ -75,7 +75,7 @@ export default function AdminNavigation() {
     ];
 
     // Hide navigation grid on the main admin dashboard to avoid duplication with the main tiles
-    const isMainDashboard = pathname.endsWith('/admin');
+    const isMainDashboard = /\/admin\/?$/.test(pathname);
 
     return (
         <nav className="mb-8 space-y-4">
