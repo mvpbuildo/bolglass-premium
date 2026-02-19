@@ -107,6 +107,26 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                                 <div className="flex flex-col">
                                                     <span className="font-medium text-gray-900">{item.name}</span>
                                                     {item.product?.sku && <span className="text-xs text-gray-500">SKU: {item.product.sku}</span>}
+                                                    {item.configuration && item.configuration !== "{}" && (
+                                                        <div className="text-xs text-gray-500 mt-1 space-y-0.5">
+                                                            {(() => {
+                                                                try {
+                                                                    const config = JSON.parse(item.configuration as string);
+                                                                    return Object.entries(config).map(([key, value]) => {
+                                                                        const labels: Record<string, string> = { size: 'Rozmiar', color: 'Kolor', text: 'Napis' };
+                                                                        return (
+                                                                            <div key={key} className="flex gap-2">
+                                                                                <span className="font-semibold">{labels[key] || key}:</span>
+                                                                                <span>{value as string}</span>
+                                                                            </div>
+                                                                        );
+                                                                    });
+                                                                } catch (e) {
+                                                                    return null;
+                                                                }
+                                                            })()}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">{item.quantity}</TableCell>

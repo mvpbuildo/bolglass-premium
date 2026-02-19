@@ -9,14 +9,17 @@ import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
 
-function Bauble({ color, text, scale }: { color: string, text: string, scale: number }) {
+
+function Bauble({ color, text, scale, isCapturing }: { color: string, text: string, scale: number, isCapturing?: boolean }) {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshPhysicalMaterial>(null);
 
     // Rotate the bauble slowly
     useFrame((state, delta) => {
-        if (meshRef.current) {
+        if (meshRef.current && !isCapturing) {
             meshRef.current.rotation.y += delta * 0.1;
+        } else if (meshRef.current && isCapturing) {
+            meshRef.current.rotation.y = 0; // Force front view for screenshot
         }
     });
 
@@ -153,11 +156,23 @@ export default function BaubleConfigurator() {
     const textPrice = text.length > 0 ? config.addons.textPrice : 0;
     const totalPrice = basePrice + colorPrice + textPrice;
 
-    const handleAddToCart = () => {
+
+    const [isCapturing, setIsCapturing] = useState(false);
+
+    const handleAddToCart = async () => {
         if (!selectedSize || !selectedColor) return;
+
+        // Start capture mode (stops rotation)
+        setIsCapturing(true);
+
+        // Wait a bit for React to render the "stopped" state and Three.js to update
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         // Capture screenshot
         const screenshot = captureRef.current ? captureRef.current() : '/bauble-placeholder.png';
+
+        // End capture mode
+        setIsCapturing(false);
 
         addItem({
             id: `config-${Date.now()}`,
@@ -292,8 +307,8 @@ export default function BaubleConfigurator() {
                         <pointLight position={[10, 10, 10]} intensity={1} castShadow />
                         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#blue" />
 
-                        <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.5}>
-                            <Bauble color={color} text={text} scale={selectedSize?.scale || 1} />
+                        <Float speed={isCapturing ? 0 : 1.5} rotationIntensity={isCapturing ? 0 : 0.5} floatIntensity={0.5}>
+                            <Bauble color={color} text={text} scale={selectedSize?.scale || 1} isCapturing={isCapturing} />
                         </Float>
 
                         <ContactShadows position={[0, -1.6, 0]} opacity={0.5} scale={10} blur={2} far={4} color="#000000" />

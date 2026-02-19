@@ -159,6 +159,26 @@ export default async function OrderDetailsPage(props: { params: Promise<{ id: st
                                 <TableCell className="font-medium text-gray-900 dark:text-gray-200">
                                     <div className="flex flex-col">
                                         <span>{item.name}</span>
+                                        {item.configuration && item.configuration !== "{}" && (
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
+                                                {(() => {
+                                                    try {
+                                                        const config = JSON.parse(item.configuration as string);
+                                                        return Object.entries(config).map(([key, value]) => {
+                                                            const labels: Record<string, string> = { size: 'Rozmiar', color: 'Kolor', text: 'Napis' };
+                                                            return (
+                                                                <div key={key} className="flex gap-2">
+                                                                    <span className="font-semibold">{labels[key] || key}:</span>
+                                                                    <span>{value as string}</span>
+                                                                </div>
+                                                            );
+                                                        });
+                                                    } catch (e) {
+                                                        return <span>Błąd konfiguracji</span>;
+                                                    }
+                                                })()}
+                                            </div>
+                                        )}
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-xs text-gray-500 dark:text-gray-400">{item.product?.sku || '-'}</TableCell>
