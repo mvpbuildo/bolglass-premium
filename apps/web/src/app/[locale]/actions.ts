@@ -160,7 +160,7 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
     };
 }
 
-export async function getEmailSettings() {
+export async function getAdminEmailSettings() {
     try {
         const keys = Object.values(EMAIL_SETTING_KEYS);
         const settings = await prisma.systemSetting.findMany({
