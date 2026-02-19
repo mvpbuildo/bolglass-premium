@@ -37,13 +37,21 @@ export default async function OrderDetailsPage(props: { params: Promise<{ id: st
         ? `${shippingAddress.street}\n${shippingAddress.zip} ${shippingAddress.city}`
         : 'Brak danych adresowych';
 
+    // Helper for readable payment methods
+    const paymentMethods: Record<string, string> = {
+        'manual_transfer': 'Przelew tradycyjny',
+        'przelewy24': 'Przelewy24',
+        'stripe': 'Stripe'
+    };
+    const paymentLabel = paymentMethods[order.paymentProvider] || order.paymentProvider || 'Nieznana';
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
                 <Link href="/admin/orders">
                     <Button variant="outline" size="sm">← Powrót</Button>
                 </Link>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Zamówienie #{order.id.substring(0, 8)}</h1>
+                <h1 className="text-3xl font-bold text-white">Zamówienie #{order.id.substring(0, 8)}</h1>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -95,8 +103,16 @@ export default async function OrderDetailsPage(props: { params: Promise<{ id: st
                     <div className="grid grid-cols-2 gap-4 text-sm items-center">
                         <div className="text-gray-600 dark:text-gray-400">Data złożenia:</div>
                         <div className="font-medium text-gray-900 dark:text-gray-200">{format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</div>
+
                         <div className="text-gray-600 dark:text-gray-400">Metoda płatności:</div>
-                        <div className="font-medium text-gray-900 dark:text-gray-200">{order.paymentProvider || 'Nieznana'}</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-200">{paymentLabel}</div>
+
+                        <div className="text-gray-600 dark:text-gray-400">Sposób dostawy:</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-200">{order.shippingMethod}</div>
+
+                        <div className="text-gray-600 dark:text-gray-400">Koszt dostawy:</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-200">{order.shippingCost.toFixed(2)} PLN</div>
+
                         <div className="text-gray-600 dark:text-gray-400">Status:</div>
                         <div>
                             <form action={updateOrderStatus} className="flex gap-2">
