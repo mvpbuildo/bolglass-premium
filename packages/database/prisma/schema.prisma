@@ -85,6 +85,34 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// --- Cart System ---
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?    @unique // Optional: Cart can exist without user (guest), but we mostly sync for users
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int      @default(1)
+  
+  // Snapshot of item details if needed, but linking to Product is better for live price calls
+  // However, for 3D configurator, we need custom config persistence
+  configuration String? // JSON: { color: "red", text: "Name" }
+
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId, configuration]) // Prevent duplicate rows for exact same item+config
+}
+
 // --- Ecommerce Models ---
 
 model Category {

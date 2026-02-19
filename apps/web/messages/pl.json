@@ -12,6 +12,60 @@
       "contact": "Kontakt"
     }
   },
+  "Booking": {
+    "title": "Rezerwacja online",
+    "steps": {
+      "package_people": "Pakiet i Liczba Osób",
+      "date_time": "Wybór Terminu",
+      "details": "Twoje Dane",
+      "success": "Gotowe"
+    },
+    "step1": {
+      "title": "1. Wybierz pakiet i wielkość grupy",
+      "sightseeing_title": "Zwiedzanie Fabryki",
+      "sightseeing_desc": "Przejście ścieżką edukacyjną z przewodnikiem. Zobacz proces dmuchania i dekorowania.",
+      "workshop_title": "Zwiedzanie + Warsztaty",
+      "workshop_desc": "Zwiedzanie oraz własnoręczne malowanie bombek pod okiem artystki.",
+      "recommended": "Polecane",
+      "people_label": "Dla ilu osób chcesz zarezerwować wejście?",
+      "max_capacity": "Maksymalna pojemność sali warsztatowej to 92 osoby.",
+      "check_dates": "Sprawdź Terminy"
+    },
+    "step2": {
+      "title": "2. Wybierz termin",
+      "change_params": "Zmień parametry",
+      "available_days": "Dostępne dni:",
+      "select_day_placeholder": "Wybierz dzień z listy",
+      "hours_label": "Godziny",
+      "no_slots": "Brak wolnych godzin dla grupy",
+      "next": "Dalej"
+    },
+    "step3": {
+      "summary_title": "Podsumowanie Rezerwacji",
+      "package": "Pakiet",
+      "date": "Termin",
+      "participants": "Uczestnicy",
+      "total_price": "Do zapłaty",
+      "name_label": "Imię i Nazwisko",
+      "name_placeholder": "Jan Kowalski",
+      "email_label": "Adres Email",
+      "email_placeholder": "jan@przykład.pl",
+      "group_invoice": "Rezerwacja Grupowa (Faktura)",
+      "institution_name": "Nazwa Instytucji",
+      "institution_address": "Adres Instytucji (do faktury)",
+      "back": "Wróć",
+      "confirm": "Potwierdź Rezerwację",
+      "processing": "Przetwarzanie...",
+      "payment_info": "Płatność na miejscu (gotówka/karta) lub przelewem (dane w mailu)."
+    },
+    "success": {
+      "title": "Rezerwacja Potwierdzona!",
+      "message": "Dziękujemy, {name}. Potwierdzenie wysłaliśmy na adres",
+      "details_title": "Szczegóły Rezerwacji",
+      "invoice_data": "Dane do faktury (Grupa)",
+      "back_home": "Wróć do strony głównej"
+    }
+  },
   "HomePage": {
     "title": "Bolglass - Magia Szklanych Ozdób",
     "hero": {

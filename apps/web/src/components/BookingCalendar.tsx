@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button, Input, Select, Card } from '@bolglass/ui';
 import { getAvailableSlots, createBooking, getSystemSettings, getBookingAvailability } from '../app/[locale]/actions';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export default function BookingCalendar() {
     // Wizard State
@@ -120,11 +121,15 @@ export default function BookingCalendar() {
 
     const currentPrice = bookingType === 'WORKSHOP' ? prices.workshop : prices.sightseeing;
 
+    const t = useTranslations('Booking');
+
+    // ... (keep state) ...
+
     return (
         <section ref={containerRef} className="py-24 bg-white text-black scroll-mt-20">
             <div className="max-w-5xl mx-auto px-4">
                 <h2 className="text-3xl font-bold mb-12 text-center text-red-600 font-serif">
-                    Rezerwacja online
+                    {t('title')}
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -133,21 +138,21 @@ export default function BookingCalendar() {
                         <StepCard
                             step={0}
                             currentStep={step}
-                            label="Pakiet i Liczba Osób"
+                            label={t('steps.package_people')}
                             setStep={setStep}
-                            subText={step > 0 ? `${bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'} (${people} os.)` : ''}
+                            subText={step > 0 ? `${bookingType === 'WORKSHOP' ? t('step1.workshop_title') : t('step1.sightseeing_title')} (${people} os.)` : ''}
                         />
                         <StepCard
                             step={1}
                             currentStep={step}
-                            label="Wybór Terminu"
+                            label={t('steps.date_time')}
                             setStep={setStep}
                             subText={step > 1 && selectedTime ? new Date(selectedTime).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' }) : ''}
                         />
                         <StepCard
                             step={2}
                             currentStep={step}
-                            label="Twoje Dane"
+                            label={t('steps.details')}
                             setStep={setStep}
                         />
                     </div>
