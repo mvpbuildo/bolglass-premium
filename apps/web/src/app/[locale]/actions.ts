@@ -7,6 +7,7 @@ import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { auth } from '@/auth';
+import { paymentProvider, shippingProvider } from '@/lib/modules/store-context';
 
 // --- System Settings API ---
 
