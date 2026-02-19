@@ -43,7 +43,7 @@ export default async function OrderDetailsPage(props: { params: Promise<{ id: st
         'przelewy24': 'Przelewy24',
         'stripe': 'Stripe'
     };
-    const paymentLabel = paymentMethods[order.paymentProvider] || order.paymentProvider || 'Nieznana';
+    const paymentLabel = (order.paymentProvider && paymentMethods[order.paymentProvider]) || order.paymentProvider || 'Nieznana';
 
     return (
         <div className="space-y-6">
