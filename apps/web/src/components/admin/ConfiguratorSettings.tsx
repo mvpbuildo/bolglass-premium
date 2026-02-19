@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Card, Input } from '@bolglass/ui';
 import { toast } from 'sonner';
-import { getConfiguratorSettings, updateConfiguratorSettings, type BaubleConfig } from './actions';
+import { getConfiguratorSettings, updateConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
 import { Trash2, Plus } from 'lucide-react';
 
 export default function ConfiguratorSettings() {
