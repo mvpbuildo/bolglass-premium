@@ -69,6 +69,13 @@ export default function AdminNavigation() {
             icon: <Files className="w-4 h-4" />,
             groupPaths: ['/admin/files'],
             color: 'text-cyan-600 group-hover:text-cyan-600',
+        },
+        {
+            title: 'Ustawienia 3D',
+            path: '/admin/settings/3d',
+            icon: <Settings className="w-4 h-4" />,
+            groupPaths: ['/admin/settings/3d'],
+            color: 'text-amber-600 group-hover:text-amber-600',
         }
     ];
 
