@@ -39,6 +39,10 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
         return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
     };
 
+    const isReturnable = order.status === 'COMPLETED' &&
+        order.documentType !== 'INVOICE' &&
+        !order.items.some((item: any) => item.configuration && item.configuration !== "{}");
+
     return (
         <Card className="overflow-hidden hover:shadow-md transition-shadow relative group border-gray-100 flex flex-col h-full bg-white">
             {/* Header */}
@@ -77,6 +81,15 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
                         {order.paymentProvider || 'Tradycyjny przelew'}
                     </p>
                 </div>
+
+                {(!isReturnable && order.status === 'COMPLETED') && (
+                    <div className="pt-2 border-t border-gray-50">
+                        <p className="text-[10px] text-red-500 uppercase font-bold">Zwrot niedostępny</p>
+                        <p className="text-[10px] text-gray-400">
+                            {order.documentType === 'INVOICE' ? 'Zamówienie na firmę (Faktura)' : 'Produkty personalizowane'}
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Actions */}
@@ -86,7 +99,7 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
                         SZCZEGÓŁY
                     </Button>
                 </Link>
-                {order.status === 'COMPLETED' ? (
+                {isReturnable ? (
                     <form action={requestReturn.bind(null, order.id)} className="w-full">
                         <Button type="submit" variant="secondary" className="w-full text-xs font-bold py-2.5 bg-gray-200 text-gray-800 hover:bg-gray-300 border-none transition-all">
                             ZWRÓĆ

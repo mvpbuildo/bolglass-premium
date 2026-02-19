@@ -18,6 +18,9 @@ export default async function OrderHistoryPage() {
         where: {
             userId: session.user.id
         },
+        include: {
+            items: true
+        },
         orderBy: {
             createdAt: 'desc'
         }

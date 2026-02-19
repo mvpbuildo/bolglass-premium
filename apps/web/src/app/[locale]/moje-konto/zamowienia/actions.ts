@@ -11,7 +11,8 @@ export async function requestReturn(orderId: string) {
     }
 
     const order = await prisma.order.findUnique({
-        where: { id: orderId }
+        where: { id: orderId },
+        include: { items: true }
     });
 
     if (!order) {
@@ -24,6 +25,16 @@ export async function requestReturn(orderId: string) {
 
     if (order.status !== 'COMPLETED') {
         throw new Error('Order must be completed to be returned');
+    }
+
+    // New Validations
+    if (order.documentType === 'INVOICE') {
+        throw new Error('Returns are not available for B2B/Invoice orders.');
+    }
+
+    const hasCustomItems = order.items.some(item => item.configuration && item.configuration !== "{}");
+    if (hasCustomItems) {
+        throw new Error('Returns are not available for personalized products.');
     }
 
     await prisma.order.update({
