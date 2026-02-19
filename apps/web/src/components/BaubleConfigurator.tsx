@@ -128,6 +128,7 @@ export default function BaubleConfigurator() {
     const [selectedSizeId, setSelectedSizeId] = useState<string>('');
     const [color, setColor] = useState('#D91A1A'); // Default Red
     const [text, setText] = useState('');
+    const [isCapturing, setIsCapturing] = useState(false);
     const { addItem } = useCart();
     const captureRef = useRef<() => string>(() => ''); // Ref to hold capture function
 
@@ -157,7 +158,7 @@ export default function BaubleConfigurator() {
     const totalPrice = basePrice + colorPrice + textPrice;
 
 
-    const [isCapturing, setIsCapturing] = useState(false);
+
 
     const handleAddToCart = async () => {
         if (!selectedSize || !selectedColor) return;
