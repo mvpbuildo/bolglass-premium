@@ -5,7 +5,9 @@ import { Card, Button } from '@bolglass/ui';
 import { Link } from '@/i18n/navigation';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
-export default async function OrderConfirmationPage({ params, searchParams }: { params: { id: string, locale: string }, searchParams: { method?: string } }) {
+export default async function OrderConfirmationPage(props: { params: Promise<{ id: string, locale: string }>, searchParams: Promise<{ method?: string }> }) {
+    const params = await props.params;
+    const searchParams = await props.searchParams;
     const { id, locale } = params;
     const t = await getTranslations({ locale, namespace: 'Checkout' });
 
