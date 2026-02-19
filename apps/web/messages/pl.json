@@ -87,6 +87,23 @@
     "status": "Status",
     "paymentMethod": "Metoda płatności",
     "confirmationEmailSent": "Na Twój adres email wysłaliśmy potwierdzenie zamówienia wraz z instrukcją płatności.",
-    "backToShop": "Wróć do sklepu"
+    "backToShop": "Wróć do sklepu",
+    "statuses": {
+      "PENDING": "Oczekujące (Do opłacenia)",
+      "PAID": "Opłacone",
+      "FAILED": "Błąd płatności",
+      "CANCELLED": "Anulowane",
+      "COMPLETED": "Zakończone",
+      "PROCESSING": "W trakcie realizacji",
+      "SHIPPED": "Wysłane",
+      "RETURN_REQUESTED": "Zgłoszono zwrot",
+      "RETURNED": "Zwrócone"
+    },
+    "paymentMethods": {
+      "manual_transfer": "Przelew tradycyjny",
+      "transfer": "Przelew tradycyjny",
+      "payu": "Płatność online (PayU)",
+      "card": "Karta płatnicza"
+    }
   }
 }
