@@ -48,10 +48,6 @@ function Bauble({ color, text, scale }: { color: string, text: string, scale: nu
                             transparent
                             polygonOffset
                             polygonOffsetFactor={-1}
-                        <meshStandardMaterial
-                            transparent
-                            polygonOffset
-                            polygonOffsetFactor={-1}
                             roughness={1}
                             metalness={0}
                             depthWrite={false}
