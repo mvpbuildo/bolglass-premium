@@ -16,7 +16,27 @@ async function main() {
             { key: 'email_subject_workshop', value: 'Potwierdzenie rezerwacji warsztatów - Bolglass' },
             { key: 'email_body_workshop', value: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' },
             { key: 'email_subject_reminder', value: 'Przypomnienie o wizycie w Bolglass' },
-            { key: 'email_body_reminder', value: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' }
+            { key: 'email_body_reminder', value: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł' },
+            {
+                key: 'bauble_config',
+                value: JSON.stringify({
+                    sizes: [
+                        { id: '8cm', label: '8 cm', basePrice: 29.99, scale: 0.8 },
+                        { id: '10cm', label: '10 cm', basePrice: 34.99, scale: 1.0 },
+                        { id: '12cm', label: '12 cm', basePrice: 44.99, scale: 1.2 },
+                        { id: '15cm', label: '15 cm', basePrice: 59.99, scale: 1.5 }
+                    ],
+                    colors: [
+                        { hex: '#D91A1A', name: 'Czerwień Królewska', price: 0 },
+                        { hex: '#1E40AF', name: 'Głębia Oceanu', price: 0 },
+                        { hex: '#047857', name: 'Szmaragdowy Las', price: 0 },
+                        { hex: '#F59E0B', name: 'Złoty Bursztyn', price: 5 },
+                        { hex: '#FCD34D', name: 'Jasne Złoto', price: 5 },
+                        { hex: '#9333EA', name: 'Purpura Władców', price: 5 }
+                    ],
+                    addons: { textPrice: 10 }
+                })
+            }
         ];
 
         for (const s of settings) {
