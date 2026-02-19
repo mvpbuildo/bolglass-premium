@@ -9,45 +9,194 @@ import { join } from 'path';
 
 // --- System Settings API ---
 
-export async function getAdminEmailSettings() {
-    try {
-        const keys = Object.values(EMAIL_SETTING_KEYS);
-        const settings = await prisma.systemSetting.findMany({
-            where: { key: { in: keys } }
-        });
-        const settingsMap: Record<string, string> = {};
+export async function placeOrder(formData: FormData, cartItemsJson: string, total: number) {
+    const session = await auth();
+    const userId = session?.user?.id;
 
-        // Define defaults for all keys
-        const defaults: Record<string, string> = {
-            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_SIGHTSEEING]: 'Potwierdzenie rezerwacji zwiedzania - Bolglass',
-            [EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING]: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
-            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP]: 'Potwierdzenie rezerwacji warsztatów - Bolglass',
-            [EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP]: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
-            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
-            [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
-            [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE]: 'Aktualizacja Twojej rezerwacji w Bolglass',
-            [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}'
-        };
+    const email = formData.get('email') as string;
+    const name = formData.get('name') as string;
+    const address = formData.get('address') as string;
+    const city = formData.get('city') as string;
+    const zip = formData.get('zip') as string;
+    const phone = formData.get('phone') as string;
 
-        // Initialize with defaults
-        keys.forEach(k => settingsMap[k] = defaults[k] || '');
+    // Shipping & Payment Selections (Frontend must send these, or we default)
+    const shippingMethodKey = formData.get('shippingMethod') as string || 'courier';
+    const paymentMethodKey = formData.get('paymentMethod') as string || 'transfer';
 
-        settings.forEach((s: any) => {
+    // VAT Invoice fields
+    const documentType = formData.get('documentType') as string || 'RECEIPT';
+    const nip = formData.get('nip') as string;
+    const companyName = formData.get('companyName') as string;
+    const companyAddress = formData.get('companyAddress') as string;
 
-            // If the database has a value, but it's an email body and it's too short, 
-            // we ignore it and keep our professional default.
-            const isBody = s.key.includes('body');
-            const isTooShort = isBody && s.value.trim().length < 20;
+    const items = JSON.parse(cartItemsJson);
 
-            if (s.value && !isTooShort) {
-                settingsMap[s.key] = s.value;
-            }
-        });
-        return settingsMap;
-    } catch (error) {
-        console.error('Error fetching email settings:', error);
-        return {};
+    if (!items || items.length === 0) {
+        throw new Error("Cart is empty");
     }
+
+    // --- Server-Side Validation ---
+    const productIds = items.map((i: any) => i.id);
+    const dbProducts = await prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, price: true, name: true }
+    });
+
+    let calculatedItemsTotal = 0;
+    const trustedItems: any[] = [];
+
+    for (const item of items) {
+        const dbProduct = dbProducts.find(p => p.id === item.id);
+
+        if (!dbProduct) {
+            throw new Error(`Product not found: ${item.name} (${item.id})`);
+        }
+
+        const itemTotal = dbProduct.price * item.quantity;
+        calculatedItemsTotal += itemTotal;
+
+        trustedItems.push({
+            productId: dbProduct.id,
+            name: dbProduct.name,
+            price: dbProduct.price,
+            quantity: item.quantity
+        });
+    }
+
+    // --- Shipping Calculation (Universal Adapter) ---
+    // We calculate rates based on trusted items and address
+    // In a real scenario, we might call the provider to get the cost for the *selected* method specifically.
+    // Here we get all rates and find the selected one.
+    const rates = await shippingProvider.calculateRates(trustedItems, { city, zip });
+    const selectedRate = rates.find(r => r.id === shippingMethodKey) || rates[0]; // Default to first if invalid
+    const shippingCost = selectedRate ? selectedRate.price : 0;
+    const shippingMethodName = selectedRate ? selectedRate.name : 'Unknown';
+
+    const finalTotal = calculatedItemsTotal + shippingCost;
+
+    const invoiceData = documentType === 'INVOICE' ? {
+        nip,
+        companyName,
+        companyAddress
+    } : null;
+
+    // --- Create Order (Universal) ---
+    const order = await prisma.order.create({
+        data: {
+            userId: userId || null,
+            email: email,
+            status: "PENDING",
+            paymentStatus: "UNPAID",
+            total: finalTotal,
+
+            // Store provider info
+            shippingMethod: shippingMethodName,
+            shippingCost: shippingCost,
+            // paymentProvider: paymentProvider.key, // Schema might need update for this field?
+            // Checking schema: paymentProvider String? // "PAYU", "P24", "MANUAL"
+            paymentProvider: paymentProvider.key,
+
+            documentType,
+            invoiceData: invoiceData as any,
+            shippingAddress: {
+                name,
+                street: address,
+                city,
+                zip,
+                phone
+            },
+            items: {
+                create: trustedItems.map(item => ({
+                    productId: item.productId,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                }))
+            }
+        }
+    });
+
+    // --- Payment Initialization (Universal Adapter) ---
+    let paymentResult = { success: true, paymentUrl: `/sklep/zamowienie/${order.id}/potwierdzenie` };
+    try {
+        const result = await paymentProvider.createTransaction({
+            id: order.id,
+            total: finalTotal,
+            currency: 'PLN',
+            email: email,
+            description: `Zamówienie #${order.id.substring(0, 8)}`
+        });
+
+        if (result.success && result.paymentUrl) {
+            paymentResult.paymentUrl = result.paymentUrl;
+        }
+    } catch (error) {
+        console.error("Payment initialization failed:", error);
+        // Soft fail: Order created, but auto-redirect failed. User can retry from order page.
+    }
+
+    // Persistence: Update User Profile if logged in
+    if (userId && documentType === 'INVOICE') {
+        try {
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    isCompany: true,
+                    companyName: companyName,
+                    nip: nip,
+                    companyStreet: companyAddress,
+                }
+            });
+        } catch (err) {
+            console.error("Failed to update user profile with company data:", err);
+        }
+    }
+
+    return {
+        orderId: order.id,
+        success: true,
+        paymentUrl: paymentResult.paymentUrl
+    };
+}
+try {
+    const keys = Object.values(EMAIL_SETTING_KEYS);
+    const settings = await prisma.systemSetting.findMany({
+        where: { key: { in: keys } }
+    });
+    const settingsMap: Record<string, string> = {};
+
+    // Define defaults for all keys
+    const defaults: Record<string, string> = {
+        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_SIGHTSEEING]: 'Potwierdzenie rezerwacji zwiedzania - Bolglass',
+        [EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING]: 'Dziękujemy za rezerwację zwiedzania w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_WORKSHOP]: 'Potwierdzenie rezerwacji warsztatów - Bolglass',
+        [EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP]: 'Dziękujemy za rezerwację warsztatów w Bolglass!\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
+        [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
+        [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE]: 'Aktualizacja Twojej rezerwacji w Bolglass',
+        [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}'
+    };
+
+    // Initialize with defaults
+    keys.forEach(k => settingsMap[k] = defaults[k] || '');
+
+    settings.forEach((s: any) => {
+
+        // If the database has a value, but it's an email body and it's too short, 
+        // we ignore it and keep our professional default.
+        const isBody = s.key.includes('body');
+        const isTooShort = isBody && s.value.trim().length < 20;
+
+        if (s.value && !isTooShort) {
+            settingsMap[s.key] = s.value;
+        }
+    });
+    return settingsMap;
+} catch (error) {
+    console.error('Error fetching email settings:', error);
+    return {};
+}
 }
 
 export async function updateAdminEmailSettings(settings: Record<string, string>) {

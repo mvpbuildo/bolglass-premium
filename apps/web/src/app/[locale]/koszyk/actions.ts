@@ -2,6 +2,7 @@
 
 import { prisma } from '@bolglass/database';
 import { auth } from '@/auth';
+import { paymentProvider, shippingProvider } from '@/lib/modules/store-context';
 
 export async function placeOrder(formData: FormData, cartItemsJson: string, total: number) {
     const session = await auth();
@@ -13,6 +14,10 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
     const city = formData.get('city') as string;
     const zip = formData.get('zip') as string;
     const phone = formData.get('phone') as string;
+
+    // Shipping & Payment Selections (Frontend must send these, or we default)
+    const shippingMethodKey = formData.get('shippingMethod') as string || 'courier';
+    const paymentMethodKey = formData.get('paymentMethod') as string || 'transfer';
 
     // VAT Invoice fields
     const documentType = formData.get('documentType') as string || 'RECEIPT';
@@ -30,10 +35,10 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
     const productIds = items.map((i: any) => i.id);
     const dbProducts = await prisma.product.findMany({
         where: { id: { in: productIds } },
-        select: { id: true, price: true, name: true } // Add stock check if needed
+        select: { id: true, price: true, name: true }
     });
 
-    let calculatedTotal = 0;
+    let calculatedItemsTotal = 0;
     const trustedItems: any[] = [];
 
     for (const item of items) {
@@ -43,26 +48,27 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
             throw new Error(`Product not found: ${item.name} (${item.id})`);
         }
 
-        // Use DB price, not client price
-        // TODO: Handle promotions/discounts here if applicable (e.g. verify coupon)
         const itemTotal = dbProduct.price * item.quantity;
-        calculatedTotal += itemTotal;
+        calculatedItemsTotal += itemTotal;
 
         trustedItems.push({
             productId: dbProduct.id,
-            name: dbProduct.name, // Or use DB name to ensure consistency
+            name: dbProduct.name,
             price: dbProduct.price,
             quantity: item.quantity
         });
     }
 
-    // Optional: Allow small floating point diffs or reject if mismatch is large
-    // For now, we AUTHORITATIVELY use the calculatedTotal.
-    // If the client sent a total that is wildly different, it might be an attack or a bug.
-    const diff = Math.abs(calculatedTotal - total);
-    if (diff > 1.00) {
-        console.warn(`Price mismatch! Client: ${total}, Server: ${calculatedTotal}. Using Server value.`);
-    }
+    // --- Shipping Calculation (Universal Adapter) ---
+    // We calculate rates based on trusted items and address
+    // In a real scenario, we might call the provider to get the cost for the *selected* method specifically.
+    // Here we get all rates and find the selected one.
+    const rates = await shippingProvider.calculateRates(trustedItems, { city, zip });
+    const selectedRate = rates.find(r => r.id === shippingMethodKey) || rates[0]; // Default to first if invalid
+    const shippingCost = selectedRate ? selectedRate.price : 0;
+    const shippingMethodName = selectedRate ? selectedRate.name : 'Unknown';
+
+    const finalTotal = calculatedItemsTotal + shippingCost;
 
     const invoiceData = documentType === 'INVOICE' ? {
         nip,
@@ -70,14 +76,21 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
         companyAddress
     } : null;
 
-    // Create Order with Trusted Values
+    // --- Create Order (Universal) ---
     const order = await prisma.order.create({
         data: {
             userId: userId || null,
             email: email,
             status: "PENDING",
             paymentStatus: "UNPAID",
-            total: calculatedTotal, // TRUSTED
+            total: finalTotal,
+
+            // Store provider info
+            shippingMethod: shippingMethodName,
+            shippingCost: shippingCost,
+            // paymentProvider: paymentProvider.key,
+            paymentProvider: paymentProvider.key,
+
             documentType,
             invoiceData: invoiceData as any,
             shippingAddress: {
@@ -98,6 +111,24 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
         }
     });
 
+    // --- Payment Initialization (Universal Adapter) ---
+    let paymentResult = { success: true, paymentUrl: `/sklep/zamowienie/${order.id}/potwierdzenie` };
+    try {
+        const result = await paymentProvider.createTransaction({
+            id: order.id,
+            total: finalTotal,
+            currency: 'PLN',
+            email: email,
+            description: `Zamówienie #${order.id.substring(0, 8)}`
+        });
+
+        if (result.success && result.paymentUrl) {
+            paymentResult.paymentUrl = result.paymentUrl;
+        }
+    } catch (error) {
+        console.error("Payment initialization failed:", error);
+    }
+
     // Persistence: Update User Profile if logged in
     if (userId && documentType === 'INVOICE') {
         try {
@@ -107,8 +138,7 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
                     isCompany: true,
                     companyName: companyName,
                     nip: nip,
-                    companyStreet: companyAddress, // Mapping one field to schema for now
-                    // Note: If we had separate city/zip in checkout, we'd update them here too.
+                    companyStreet: companyAddress,
                 }
             });
         } catch (err) {
@@ -116,8 +146,13 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
         }
     }
 
-    return { orderId: order.id, success: true };
+    return {
+        orderId: order.id,
+        success: true,
+        paymentUrl: paymentResult.paymentUrl
+    };
 }
+
 
 // --- Cart Synchronization Actions ---
 
@@ -207,4 +242,21 @@ export async function clearSyncedCart() {
     } catch (error) {
         console.error("Failed to clear synced cart:", error);
     }
+}
+
+export async function getShippingRates(items: any[], city: string = 'Warszawa', zip: string = '00-001') {
+    try {
+        const rates = await shippingProvider.calculateRates(items, { city, zip });
+        return rates;
+    } catch (e) {
+        console.error("Error fetching shipping rates:", e);
+        return [];
+    }
+}
+
+export async function getPaymentMethods() {
+    return [
+        { id: 'transfer', name: 'Przelew Tradycyjny', description: 'Dane do przelewu otrzymasz w mailu.' },
+        // Future: { id: 'payu', name: 'Szybkie Płatności', description: 'BLIK, Karta' }
+    ];
 }

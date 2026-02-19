@@ -65,8 +65,8 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500">Rodzaj dokumentu:</span>
                                 <span className={`px-2 py-1 rounded text-xs font-bold ${order.documentType === 'INVOICE'
-                                        ? 'bg-blue-100 text-blue-700'
-                                        : 'bg-green-100 text-green-700'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-green-100 text-green-700'
                                     }`}>
                                     {order.documentType === 'INVOICE' ? 'FAKTURA VAT' : 'PARAGON'}
                                 </span>
@@ -103,7 +103,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
                                 <select
                                     name="status"
                                     defaultValue={order.status}
-                                    className="border rounded px-2 py-1 text-sm bgbw-white"
+                                    className="border rounded px-2 py-1 text-sm bg-white text-gray-900"
                                     aria-label="Zmień status zamówienia"
                                 >
                                     <option value="PENDING">Oczekujące</option>

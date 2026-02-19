@@ -1,11 +1,9 @@
-'use client';
-
 import { useCart } from '@/context/CartContext';
 import { Button, Card } from '@bolglass/ui';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
-import { placeOrder } from './actions';
+import { useState, useEffect } from 'react';
+import { placeOrder, getShippingRates, getPaymentMethods } from './actions';
 import Image from 'next/image';
 
 export default function CheckoutPage() {
@@ -15,18 +13,57 @@ export default function CheckoutPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [documentType, setDocumentType] = useState<'RECEIPT' | 'INVOICE'>('RECEIPT');
 
+    // Universal Adapter State
+    const [shippingMethods, setShippingMethods] = useState<any[]>([]);
+    const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+    const [selectedShipping, setSelectedShipping] = useState<string>('');
+    const [selectedPayment, setSelectedPayment] = useState<string>('');
+    const [shippingCost, setShippingCost] = useState(0);
+
+    // Fetch Providers Data
+    useEffect(() => {
+        if (items.length > 0) {
+            // Fetch shipping rates
+            getShippingRates(items).then(rates => {
+                setShippingMethods(rates);
+                if (rates.length > 0) {
+                    setSelectedShipping(rates[0].id);
+                    setShippingCost(rates[0].price);
+                }
+            });
+
+            // Fetch payment methods
+            getPaymentMethods().then(methods => {
+                setPaymentMethods(methods);
+                if (methods.length > 0) {
+                    setSelectedPayment(methods[0].id);
+                }
+            });
+        }
+    }, [items]); // Re-fetch if items change (weight/size might change)
+
+    // Update cost when shipping method changes
+    useEffect(() => {
+        const method = shippingMethods.find(m => m.id === selectedShipping);
+        if (method) {
+            setShippingCost(method.price);
+        }
+    }, [selectedShipping, shippingMethods]);
+
+    const finalTotal = total + shippingCost;
+
     async function handleSubmit(formData: FormData) {
         setIsSubmitting(true);
         try {
-            // Add document type to formData
+            // Add document type & selections to formData
             formData.append('documentType', documentType);
+            formData.append('shippingMethod', selectedShipping);
+            formData.append('paymentMethod', selectedPayment);
 
-            const result = await placeOrder(formData, JSON.stringify(items), total);
+            const result = await placeOrder(formData, JSON.stringify(items), finalTotal);
             if (result.success) {
                 clearCart();
-                // Redirect to success / thank you
-                alert(`Zamówienie złożone! Numer: ${result.orderId}`);
-                router.push('/sklep'); // or /sklep/zamowienie/[id]
+                router.push(result.paymentUrl || `/sklep/zamowienie/${result.orderId}`);
             }
         } catch (error) {
             console.error(error);
@@ -35,6 +72,7 @@ export default function CheckoutPage() {
             setIsSubmitting(false);
         }
     }
+
     if (items.length === 0) {
         return (
             <main className="min-h-screen bg-[#050505] pt-32">
@@ -77,10 +115,9 @@ export default function CheckoutPage() {
                                             <h3 className="font-serif text-lg text-amber-50 mb-1">{item.name}</h3>
                                             <p className="text-amber-500 font-black text-sm">{item.price.toFixed(2)} zł</p>
                                         </div>
-                                        {/* ... quantity and remove remain similar but themed ... */}
                                         <div className="flex items-center gap-2">
                                             <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">-</button>
-                                            <span className="w-8 text-center font-bold">{item.quantity}</span>
+                                            <span className="w-8 text-center font-bold text-white">{item.quantity}</span>
                                             <button type="button" onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">+</button>
                                         </div>
                                         <button type="button" onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700 ml-2">
@@ -89,17 +126,27 @@ export default function CheckoutPage() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 pt-4 border-t flex justify-between items-center text-xl font-black">
-                                <span>Razem</span>
-                                <span>{total.toFixed(2)} zł</span>
+                            <div className="mt-6 pt-4 border-t border-white/10 flex flex-col gap-2 text-xl font-black text-amber-50">
+                                <div className="flex justify-between text-sm text-amber-50/60">
+                                    <span>Produkty</span>
+                                    <span>{total.toFixed(2)} zł</span>
+                                </div>
+                                <div className="flex justify-between text-sm text-amber-50/60">
+                                    <span>Dostawa ({shippingMethods.find(m => m.id === selectedShipping)?.name || '...'})</span>
+                                    <span>{shippingCost.toFixed(2)} zł</span>
+                                </div>
+                                <div className="flex justify-between border-t border-white/10 pt-2 mt-2 text-2xl text-amber-500">
+                                    <span>Razem</span>
+                                    <span>{finalTotal.toFixed(2)} zł</span>
+                                </div>
                             </div>
                         </Card>
                     </div>
 
                     {/* RIGHT COLUMN: Checkout Form */}
                     <div>
-                        <Card className="p-6 bg-white shadow-sm sticky top-24">
-                            <h2 className="text-xl font-bold mb-4 border-b pb-2">Dane do Dostawy</h2>
+                        <Card className="p-6 bg-white shadow-sm sticky top-24 rounded-2xl">
+                            <h2 className="text-xl font-bold mb-4 border-b pb-2 text-black">Dane do Dostawy</h2>
 
                             {!session && (
                                 <div className="mb-6 p-4 bg-blue-50 text-blue-700 rounded-lg text-sm">
@@ -206,27 +253,65 @@ export default function CheckoutPage() {
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Telefon</label>
                                     <input name="phone" type="tel" required className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-gray-900" title="Telefon" />
                                 </div>
+
+                                <div className="pt-4 mt-6 border-t border-gray-100">
+                                    <h3 className="font-bold mb-3 text-gray-900">Metoda Dostawy</h3>
+                                    <div className="space-y-2">
+                                        {shippingMethods.map((method) => (
+                                            <label key={method.id} className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all ${selectedShipping === method.id ? 'border-amber-500 bg-amber-50 ring-1 ring-amber-500' : 'border-gray-200 hover:border-gray-300'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <input
+                                                        type="radio"
+                                                        name="shippingMethod"
+                                                        value={method.id}
+                                                        checked={selectedShipping === method.id}
+                                                        onChange={() => setSelectedShipping(method.id)}
+                                                        className="h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-300"
+                                                    />
+                                                    <span className="font-medium text-gray-700">{method.name}</span>
+                                                </div>
+                                                <span className="font-bold text-gray-900">{method.price.toFixed(2)} zł</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 mt-4 border-t border-gray-100">
+                                    <h3 className="font-bold mb-3 text-gray-900">Płatność</h3>
+                                    <div className="space-y-2">
+                                        {paymentMethods.map((method) => (
+                                            <div key={method.id} className={`p-3 border rounded-lg cursor-pointer transition-all ${selectedPayment === method.id ? 'border-amber-500 bg-amber-50 ring-1 ring-amber-500' : 'border-gray-200 hover:border-gray-300'}`} onClick={() => setSelectedPayment(method.id)}>
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <input
+                                                        type="radio"
+                                                        name="paymentMethod"
+                                                        value={method.id}
+                                                        checked={selectedPayment === method.id}
+                                                        onChange={() => setSelectedPayment(method.id)}
+                                                        className="h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-300"
+                                                    />
+                                                    <span className="font-bold text-gray-800">{method.name}</span>
+                                                </div>
+                                                <p className="text-xs text-gray-500 ml-7">{method.description}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 {!session && (
-                                    <div className="mb-8 p-6 bg-amber-500/5 border border-amber-500/10 text-amber-200/60 rounded-2xl text-sm italic">
+                                    <div className="mt-8 mb-4 p-6 bg-amber-500/5 border border-amber-500/10 text-amber-700 rounded-2xl text-sm italic">
                                         Kupujesz jako <strong>Gość</strong>. <Link href="/api/auth/signin" className="text-amber-500 underline font-bold">Zaloguj się</Link>, aby zapisać zamówienie w swojej historii.
                                     </div>
                                 )}
-
-                                <div className="pt-4 mt-4 border-t">
-                                    <h3 className="font-bold mb-2">Płatność</h3>
-                                    <div className="p-3 border rounded-lg bg-gray-50 text-sm text-gray-600">
-                                        🔘 Przelew Tradycyjny (Dane otrzymasz w mailu)
-                                    </div>
-                                </div>
 
                                 <Button
                                     type="submit"
                                     className="w-full bg-amber-500 hover:bg-amber-600 text-black py-4 text-lg font-black uppercase tracking-widest mt-6 shadow-lg hover:shadow-amber-500/20 transition-all rounded-full"
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? 'Przetwarzanie...' : `Zamawiam i Płacę (${total.toFixed(2)} zł)`}
+                                    {isSubmitting ? 'Przetwarzanie...' : `Zamawiam i Płacę (${finalTotal.toFixed(2)} zł)`}
                                 </Button>
-                                <p className="text-[10px] text-center text-amber-200/20 mt-4 uppercase tracking-widest leading-loose">
+                                <p className="text-[10px] text-center text-gray-400 mt-4 uppercase tracking-widest leading-loose">
                                     Klikając &quot;Zamawiam i Płacę&quot; akceptujesz regulamin sklepu.
                                 </p>
                             </form>
