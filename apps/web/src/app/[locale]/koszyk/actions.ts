@@ -182,7 +182,7 @@ export async function getSyncedCart() {
     }
 }
 
-export async function syncCartItem(item: { id: string; quantity: number }, remove = false) {
+export async function syncCartItem(item: { id: string; quantity: number; configuration?: string }, remove = false) {
     const session = await auth();
     if (!session?.user?.id) return { success: false };
 
@@ -201,7 +201,7 @@ export async function syncCartItem(item: { id: string; quantity: number }, remov
                 where: {
                     cartId: cart.id,
                     productId: item.id,
-                    configuration: "{}"
+                    configuration: item.configuration || "{}"
                 }
             });
         } else {
@@ -210,7 +210,7 @@ export async function syncCartItem(item: { id: string; quantity: number }, remov
                     cartId_productId_configuration: {
                         cartId: cart.id,
                         productId: item.id,
-                        configuration: "{}"
+                        configuration: item.configuration || "{}"
                     }
                 },
                 update: { quantity: item.quantity },
@@ -218,7 +218,7 @@ export async function syncCartItem(item: { id: string; quantity: number }, remov
                     cartId: cart.id,
                     productId: item.id,
                     quantity: item.quantity,
-                    configuration: "{}"
+                    configuration: item.configuration || "{}"
                 }
             });
         }

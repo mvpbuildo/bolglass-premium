@@ -11,6 +11,7 @@ export type CartItem = {
     image?: string;
     quantity: number;
     slug: string;
+    configuration?: string;
 };
 
 type CartContextType = {
@@ -82,8 +83,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             // Sync to server
             if (session?.user) {
                 const itemToSync = existing
-                    ? { id: newItem.id, quantity: existing.quantity + newItem.quantity }
-                    : { id: newItem.id, quantity: newItem.quantity };
+                    ? { id: newItem.id, quantity: existing.quantity + newItem.quantity, configuration: newItem.configuration }
+                    : { id: newItem.id, quantity: newItem.quantity, configuration: newItem.configuration };
                 syncCartItem(itemToSync);
             }
 
