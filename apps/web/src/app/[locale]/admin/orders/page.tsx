@@ -2,6 +2,17 @@ import { prisma } from '@bolglass/database';
 import OrderCard from './OrderCard';
 import AdminNavigation from '@/components/AdminNavigation';
 
+export const dynamic = 'force-dynamic';
+
+async function getOrders() {
+    return await prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+            items: true
+        }
+    });
+}
+
 export default async function AdminOrdersPage() {
     const orders = await getOrders();
 
