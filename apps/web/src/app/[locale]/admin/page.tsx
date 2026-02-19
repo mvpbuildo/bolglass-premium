@@ -72,8 +72,7 @@ export default async function AdminDashboardPage() {
             color: 'border-purple-100 bg-purple-50/30',
             bg: 'bg-purple-600',
             links: [
-                { name: 'Promocje', path: '/admin/marketing/promocje', icon: <Tag className="w-4 h-4" /> },
-                { name: 'Newsletter', path: '/admin/marketing/newsletter', icon: <ShoppingCart className="w-4 h-4" /> },
+                { name: 'Mailing', path: '/admin/marketing/mailing', icon: <ShoppingCart className="w-4 h-4" /> },
                 { name: 'Analityka', path: '/admin/marketing/analityka', icon: <TrendingUp className="w-4 h-4" /> },
             ]
         },
@@ -96,6 +95,7 @@ export default async function AdminDashboardPage() {
             bg: 'bg-gray-900',
             links: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+                { name: 'Ustawienia', path: '/admin/system/settings', icon: <Settings className="w-4 h-4" /> },
             ]
         },
         {
@@ -105,7 +105,7 @@ export default async function AdminDashboardPage() {
             color: 'border-pink-100 bg-pink-50/30',
             bg: 'bg-pink-600',
             links: [
-                { name: 'Konfiguracja', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
+                { name: 'Konfiguracja', path: '/admin/system/settings', icon: <Settings className="w-4 h-4" /> },
             ]
         },
         {

@@ -57,6 +57,14 @@ export default function AdminNavigation() {
             ]
         },
         {
+            title: 'KONTAKT',
+            color: 'text-pink-600',
+            bg: 'bg-pink-50',
+            items: [
+                { name: 'Konfiguracja', path: '/admin/system/settings', icon: '📞' },
+            ]
+        },
+        {
             title: 'ZASOBY',
             color: 'text-blue-600',
             bg: 'bg-blue-50',
