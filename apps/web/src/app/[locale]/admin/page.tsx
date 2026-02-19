@@ -14,7 +14,8 @@ import {
     Image as ImageIcon,
     Files,
     ArrowRight,
-    Phone
+    Phone,
+    TrendingUp
 } from 'lucide-react';
 import { prisma } from '@bolglass/database';
 import { format } from 'date-fns';
@@ -73,6 +74,7 @@ export default async function AdminDashboardPage() {
             links: [
                 { name: 'Promocje', path: '/admin/marketing/promocje', icon: <Tag className="w-4 h-4" /> },
                 { name: 'Newsletter', path: '/admin/marketing/newsletter', icon: <ShoppingCart className="w-4 h-4" /> },
+                { name: 'Analityka', path: '/admin/marketing/analityka', icon: <TrendingUp className="w-4 h-4" /> },
                 { name: 'Analityka', path: '/admin/marketing/analityka', icon: <TrendingUp className="w-4 h-4" /> },
             ]
         },
