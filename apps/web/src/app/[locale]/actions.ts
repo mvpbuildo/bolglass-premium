@@ -633,3 +633,22 @@ export async function uploadContactLogo(formData: FormData) {
         return { error: "Wystąpił błąd podczas przesyłania logo." };
     }
 }
+// --- Analytics ---
+
+export async function trackVisit() {
+    try {
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+        const date = new Date(dateStr + "T00:00:00.000Z");
+
+        await prisma.analyticsDay.upsert({
+            where: { date },
+            update: { views: { increment: 1 } },
+            create: { date, views: 1 }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error tracking visit:", error);
+        return { success: false };
+    }
+}

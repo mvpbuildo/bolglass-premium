@@ -1,4 +1,32 @@
-import type { Metadata } from "next";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
+
+// ... (existing imports)
+
+export default async function LocaleLayout({
+    children,
+    params
+}: {
+    children: React.ReactNode;
+    params: Promise<{ locale: string }>;
+}) {
+    // ... (existing code)
+
+    return (
+        <html lang={locale}>
+            <body className={`${inter.variable} antialiased font-sans bg-black text-white`}>
+                <NextIntlClientProvider messages={messages} locale={locale}>
+                    <Providers>
+                        <AnalyticsTracker />
+                        <Navbar logoUrl={settings.contact_logo} />
+                        <MainLayoutSpacer />
+                        {children}
+                        <Footer />
+                    </Providers>
+                </NextIntlClientProvider>
+            </body>
+        </html>
+    );
+}
 import { Inter } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
