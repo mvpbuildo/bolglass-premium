@@ -34,10 +34,10 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
     // Separate standard products from custom configurations
     // Custom items are identified by having 'configuration' or starting with 'config-'
     const standardItemIds = items
-        .filter((i: any) => !i.configuration && !i.id.startsWith('config-'))
-        .map((i: any) => i.id);
+        .filter((i: { configuration?: string; id: string }) => !i.configuration && !i.id.startsWith('config-'))
+        .map((i: { id: string }) => i.id);
 
-    const hasCustomItems = items.some((i: any) => i.configuration || i.id.startsWith('config-'));
+    const hasCustomItems = items.some((i: { configuration?: string; id: string }) => i.configuration || i.id.startsWith('config-'));
 
     // Fetch Standard Products
     const dbProducts = await prisma.product.findMany({
@@ -71,7 +71,7 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
 
 
     let calculatedItemsTotal = 0;
-    const trustedItems: any[] = [];
+    const trustedItems: { productId: string; name: string; price: number; quantity: number; configuration?: string }[] = [];
 
     for (const item of items) {
         let dbProduct = dbProducts.find(p => p.id === item.id);

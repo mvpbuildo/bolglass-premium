@@ -3,7 +3,7 @@ import { paymentProvider, shippingProvider } from '@/lib/modules/store-context';
 
 export interface OrderInput {
     formData: FormData;
-    cartItems: any[];
+    cartItems: { id: string; quantity: number; name: string }[];
     userId?: string;
 }
 
