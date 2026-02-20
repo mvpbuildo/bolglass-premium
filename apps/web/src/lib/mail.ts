@@ -21,7 +21,11 @@ export async function getTransporter() {
     console.log(`--- SMTP Attempt: Host=${config[EMAIL_SETTING_KEYS.SMTP_HOST]}, Port=${config[EMAIL_SETTING_KEYS.SMTP_PORT]}, User=${config[EMAIL_SETTING_KEYS.SMTP_USER]} ---`);
 
     if (!config[EMAIL_SETTING_KEYS.SMTP_HOST] || !config[EMAIL_SETTING_KEYS.SMTP_USER]) {
-        console.warn('SMTP configuration is incomplete. Skipping mail delivery.');
+        console.error('CRITICAL: SMTP configuration is incomplete in database!', {
+            host: config[EMAIL_SETTING_KEYS.SMTP_HOST] ? 'YES' : 'MISSING',
+            user: config[EMAIL_SETTING_KEYS.SMTP_USER] ? 'YES' : 'MISSING',
+            port: config[EMAIL_SETTING_KEYS.SMTP_PORT] ? 'YES' : 'MISSING'
+        });
         return null;
     }
 
@@ -292,11 +296,11 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
         const itemsList = order.items.map((item: any) => `- ${item.name} (x${item.quantity}) - ${item.price.toFixed(2)} PLN`).join('\n');
 
         const replacements: Record<string, string> = {
-            '{{id}}': order.id.substring(0, 8),
-            '{{total}}': order.total.toFixed(2),
+            '{{id}}': fullOrder.id.substring(0, 8),
+            '{{total}}': fullOrder.total.toFixed(2),
             '{{items}}': itemsList,
-            '{{email}}': order.email,
-            '{{date}}': new Date(order.createdAt).toLocaleString(locale === 'pl' ? 'pl-PL' : locale === 'de' ? 'de-DE' : 'en-GB')
+            '{{email}}': fullOrder.email,
+            '{{date}}': new Date(fullOrder.createdAt).toLocaleString(locale === 'pl' ? 'pl-PL' : locale === 'de' ? 'de-DE' : 'en-GB')
         };
 
         Object.entries(replacements).forEach(([tag, val]) => {
@@ -315,7 +319,7 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
 
         const info = await transporter.sendMail({
             from: `"Bolglass" <${from}>`,
-            to: order.email,
+            to: fullOrder.email,
             subject: subject,
             text: body,
             html: html
