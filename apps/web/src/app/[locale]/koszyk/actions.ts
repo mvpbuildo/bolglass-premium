@@ -339,7 +339,7 @@ export async function getShippingRates(items: any[], city: string = 'Warszawa', 
 
 export async function getPaymentMethods() {
     return [
-        { id: 'transfer', name: 'Przelew Tradycyjny', description: 'Dane do przelewu otrzymasz w mailu.' },
-        // Future: { id: 'payu', name: 'Szybkie Płatności', description: 'BLIK, Karta' }
+        { id: 'transfer' }, // Only ID needed, UI uses i18n
+        // Future: { id: 'payu' }
     ];
 }

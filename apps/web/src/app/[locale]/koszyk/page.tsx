@@ -154,7 +154,7 @@ export default function CheckoutPage() {
                                     <span>{formatPrice(total)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-amber-50/60">
-                                    <span>{t('shipping')} ({shippingMethods.find(m => m.id === selectedShipping)?.name || '...'})</span>
+                                    <span>{t('shipping')} ({selectedShipping ? t(`methods.shipping.${selectedShipping}`) : '...'})</span>
                                     <span>{formatPrice(shippingCost)}</span>
                                 </div>
                                 <div className="flex justify-between border-t border-white/10 pt-2 mt-2 text-2xl text-amber-500">
@@ -290,7 +290,10 @@ export default function CheckoutPage() {
                                                         onChange={() => setSelectedShipping(method.id)}
                                                         className="h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-300"
                                                     />
-                                                    <span className="font-medium text-gray-700">{method.name}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-gray-700">{t(`methods.shipping.${method.id}`)}</span>
+                                                        <span className="text-[10px] text-gray-400 capitalize">{t(`methods.shipping.${method.id}_desc`)}</span>
+                                                    </div>
                                                 </div>
                                                 <span className="font-bold text-gray-900">{formatPrice(method.price)}</span>
                                             </label>
@@ -312,9 +315,9 @@ export default function CheckoutPage() {
                                                         onChange={() => setSelectedPayment(method.id)}
                                                         className="h-4 w-4 text-amber-500 focus:ring-amber-500 border-gray-300"
                                                     />
-                                                    <span className="font-bold text-gray-800">{method.name}</span>
+                                                    <span className="font-bold text-gray-800">{t(`methods.payment.${method.id}`)}</span>
                                                 </div>
-                                                <p className="text-xs text-gray-500 ml-7">{method.description}</p>
+                                                <p className="text-xs text-gray-500 ml-7">{t(`methods.payment.${method.id}_desc`)}</p>
                                             </div>
                                         ))}
                                     </div>

@@ -3,6 +3,7 @@
 import { useCart } from '@/context/CartContext';
 import { Button } from '@bolglass/ui';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 // Define a minimal product type for the cart
 type Product = {
@@ -20,6 +21,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
     const { addItem } = useCart();
     const [quantity, setQuantity] = useState(1);
     const [isAdded, setIsAdded] = useState(false);
+    const t = useTranslations('Shop');
 
     const handleAddToCart = () => {
         const effectivePrice = product.price * (1 - (product.discountPercent || 0) / 100);
@@ -63,7 +65,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
                 className={`flex-1 py-3 text-lg transition-all ${isAdded ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
                     }`}
             >
-                {isAdded ? '✓ Dodano!' : (product.stock > 0 ? 'Dodaj do Koszyka' : 'Niedostępny')}
+                {isAdded ? t('addedToCart') : (product.stock > 0 ? t('addToCart') : t('outOfStock'))}
             </Button>
         </div>
     );

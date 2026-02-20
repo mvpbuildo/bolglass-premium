@@ -231,7 +231,19 @@
         "loginToSave": "Melden Sie sich an, um die Bestellung in Ihrer Historie zu speichern.",
         "orderAndPay": "Bestellen und Bezahlen",
         "acceptTerms": "Mit dem Klick auf \"{buttonText}\" akzeptieren Sie die Ladenbedingungen.",
-        "errorPlacingOrder": "Beim Aufgeben der Bestellung ist ein Fehler aufgetreten."
+        "errorPlacingOrder": "Beim Aufgeben der Bestellung ist ein Fehler aufgetreten.",
+        "methods": {
+            "shipping": {
+                "pickup": "Selbstabholung (Werkstatt)",
+                "pickup_desc": "Bereit in 24h",
+                "courier": "Kurier (DPD/InPost)",
+                "courier_desc": "1-2 Werktage"
+            },
+            "payment": {
+                "transfer": "Banküberweisung",
+                "transfer_desc": "Die Bankverbindung erhalten Sie per E-Mail."
+            }
+        }
     },
     "Checkout": {
         "orderPlaced": "Vielen Dank für Ihre Bestellung!",

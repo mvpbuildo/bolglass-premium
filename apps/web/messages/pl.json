@@ -231,7 +231,19 @@
     "loginToSave": "Zaloguj się, aby zapisać zamówienie w swojej historii.",
     "orderAndPay": "Zamawiam i Płacę",
     "acceptTerms": "Klikając \"{buttonText}\" akceptujesz regulamin sklepu.",
-    "errorPlacingOrder": "Wystąpił błąd podczas składania zamówienia."
+    "errorPlacingOrder": "Wystąpił błąd podczas składania zamówienia.",
+    "methods": {
+      "shipping": {
+        "pickup": "Odbiór Osobisty (Warsztat)",
+        "pickup_desc": "Gotowe w 24h",
+        "courier": "Kurier (DPD/InPost)",
+        "courier_desc": "1-2 dni robocze"
+      },
+      "payment": {
+        "transfer": "Przelew Tradycyjny",
+        "transfer_desc": "Dane do przelewu otrzymasz w mailu."
+      }
+    }
   },
   "Checkout": {
     "orderPlaced": "Dziękujemy za złożenie zamówienia!",

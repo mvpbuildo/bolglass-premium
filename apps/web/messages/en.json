@@ -231,7 +231,19 @@
         "loginToSave": "Log in to save the order in your history.",
         "orderAndPay": "Order and Pay",
         "acceptTerms": "By clicking \"{buttonText}\" you accept the store terms.",
-        "errorPlacingOrder": "An error occurred while placing the order."
+        "errorPlacingOrder": "An error occurred while placing the order.",
+        "methods": {
+            "shipping": {
+                "pickup": "Local Pickup (Workshop)",
+                "pickup_desc": "Ready in 24h",
+                "courier": "Courier (DPD/InPost)",
+                "courier_desc": "1-2 business days"
+            },
+            "payment": {
+                "transfer": "Bank Transfer",
+                "transfer_desc": "You will receive the transfer details via email."
+            }
+        }
     },
     "Checkout": {
         "orderPlaced": "Thank you for your order!",
