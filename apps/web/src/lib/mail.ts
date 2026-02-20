@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import { prisma } from '@bolglass/database';
 import { EMAIL_SETTING_KEYS } from './mail-constants';
 
+console.log(">>> [MAIL MODULE] Initializing mail service module...");
+
 export async function getTransporter() {
     const settings = await prisma.systemSetting.findMany({
         where: {

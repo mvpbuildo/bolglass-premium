@@ -9,6 +9,7 @@ export interface OrderInput {
 
 export class CheckoutService {
     static async placeOrder({ formData, cartItems, userId }: OrderInput) {
+        console.log(">>> [CheckoutService] Entering placeOrder");
         try {
             const email = formData.get('email') as string;
             const name = formData.get('name') as string;
@@ -139,8 +140,11 @@ export class CheckoutService {
 
             // --- Send Confirmation Email ---
             const locale = formData.get('locale') as string || 'pl';
+            console.log(`>>> [CheckoutService] Attempting to import mail service, locale: ${locale}`);
             const { sendOrderConfirmationEmail } = await import('@/lib/mail');
+            console.log(">>> [CheckoutService] Calling sendOrderConfirmationEmail...");
             await sendOrderConfirmationEmail(order, locale).catch(err => console.error("CRITICAL: Email send failed:", err));
+            console.log(">>> [CheckoutService] sendOrderConfirmationEmail call finished (awaited)");
 
             return {
                 orderId: order.id,
