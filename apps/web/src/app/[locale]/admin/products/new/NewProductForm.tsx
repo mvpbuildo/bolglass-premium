@@ -85,8 +85,9 @@ export default function NewProductForm() {
                     }));
                 }
             }
-        } catch (err: { message?: string }) {
-            alert(err.message || 'Błąd podczas tłumaczenia.');
+        } catch (err: unknown) {
+            const error = err as { message?: string };
+            alert(error.message || 'Błąd podczas tłumaczenia.');
         } finally {
             setIsTranslating(null);
         }
