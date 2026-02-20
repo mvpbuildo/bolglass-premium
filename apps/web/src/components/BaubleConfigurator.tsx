@@ -8,6 +8,7 @@ import { Button, Input } from '@bolglass/ui';
 import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
+import { calculateBaublePrice } from '@/services/pricing';
 
 
 function Bauble({ color, text, scale, isCapturing }: { color: string, text: string, scale: number, isCapturing?: boolean }) {
@@ -152,10 +153,11 @@ export default function BaubleConfigurator() {
     const selectedColor = config.colors.find(c => c.hex === color);
 
     // Pricing Logic
-    const basePrice = selectedSize?.basePrice || 0;
-    const colorPrice = selectedColor?.price || 0;
-    const textPrice = text.length > 0 ? config.addons.textPrice : 0;
-    const totalPrice = basePrice + colorPrice + textPrice;
+    const currentPrice = config ? calculateBaublePrice({
+        sizeId: selectedSize.id,
+        colorHex: selectedColor.hex,
+        text: text
+    }, config) : 0;
 
 
 
@@ -176,9 +178,9 @@ export default function BaubleConfigurator() {
         setIsCapturing(false);
 
         addItem({
-            id: `config-${Date.now()}`,
+            id: `config-${crypto.randomUUID()}`,
             name: `Bombka ${selectedSize.label} (${selectedColor.name})`,
-            price: totalPrice,
+            price: currentPrice,
             slug: 'bombka-personalizowana',
             quantity: 1,
             image: screenshot, // Use captured screenshot
@@ -279,7 +281,7 @@ export default function BaubleConfigurator() {
                 <div className="pt-6 border-t border-white/10 mt-4">
                     <div className="flex justify-between items-end mb-6">
                         <span className="text-sm text-gray-400">Cena całkowita</span>
-                        <span className="text-3xl font-bold text-white">{totalPrice.toFixed(2)} zł</span>
+                        <span className="text-3xl font-bold text-white">{currentPrice.toFixed(2)} zł</span>
                     </div>
 
                     <Button
