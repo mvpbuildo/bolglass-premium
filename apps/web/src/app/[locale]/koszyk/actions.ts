@@ -192,6 +192,14 @@ export async function placeOrder(formData: FormData, cartItemsJson: string, tota
         }
     }
 
+    // --- Email Notification ---
+    const locale = (formData.get('locale') as string) || 'pl';
+    const { sendOrderConfirmationEmail } = await import('@/lib/mail');
+    // We await here for better diagnostics on VPS logs
+    await sendOrderConfirmationEmail(order, locale).catch(err =>
+        console.error("CRITICAL: Email send failed in koszyk/actions:", err)
+    );
+
     return {
         orderId: order.id,
         success: true,
