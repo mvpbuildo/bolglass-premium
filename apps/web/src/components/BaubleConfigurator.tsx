@@ -144,7 +144,7 @@ export default function BaubleConfigurator() {
     const [color, setColor] = useState('#D91A1A'); // Default Red
     const [text, setText] = useState('');
     const [isCapturing, setIsCapturing] = useState(false);
-    const { formatPrice } = useCurrency();
+    const { formatPrice, currencySymbol, currency, rate } = useCurrency();
     const { addItem } = useCart();
     const captureRef = useRef<() => string>(() => ''); // Ref to hold capture function
 
@@ -278,7 +278,7 @@ export default function BaubleConfigurator() {
                                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                                     {c.price > 0 && (
                                         <span className="absolute bottom-1 right-1 text-[8px] font-bold bg-black/50 px-1 py-0.5 rounded text-amber-500">
-                                            +{c.price}
+                                            +{currency === 'EUR' ? Math.ceil(c.price / (rate || 4.25)) : c.price} {currencySymbol}
                                         </span>
                                     )}
                                 </button>
@@ -292,7 +292,7 @@ export default function BaubleConfigurator() {
                     {/* Text Input */}
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block">
-                            {t('textLabel')} <span className="text-amber-500">(+{config.addons.textPrice} PLN)</span>
+                            {t('textLabel')} <span className="text-amber-500">(+{currency === 'EUR' ? Math.ceil(config.addons.textPrice / (rate || 4.25)) : config.addons.textPrice} {currencySymbol})</span>
                         </label>
                         <Input
                             placeholder={t('textPlaceholder')}

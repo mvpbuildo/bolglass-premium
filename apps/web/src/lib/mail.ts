@@ -308,22 +308,22 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
         };
 
         const defaultBodies: Record<string, string> = {
-            pl: 'Dziękujemy za zakupy w Bolglass!\nTwoje zamówienie nr {{id}} na kwotę {{total}} PLN zostało przyjęte do realizacji.\n\nProdukty:\n{{items}}',
-            en: 'Thank you for shopping at Bolglass!\nYour order #{{id}} for {{total}} PLN has been accepted for processing.\n\nItems:\n{{items}}',
-            de: 'Vielen Dank für Ihren Einkauf bei Bolglass!\nIhre Bestellung Nr. {{id}} über {{total}} PLN wurde zur Bearbeitung angenommen.\n\nProdukte:\n{{items}}'
+            pl: 'Dziękujemy za zakupy w Bolglass!\nTwoje zamówienie nr {{id}} na kwotę {{total}} {{currency}} zostało przyjęte do realizacji.\n\nProdukty:\n{{items}}',
+            en: 'Thank you for shopping at Bolglass!\nYour order #{{id}} for {{total}} {{currency}} has been accepted for processing.\n\nItems:\n{{items}}',
+            de: 'Vielen Dank für Ihren Einkauf bei Bolglass!\nIhre Bestellung Nr. {{id}} über {{total}} {{currency}} wurde zur Bearbeitung angenommen.\n\nProdukte:\n{{items}}'
         };
 
         let subject = config[subjectKey] || defaultSubjects[locale] || defaultSubjects.pl;
         let body = config[bodyKey] || defaultBodies[locale] || defaultBodies.pl;
         const from = config[fromKey] || config[EMAIL_SETTING_KEYS.SMTP_USER];
 
-        console.log(`[MAIL] Preparing content for ${fullOrder.email} using SubjectKey: ${subjectKey}`);
-
-        const itemsList = (fullOrder.items || []).map((item: any) => `- ${item.name} (x${item.quantity}) - ${item.price.toFixed(2)} PLN`).join('\n');
+        const currency = fullOrder.currency || 'PLN';
+        const itemsList = (fullOrder.items || []).map((item: any) => `- ${item.name} (x${item.quantity}) - ${currency === 'EUR' ? Math.ceil(item.price) : item.price.toFixed(2)} ${currency}`).join('\n');
 
         const replacements: Record<string, string> = {
             '{{id}}': fullOrder.id.substring(0, 8),
-            '{{total}}': fullOrder.total.toFixed(2),
+            '{{total}}': currency === 'EUR' ? Math.ceil(fullOrder.total).toString() : fullOrder.total.toFixed(2),
+            '{{currency}}': currency,
             '{{items}}': itemsList,
             '{{email}}': fullOrder.email,
             '{{date}}': new Date(fullOrder.createdAt).toLocaleString(locale === 'pl' ? 'pl-PL' : locale === 'de' ? 'de-DE' : 'en-GB')

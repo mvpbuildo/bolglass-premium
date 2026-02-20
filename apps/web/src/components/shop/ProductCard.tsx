@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { ShoppingCart } from 'lucide-react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useTranslations } from 'next-intl';
+import PriceDisplay from './PriceDisplay';
 
 type ProductProps = {
     id: string;
@@ -21,7 +22,6 @@ type ProductProps = {
 
 export default function ProductCard({ product }: { product: ProductProps }) {
     const { addItem } = useCart();
-    const { formatPrice } = useCurrency();
     const t = useTranslations('Shop');
 
     const handleAddToCart = () => {
@@ -65,22 +65,18 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
                     <div className="flex flex-col">
                         {product.discountPercent > 0 ? (
-                            <>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl font-black text-red-500 tracking-tighter">
-                                        {formatPrice(product.price * (1 - product.discountPercent / 100))}
-                                    </span>
-                                    <span className="text-sm text-gray-400 line-through decoration-red-500/50">
-                                        {formatPrice(product.price)}
-                                    </span>
-                                </div>
-                                <span className="text-[10px] text-red-400/80 font-medium uppercase tracking-tight">{t('promo')} -{product.discountPercent}%</span>
-                            </>
+                            <PriceDisplay
+                                pricePLN={product.price}
+                                discountPercent={product.discountPercent}
+                                showOriginal={true}
+                                className="flex flex-col"
+                            />
                         ) : (
                             <>
-                                <span className="text-2xl font-black text-white tracking-tighter">
-                                    {formatPrice(product.price)}
-                                </span>
+                                <PriceDisplay
+                                    pricePLN={product.price}
+                                    className="text-2xl font-black text-white tracking-tighter"
+                                />
                                 <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">{t('grossPrice')}</span>
                             </>
                         )}

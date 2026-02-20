@@ -11,6 +11,7 @@ type UseCurrencyResult = {
     convertPrice: (pricePLN: number) => number;
     rate: number | null;
     isLoading: boolean;
+    currencySymbol: string;
 };
 
 const EUR_LOCALES = ['en', 'de'];
@@ -19,6 +20,7 @@ export function useCurrency(): UseCurrencyResult {
     const params = useParams();
     const locale = typeof params?.locale === 'string' ? params.locale : 'pl';
     const currency: Currency = EUR_LOCALES.includes(locale) ? 'EUR' : 'PLN';
+    const currencySymbol = currency === 'EUR' ? '€' : 'zł';
 
     const [rate, setRate] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(currency === 'EUR');
@@ -60,5 +62,5 @@ export function useCurrency(): UseCurrencyResult {
         return `${pricePLN.toFixed(2)} zł`;
     };
 
-    return { currency, formatPrice, convertPrice, rate, isLoading };
+    return { currency, formatPrice, convertPrice, rate, isLoading, currencySymbol };
 }

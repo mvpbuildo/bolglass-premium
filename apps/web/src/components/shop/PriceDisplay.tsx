@@ -17,10 +17,10 @@ export default function PriceDisplay({ pricePLN, className = "", showOriginal = 
     if (discountPercent > 0 && showOriginal) {
         return (
             <div className={`flex items-baseline gap-3 ${className}`}>
-                <p className="text-3xl font-black text-red-600">
+                <p className="text-2xl font-black text-red-500 tracking-tighter">
                     {formatPrice(effectivePrice)}
                 </p>
-                <p className="text-xl text-gray-400 line-through">
+                <p className="text-sm text-gray-400 line-through decoration-red-500/50">
                     {formatPrice(pricePLN)}
                 </p>
             </div>
