@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Card } from '@bolglass/ui';
 import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, generateMonthSlots, getBookingsByDate } from '../app/[locale]/actions';
 import { toast } from 'sonner';
+import { BookingSlot, GlobalBlock, Booking } from '@/types/booking';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
-    const [slots, setSlots] = useState<any[]>([]);
-    const [blocks, setBlocks] = useState<any[]>([]);
+    const [slots, setSlots] = useState<BookingSlot[]>([]);
+    const [blocks, setBlocks] = useState<GlobalBlock[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
-    const [dayBookings, setDayBookings] = useState<any[]>([]);
+    const [dayBookings, setDayBookings] = useState<Booking[]>([]);
     const [loadingDay, setLoadingDay] = useState(false);
 
     const handlePrint = () => {
@@ -33,7 +34,7 @@ export default function AdminCalendar() {
             </head>
             <body>
                 <h2>Plan Dnia: ${selectedDay} ${viewDate.toLocaleString('pl-PL', { month: 'long', year: 'numeric' })}</h2>
-                <div class="summary">Liczba rezerwacji: ${dayBookings.length} | Łącznie osób: ${dayBookings.reduce((sum: any, b: any) => sum + b.people, 0)}</div>
+                <div class="summary">Liczba rezerwacji: ${dayBookings.length} | Łącznie osób: ${dayBookings.reduce((sum: number, b: Booking) => sum + b.people, 0)}</div>
                 
                 <table>
                     <thead>
@@ -46,7 +47,7 @@ export default function AdminCalendar() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${dayBookings.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((b: any) => `
+                        ${dayBookings.sort((a: Booking, b: Booking) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((b: Booking) => `
                             <tr>
                                 <td>${new Date(b.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</td>
                                 <td>${b.name} ${b.isGroup ? '(Grupa)' : ''}<br><small>${b.email}</small></td>
@@ -92,17 +93,17 @@ export default function AdminCalendar() {
         setLoadingDay(false);
     };
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         const [s, b] = await Promise.all([getAdminSlots(), getGlobalBlocks()]);
         setSlots(s);
-        setBlocks(b);
+        setBlocks(b as unknown as GlobalBlock[]);
         setLoading(false);
-    };
+    }, []);
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
     const firstDayOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();

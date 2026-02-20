@@ -5,7 +5,8 @@ const OPENING_HOUR = 8;
 const CLOSING_HOUR = 16;
 const SLOT_INTERVAL_MINUTES = 15;
 
-export type BookingType = 'SIGHTSEEING' | 'WORKSHOP';
+import { BookingType } from '../types/booking';
+export type { BookingType };
 
 export const DURATION_MINUTES: Record<BookingType, number> = {
     'SIGHTSEEING': 30,

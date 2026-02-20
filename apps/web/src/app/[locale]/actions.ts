@@ -8,11 +8,11 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { auth } from '@/auth';
 
-// --- System Settings API ---
+import { ActionResponse, BookingSlot, GlobalBlock, Booking } from '../../types/booking';
 
 import { CheckoutService } from '@/services/CheckoutService';
 
-export async function placeOrder(formData: FormData, cartItemsJson: string) {
+export async function placeOrder(formData: FormData, cartItemsJson: string): Promise<ActionResponse> {
     const session = await auth();
     const userId = session?.user?.id;
     const items = JSON.parse(cartItemsJson);
@@ -56,7 +56,7 @@ export async function getAdminEmailSettings() {
         // Initialize with defaults
         keys.forEach(k => settingsMap[k] = defaults[k] || '');
 
-        settings.forEach((s: any) => {
+        settings.forEach((s: { key: string; value: string }) => {
 
             // If the database has a value, but it's an email body and it's too short, 
             // we ignore it and keep our professional default.
@@ -114,9 +114,9 @@ export async function updateSystemSetting(key: string, value: string) {
         });
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating setting:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -137,7 +137,7 @@ export async function getAvailableSlots() {
                 bookings: { select: { people: true, type: true } }
             },
             orderBy: { date: 'asc' },
-        }) as any[];
+        });
 
         if (slots.length === 0) {
             console.log('No future slots found in DB.');
@@ -150,15 +150,15 @@ export async function getAvailableSlots() {
         // Pass 1: Sum all direct and shadow usages
         slots.forEach(slot => {
             const time = slot.date.getTime();
-            const direct = slot.bookings.reduce((sum: number, b: any) => sum + b.people, 0);
+            const direct = slot.bookings.reduce((sum: number, b: { people: number; type: string }) => sum + b.people, 0);
 
             const current = occupancyMap.get(time) || 0;
             occupancyMap.set(time, current + direct);
 
             // Approach B: Workshop blocks the next slot too
             const workshopUsage = slot.bookings
-                .filter((b: any) => b.type === 'WORKSHOP')
-                .reduce((sum: number, b: any) => sum + b.people, 0);
+                .filter((b: { people: number; type: string }) => b.type === 'WORKSHOP')
+                .reduce((sum: number, b: { people: number; type: string }) => sum + b.people, 0);
 
             if (workshopUsage > 0) {
                 const nextTime = time + (60 * 60 * 1000);
@@ -245,11 +245,8 @@ export async function getAdminSlots() {
             const { bookings: _, ...slotData } = slot;
             return {
                 ...slotData,
-                // Capacity is 92 fixed for calculation, or slot.capacity if we want to honor overrides?
-                // Let's rely on slot.capacity as the "Room Limit" (usually 92 or 100).
-                // Remaining is Limit - Current Occupancy.
                 remainingCapacity: Math.max(0, slot.capacity - currentOccupancy)
-            };
+            } as BookingSlot;
         });
     } catch (error: unknown) {
         console.error('Error fetching admin slots:', error);
@@ -296,10 +293,10 @@ export async function getBookingsByDate(dateStr: string) {
                 institutionName: true
             }
         });
-        return { success: true, bookings };
-    } catch (error: any) {
+        return { success: true, bookings: bookings as unknown as Booking[] };
+    } catch (error: unknown) {
         console.error('Error in getBookingsByDate:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -319,8 +316,8 @@ export async function getAllBookings() {
                 createdAt: 'desc'
             }
         });
-        return bookings;
-    } catch (error: any) {
+        return bookings as unknown as Booking[];
+    } catch (error: unknown) {
         console.error('Error fetching all bookings:', error);
         return [];
     }
@@ -336,9 +333,9 @@ export async function updateBookingAdmin(id: string, data: { status?: string, ad
             }
         });
         revalidatePath('/', 'layout');
-        return { success: true, booking };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+        return { success: true, booking: booking as unknown as Booking };
+    } catch (error: unknown) {
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -360,8 +357,8 @@ export async function updateSlotCapacity(id: string, capacity: number) {
         });
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+    } catch (error: unknown) {
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -377,8 +374,8 @@ export async function updateSlotPrice(slotId: string, price: number | null) {
         });
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+    } catch (error: unknown) {
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -396,7 +393,7 @@ export async function getAdminStats() {
 
         const dayNames = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So'];
 
-        bookings.forEach((b: any) => {
+        bookings.forEach((b: { date: Date; people: number }) => {
             const date = new Date(b.date);
             const dayName = dayNames[date.getDay()];
             const hour = date.getHours().toString().padStart(2, '0') + ':00';
@@ -406,7 +403,7 @@ export async function getAdminStats() {
         });
 
         return { dayStats, hourStats };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching admin stats:', error);
         return { dayStats: {}, hourStats: {} };
     }
@@ -423,9 +420,9 @@ export async function setGlobalBlock(type: 'DATE' | 'MONTH', value: string, reas
             data: { type, value, reason }
         });
         revalidatePath('/', 'layout');
-        return { success: true, block };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+        return { success: true, block: block as GlobalBlock };
+    } catch (error: unknown) {
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -434,8 +431,8 @@ export async function removeGlobalBlock(id: string) {
         await prisma.globalBlock.delete({ where: { id } });
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+    } catch (error: unknown) {
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -447,9 +444,9 @@ export async function getBookingAvailability(date: string, type: BookingType, pe
     try {
         const slots = await getAvailableStartTimes(date, type, people);
         return { success: true, slots };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error in getBookingAvailability:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -488,9 +485,9 @@ export async function generateMonthSlots(year: number, month: number) {
         }
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error generating slots:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
     }
 }
 
@@ -524,7 +521,7 @@ export async function uploadContactLogo(formData: FormData) {
 
         const fileUrl = `/uploads/${finalFilename}`;
         return { success: true, url: fileUrl };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Upload logo failed:", error);
         return { error: "Wystąpił błąd podczas przesyłania logo." };
     }
@@ -562,8 +559,8 @@ export async function deleteCurrentUserAccount() {
 
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Account deletion failed:", error);
-        return { success: false, error: error.message };
+        return { success: false, error: (error as Error).message };
     }
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Button, Input, Select, Card } from '@bolglass/ui';
+import { Button, Input, Card } from '@bolglass/ui';
 import { getAvailableSlots, createBooking, getSystemSettings, getBookingAvailability } from '../app/[locale]/actions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { BookingType } from '@/types/booking';
 
 export default function BookingCalendar() {
     const t = useTranslations('Booking');
@@ -14,10 +15,9 @@ export default function BookingCalendar() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [prices, setPrices] = useState({ sightseeing: 35, workshop: 60 });
-    const [monthAvailability, setMonthAvailability] = useState<any[]>([]);
     const [daySlots, setDaySlots] = useState<string[]>([]);
 
-    const [bookingType, setBookingType] = useState<'SIGHTSEEING' | 'WORKSHOP'>('SIGHTSEEING');
+    const [bookingType, setBookingType] = useState<BookingType>('SIGHTSEEING');
     const [people, setPeople] = useState('1');
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -30,11 +30,10 @@ export default function BookingCalendar() {
 
     useEffect(() => {
         async function init() {
-            const [availableSlots, settings] = await Promise.all([
+            const [, settings] = await Promise.all([
                 getAvailableSlots(),
                 getSystemSettings()
             ]);
-            setMonthAvailability(availableSlots);
             if (settings.price_sightseeing) setPrices(p => ({ ...p, sightseeing: parseInt(settings.price_sightseeing) }));
             if (settings.price_workshop) setPrices(p => ({ ...p, workshop: parseInt(settings.price_workshop) }));
         }
@@ -90,10 +89,10 @@ export default function BookingCalendar() {
             } else {
                 alert('Error: ' + result.error);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
             console.error('Client booking error:', err);
-            alert('Technical error: ' + (err.message || 'Unknown error'));
+            alert('Technical error: ' + ((err as Error).message || 'Unknown error'));
         }
     };
 
@@ -400,7 +399,13 @@ export default function BookingCalendar() {
     );
 }
 
-function StepCard({ step, currentStep, label, setStep, subText }: any) {
+function StepCard({ step, currentStep, label, setStep, subText }: {
+    step: number;
+    currentStep: number;
+    label: string;
+    setStep: (s: number) => void;
+    subText?: string;
+}) {
     const isActive = currentStep === step;
     const isCompleted = currentStep > step;
 
@@ -420,7 +425,16 @@ function StepCard({ step, currentStep, label, setStep, subText }: any) {
     )
 }
 
-function TypeButton({ selected, onClick, icon, title, desc, price, duration, badge }: any) {
+function TypeButton({ selected, onClick, icon, title, desc, price, duration, badge }: {
+    selected: boolean;
+    onClick: () => void;
+    icon: string;
+    title: string;
+    desc: string;
+    price: number;
+    duration: string;
+    badge?: string;
+}) {
     return (
         <button
             onClick={onClick}
