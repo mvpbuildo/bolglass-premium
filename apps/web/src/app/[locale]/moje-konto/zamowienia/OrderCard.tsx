@@ -1,28 +1,22 @@
+'use client';
+
 import { Link } from '@/i18n/navigation';
 import { Button, Card } from '@bolglass/ui';
 import { format } from 'date-fns';
-import { Package, Calendar, ChevronRight } from 'lucide-react';
+import { Package } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { requestReturn } from './actions';
 
 interface ClientOrderCardProps {
     order: any;
 }
 
-import { requestReturn } from './actions';
-
 export default function ClientOrderCard({ order }: ClientOrderCardProps) {
+    const t = useTranslations('Account.orders');
+
     const getStatusLabel = (status: string) => {
-        const labels: Record<string, string> = {
-            'PENDING': 'Oczekujące',
-            'PROCESSING': 'W trakcie',
-            'COMPLETED': 'Zakończone',
-            'CANCELLED': 'Anulowane',
-            'PAID': 'Opłacone',
-            'SHIPPED': 'Wysłane',
-            'DELIVERED': 'Dostarczone',
-            'RETURN_REQUESTED': 'Zwrot zgłoszony',
-            'RETURNED': 'Zwrócono'
-        };
-        return labels[status] || status;
+        const key = `statuses.${status}` as any;
+        try { return t(key); } catch { return status; }
     };
 
     const getStatusColor = (status: string) => {
@@ -49,7 +43,7 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             <div className="p-4 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
                 <div className="flex items-center gap-2 text-gray-900 font-bold text-sm">
                     <Package className="w-4 h-4 text-red-600" />
-                    <span>Zamówienie #{order.id.substring(0, 8)}</span>
+                    <span>{t('order')} #{order.id.substring(0, 8)}</span>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(order.status)}`}>
@@ -62,13 +56,13 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             <div className="p-5 flex-grow space-y-4">
                 <div className="flex justify-between items-end">
                     <div className="space-y-1">
-                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Suma do zapłaty</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{t('total')}</p>
                         <p className="text-xl font-black text-gray-900 leading-none">
                             {order.total.toFixed(2)} <span className="text-xs font-medium text-gray-500">PLN</span>
                         </p>
                     </div>
                     <div className="text-right">
-                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Data złożenia</p>
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{t('date')}</p>
                         <p className="text-xs font-medium text-gray-700">
                             {format(new Date(order.createdAt), 'dd.MM.yyyy')}
                         </p>
@@ -76,17 +70,17 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
                 </div>
 
                 <div className="pt-2 border-t border-gray-50">
-                    <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">Metoda płatności</p>
+                    <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">{t('paymentMethod')}</p>
                     <p className="text-xs text-gray-600 italic">
-                        {order.paymentProvider || 'Tradycyjny przelew'}
+                        {order.paymentProvider || t('transfer')}
                     </p>
                 </div>
 
                 {(!isReturnable && order.status === 'COMPLETED') && (
                     <div className="pt-2 border-t border-gray-50">
-                        <p className="text-[10px] text-red-500 uppercase font-bold">Zwrot niedostępny</p>
+                        <p className="text-[10px] text-red-500 uppercase font-bold">{t('returnUnavailable')}</p>
                         <p className="text-[10px] text-gray-400">
-                            {order.documentType === 'INVOICE' ? 'Zamówienie na firmę (Faktura)' : 'Produkty personalizowane'}
+                            {order.documentType === 'INVOICE' ? t('returnUnavailableInvoice') : t('returnUnavailablePersonalized')}
                         </p>
                     </div>
                 )}
@@ -96,13 +90,13 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
             <div className="p-4 bg-gray-50/30 border-t border-gray-50 grid grid-cols-2 gap-2">
                 <Link href={`/moje-konto/zamowienia/${order.id}`} className="w-full">
                     <Button variant="outline" className="w-full text-xs font-bold py-2.5 border-gray-200 text-gray-900 hover:bg-white hover:text-red-600 hover:border-red-200 transition-all flex items-center justify-center gap-2">
-                        SZCZEGÓŁY
+                        {t('details').toUpperCase()}
                     </Button>
                 </Link>
                 {isReturnable ? (
                     <form action={requestReturn.bind(null, order.id)} className="w-full">
                         <Button type="submit" variant="secondary" className="w-full text-xs font-bold py-2.5 bg-gray-200 text-gray-800 hover:bg-gray-300 border-none transition-all">
-                            ZWRÓĆ
+                            {t('return').toUpperCase()}
                         </Button>
                     </form>
                 ) : (

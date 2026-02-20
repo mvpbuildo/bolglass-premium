@@ -5,8 +5,10 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { useState, Suspense } from "react";
 import { resetPasswordAction } from "./actions";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from 'next-intl';
 
 function ResetPasswordForm() {
+    const t = useTranslations('Auth.resetPassword');
     const searchParams = useSearchParams();
     const router = useRouter();
     const token = searchParams.get("token");
@@ -20,8 +22,8 @@ function ResetPasswordForm() {
     if (!token || !email) {
         return (
             <div className="text-center space-y-4">
-                <p className="text-red-600 font-medium">Nieprawidłowy lub wygasły link do resetowania hasła.</p>
-                <Link href="/sklep/forgot-password" title="Odzyskaj hasło" className="text-red-600 font-bold hover:underline">Wyślij nowy link</Link>
+                <p className="text-red-600 font-medium">{t('errorInvalidToken')}</p>
+                <Link href="/sklep/forgot-password" title={t('sendNewLink')} className="text-red-600 font-bold hover:underline">{t('sendNewLink')}</Link>
             </div>
         );
     }
@@ -29,7 +31,7 @@ function ResetPasswordForm() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setError("Hasła muszą być identyczne.");
+            setError(t('errorMismatch'));
             return;
         }
 
@@ -43,8 +45,8 @@ function ResetPasswordForm() {
             } else {
                 router.push("/sklep/login?reset=success");
             }
-        } catch (err) {
-            setError("Wystąpił błąd. Spróbuj ponownie później.");
+        } catch {
+            setError(t('errorUnexpected'));
         } finally {
             setIsLoading(false);
         }
@@ -53,7 +55,7 @@ function ResetPasswordForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-                <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-1">Nowe hasło</label>
+                <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-1">{t('newPasswordLabel')}</label>
                 <input
                     id="password"
                     name="password"
@@ -66,7 +68,7 @@ function ResetPasswordForm() {
                 />
             </div>
             <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700 mb-1">Powtórz nowe hasło</label>
+                <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700 mb-1">{t('confirmPasswordLabel')}</label>
                 <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -90,27 +92,28 @@ function ResetPasswordForm() {
                 disabled={isLoading}
                 className="w-full py-4 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg transition-all disabled:opacity-50"
             >
-                {isLoading ? 'Zmienianie...' : 'Zmień hasło'}
+                {isLoading ? t('submitting') : t('submit')}
             </Button>
         </form>
     );
 }
 
 export default function ResetPasswordPage() {
+    const t = useTranslations('Auth.resetPassword');
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
             <Card className="w-full max-w-md p-8 space-y-6 bg-white shadow-xl rounded-2xl">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Nowe hasło</h1>
-                    <p className="text-gray-500">Ustaw nowe hasło dla swojego konta.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{t('title')}</h1>
+                    <p className="text-gray-500">{t('subtitle')}</p>
                 </div>
 
-                <Suspense fallback={<div className="text-center">Ładowanie...</div>}>
+                <Suspense fallback={<div className="text-center text-gray-500">{t('loading')}</div>}>
                     <ResetPasswordForm />
                 </Suspense>
 
                 <p className="text-center text-sm text-gray-500">
-                    Wróć do <Link href="/sklep/login" className="text-red-600 font-bold hover:underline">logowania</Link>
+                    {t('backTo')} <Link href="/sklep/login" className="text-red-600 font-bold hover:underline">{t('backToLogin')}</Link>
                 </p>
             </Card>
         </div>

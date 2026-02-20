@@ -6,8 +6,11 @@ import { Settings, Trash2, AlertTriangle, Key, CheckCircle2 } from "lucide-react
 import { deleteCurrentUserAccount } from '../../actions';
 import { changePassword } from './actions';
 import { signOut } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 export default function SettingsPage() {
+    const t = useTranslations('Account.settings');
+
     // Delete Account states
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -26,12 +29,12 @@ export default function SettingsPage() {
             if (res.success) {
                 await signOut({ callbackUrl: '/' });
             } else {
-                setDeleteError(res.error || "Wystąpił nieoczekiwany błąd.");
+                setDeleteError(res.error || t('deleting'));
                 setIsDeleting(false);
                 setIsConfirmingDelete(false);
             }
         } catch (err: any) {
-            setDeleteError(err.message || "Błąd połączenia.");
+            setDeleteError(err.message || t('deleting'));
             setIsDeleting(false);
             setIsConfirmingDelete(false);
         }
@@ -50,10 +53,10 @@ export default function SettingsPage() {
                 setPasswordSuccess(true);
                 e.currentTarget.reset();
             } else {
-                setPasswordError(res.error || "Błąd zmiany hasła.");
+                setPasswordError(res.error || '');
             }
-        } catch (err: any) {
-            setPasswordError("Błąd serwera.");
+        } catch {
+            setPasswordError('');
         } finally {
             setIsChangingPassword(false);
         }
@@ -65,8 +68,8 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-white">Ustawienia Konta</h1>
-                <p className="text-gray-400 text-sm">Zarządzaj swoim kontem i preferencjami.</p>
+                <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
+                <p className="text-gray-400 text-sm">{t('subtitle')}</p>
             </div>
 
             {/* Password Change Section */}
@@ -75,12 +78,12 @@ export default function SettingsPage() {
                     <div className="bg-blue-50 p-2 rounded-lg">
                         <Key className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h2 className="font-semibold text-gray-800">Zmiana Hasła</h2>
+                    <h2 className="font-semibold text-gray-800">{t('changePassword')}</h2>
                 </div>
 
                 <form onSubmit={handlePasswordChange} className="max-w-md">
                     <div>
-                        <label className={labelClasses}>Aktualne Hasło</label>
+                        <label className={labelClasses}>{t('currentPassword')}</label>
                         <input
                             type="password"
                             name="currentPassword"
@@ -89,7 +92,7 @@ export default function SettingsPage() {
                         />
                     </div>
                     <div>
-                        <label className={labelClasses}>Nowe Hasło</label>
+                        <label className={labelClasses}>{t('newPassword')}</label>
                         <input
                             type="password"
                             name="newPassword"
@@ -99,7 +102,7 @@ export default function SettingsPage() {
                         />
                     </div>
                     <div>
-                        <label className={labelClasses}>Potwierdź Nowe Hasło</label>
+                        <label className={labelClasses}>{t('confirmPassword')}</label>
                         <input
                             type="password"
                             name="confirmPassword"
@@ -118,7 +121,7 @@ export default function SettingsPage() {
                     {passwordSuccess && (
                         <div className="p-3 bg-green-50 border border-green-100 rounded text-green-700 text-sm flex items-center gap-2 mb-4">
                             <CheckCircle2 className="w-4 h-4" />
-                            Hasło zostało pomyślnie zmienione!
+                            {t('passwordChanged')}
                         </div>
                     )}
 
@@ -128,7 +131,7 @@ export default function SettingsPage() {
                         variant="primary"
                         className="w-full md:w-auto"
                     >
-                        {isChangingPassword ? "Zmienianie..." : "Zaktualizuj Hasło"}
+                        {isChangingPassword ? t('updating') : t('updatePassword')}
                     </Button>
                 </form>
             </Card>
@@ -139,15 +142,15 @@ export default function SettingsPage() {
                     <div className="bg-red-100 p-2 rounded-lg">
                         <Trash2 className="w-5 h-5 text-red-600" />
                     </div>
-                    <h2 className="font-semibold text-red-800">Strefa Niebezpieczna</h2>
+                    <h2 className="font-semibold text-red-800">{t('dangerZone')}</h2>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div className="space-y-1">
-                        <p className="font-bold text-gray-900">Usuń moje konto</p>
+                        <p className="font-bold text-gray-900">{t('deleteAccount')}</p>
                         <p className="text-sm text-gray-600 max-w-xl">
-                            Trwale usunie Twoje dane logowania, adresy i profil.
-                            <span className="font-semibold"> Historia zamówień oraz rezerwacji zostanie zachowana w systemie</span> ze względów księgowych i prawnych.
+                            {t('deleteDescription')}
+                            <span className="font-semibold"> {t('deleteNote')}</span>
                         </p>
                     </div>
 
@@ -157,7 +160,7 @@ export default function SettingsPage() {
                             className="bg-red-600 hover:bg-red-700 text-white border-none"
                             onClick={() => setIsConfirmingDelete(true)}
                         >
-                            Usuń Konto
+                            {t('deleteButton')}
                         </Button>
                     ) : (
                         <div className="flex gap-2">
@@ -167,7 +170,7 @@ export default function SettingsPage() {
                                 onClick={() => setIsConfirmingDelete(false)}
                                 disabled={isDeleting}
                             >
-                                Anuluj
+                                {t('cancel')}
                             </Button>
                             <Button
                                 variant="primary"
@@ -176,7 +179,7 @@ export default function SettingsPage() {
                                 onClick={handleDeleteAccount}
                                 disabled={isDeleting}
                             >
-                                {isDeleting ? "Usuwanie..." : "Tak, Usuń trwale"}
+                                {isDeleting ? t('deleting') : t('deleteConfirm')}
                             </Button>
                         </div>
                     )}

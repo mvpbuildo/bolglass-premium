@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { Link, redirect } from "@/i18n/navigation";
-import { Button } from "@bolglass/ui";
 import { LogOut, Package, User, Settings } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export default async function AccountLayout({
     children,
@@ -12,15 +12,16 @@ export default async function AccountLayout({
 }) {
     const session = await auth();
     const { locale } = await params;
+    const t = await getTranslations('Account');
 
     if (!session) {
         redirect({ href: "/sklep/login", locale });
     }
 
     const navigation = [
-        { name: "Moje Zamówienia", href: "/moje-konto/zamowienia", icon: Package },
-        { name: "Profil", href: "/moje-konto/profil", icon: User },
-        { name: "Ustawienia", href: "/moje-konto/ustawienia", icon: Settings },
+        { name: t('nav.orders'), href: "/moje-konto/zamowienia", icon: Package },
+        { name: t('nav.profile'), href: "/moje-konto/profil", icon: User },
+        { name: t('nav.settings'), href: "/moje-konto/ustawienia", icon: Settings },
     ];
 
     return (
@@ -46,7 +47,7 @@ export default async function AccountLayout({
                                     className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors group"
                                 >
                                     <LogOut className="w-5 h-5" />
-                                    Wyloguj się
+                                    {t('nav.logout')}
                                 </button>
                             </form>
                         </div>

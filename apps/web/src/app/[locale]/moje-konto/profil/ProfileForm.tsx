@@ -1,11 +1,13 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@bolglass/ui';
 import { updateProfile } from './actions';
 import { Building2, User, Home, Truck, Mail } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function ProfileForm({ user }: { user: any }) {
+    const t = useTranslations('Account.profile');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCompany, setIsCompany] = useState(user.isCompany);
 
@@ -13,9 +15,9 @@ export default function ProfileForm({ user }: { user: any }) {
         setIsSubmitting(true);
         try {
             await updateProfile(formData);
-            alert("Profil zaktualizowany!");
+            alert(t('savedSuccess'));
         } catch (err: any) {
-            alert("Błąd aktualizacji: " + err.message);
+            alert(t('saveError') + ': ' + err.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -35,10 +37,10 @@ export default function ProfileForm({ user }: { user: any }) {
                     <div className="space-y-4">
                         <div className={sectionTitleClasses}>
                             <User className="w-5 h-5 text-red-600" />
-                            <h2>Podstawowe Dane</h2>
+                            <h2>{t('basicInfo')}</h2>
                         </div>
                         <div>
-                            <label className={labelClasses}>Imię i Nazwisko</label>
+                            <label className={labelClasses}>{t('nameLabel')}</label>
                             <input
                                 name="name"
                                 defaultValue={user.name || ''}
@@ -48,7 +50,7 @@ export default function ProfileForm({ user }: { user: any }) {
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-400 mb-1.5 flex items-center gap-2">
-                                <Mail className="w-4 h-4" /> Email (nieedytowalny)
+                                <Mail className="w-4 h-4" /> {t('emailLabel')}
                             </label>
                             <input
                                 value={user.email || ''}
@@ -57,7 +59,7 @@ export default function ProfileForm({ user }: { user: any }) {
                             />
                         </div>
                         <div>
-                            <label className={labelClasses}>Numer Telefonu</label>
+                            <label className={labelClasses}>{t('phoneLabel')}</label>
                             <input
                                 name="personalPhone"
                                 defaultValue={user.personalPhone || user.phone || ''}
@@ -71,10 +73,10 @@ export default function ProfileForm({ user }: { user: any }) {
                     <div className="space-y-4">
                         <div className={sectionTitleClasses}>
                             <Home className="w-5 h-5 text-red-600" />
-                            <h2>Adres Zamieszkania</h2>
+                            <h2>{t('homeAddress')}</h2>
                         </div>
                         <div>
-                            <label className={labelClasses}>Ulica i numer</label>
+                            <label className={labelClasses}>{t('streetLabel')}</label>
                             <input
                                 name="personalStreet"
                                 defaultValue={user.personalStreet || user.street || ''}
@@ -84,7 +86,7 @@ export default function ProfileForm({ user }: { user: any }) {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className={labelClasses}>Kod pocztowy</label>
+                                <label className={labelClasses}>{t('zipLabel')}</label>
                                 <input
                                     name="personalZipCode"
                                     defaultValue={user.personalZipCode || user.zipCode || ''}
@@ -93,7 +95,7 @@ export default function ProfileForm({ user }: { user: any }) {
                                 />
                             </div>
                             <div>
-                                <label className={labelClasses}>Miasto</label>
+                                <label className={labelClasses}>{t('cityLabel')}</label>
                                 <input
                                     name="personalCity"
                                     defaultValue={user.personalCity || user.city || ''}
@@ -112,11 +114,11 @@ export default function ProfileForm({ user }: { user: any }) {
                     <div className="space-y-4">
                         <div className={sectionTitleClasses}>
                             <Truck className="w-5 h-5 text-red-600" />
-                            <h2>Adres do Wysyłki</h2>
+                            <h2>{t('shippingAddress')}</h2>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className={labelClasses}>Imię (Wysyłka)</label>
+                                <label className={labelClasses}>{t('shippingFirstName')}</label>
                                 <input
                                     name="shippingFirstName"
                                     defaultValue={user.shippingFirstName || ''}
@@ -125,7 +127,7 @@ export default function ProfileForm({ user }: { user: any }) {
                                 />
                             </div>
                             <div>
-                                <label className={labelClasses}>Nazwisko (Wysyłka)</label>
+                                <label className={labelClasses}>{t('shippingLastName')}</label>
                                 <input
                                     name="shippingLastName"
                                     defaultValue={user.shippingLastName || ''}
@@ -135,7 +137,7 @@ export default function ProfileForm({ user }: { user: any }) {
                             </div>
                         </div>
                         <div>
-                            <label className={labelClasses}>Telefon do Dostawy</label>
+                            <label className={labelClasses}>{t('shippingPhone')}</label>
                             <input
                                 name="shippingPhone"
                                 defaultValue={user.shippingPhone || ''}
@@ -144,7 +146,7 @@ export default function ProfileForm({ user }: { user: any }) {
                             />
                         </div>
                         <div>
-                            <label className={labelClasses}>Ulica i numer (Wysyłka)</label>
+                            <label className={labelClasses}>{t('shippingStreet')}</label>
                             <input
                                 name="shippingStreet"
                                 defaultValue={user.shippingStreet || ''}
@@ -154,7 +156,7 @@ export default function ProfileForm({ user }: { user: any }) {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className={labelClasses}>Kod pocztowy</label>
+                                <label className={labelClasses}>{t('zipLabel')}</label>
                                 <input
                                     name="shippingZipCode"
                                     defaultValue={user.shippingZipCode || ''}
@@ -163,7 +165,7 @@ export default function ProfileForm({ user }: { user: any }) {
                                 />
                             </div>
                             <div>
-                                <label className={labelClasses}>Miasto</label>
+                                <label className={labelClasses}>{t('cityLabel')}</label>
                                 <input
                                     name="shippingCity"
                                     defaultValue={user.shippingCity || ''}
@@ -179,7 +181,7 @@ export default function ProfileForm({ user }: { user: any }) {
                         <div className="flex items-center justify-between border-b pb-2 mb-4">
                             <div className="flex items-center gap-2 text-gray-900 font-bold">
                                 <Building2 className="w-5 h-5 text-red-600" />
-                                <h2>Dane Firmowe (Faktura)</h2>
+                                <h2>{t('companyData')}</h2>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
@@ -196,7 +198,7 @@ export default function ProfileForm({ user }: { user: any }) {
                         {isCompany ? (
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                                 <div>
-                                    <label className={labelClasses}>NIP</label>
+                                    <label className={labelClasses}>{t('nipLabel')}</label>
                                     <input
                                         name="nip"
                                         defaultValue={user.nip || ''}
@@ -205,7 +207,7 @@ export default function ProfileForm({ user }: { user: any }) {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClasses}>Nazwa Firmy</label>
+                                    <label className={labelClasses}>{t('companyNameLabel')}</label>
                                     <input
                                         name="companyName"
                                         defaultValue={user.companyName || ''}
@@ -213,11 +215,11 @@ export default function ProfileForm({ user }: { user: any }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className={labelClasses}>Adres Firmy</label>
+                                    <label className={labelClasses}>{t('companyAddressLabel')}</label>
                                     <input
                                         name="companyStreet"
                                         defaultValue={user.companyStreet || ''}
-                                        placeholder="Ulica i numer"
+                                        placeholder={t('streetPlaceholder')}
                                         className={inputClasses}
                                     />
                                     <div className="grid grid-cols-2 gap-4 pt-1">
@@ -230,7 +232,7 @@ export default function ProfileForm({ user }: { user: any }) {
                                         <input
                                             name="companyCity"
                                             defaultValue={user.companyCity || ''}
-                                            placeholder="Miasto"
+                                            placeholder="Warszawa"
                                             className={inputClasses}
                                         />
                                     </div>
@@ -238,7 +240,9 @@ export default function ProfileForm({ user }: { user: any }) {
                             </div>
                         ) : (
                             <div className="p-8 border border-dashed rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 text-sm text-center">
-                                Włącz przełącznik powyżej,<br />jeśli chcesz dodać dane firmowe do faktur.
+                                {t('companyToggleHint').split('\n').map((line, i) => (
+                                    <span key={i}>{line}{i === 0 && <br />}</span>
+                                ))}
                             </div>
                         )}
                     </div>
@@ -252,7 +256,7 @@ export default function ProfileForm({ user }: { user: any }) {
                     disabled={isSubmitting}
                     className="px-12 py-3 text-lg"
                 >
-                    {isSubmitting ? "Zapisywanie..." : "Zapisz Zmiany Profilu"}
+                    {isSubmitting ? t('saving') : t('saveButton')}
                 </Button>
             </div>
         </form>
