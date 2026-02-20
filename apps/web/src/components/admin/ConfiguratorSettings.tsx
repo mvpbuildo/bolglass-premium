@@ -149,23 +149,23 @@ export default function ConfiguratorSettings() {
 
     return (
         <div className="space-y-8 max-w-5xl">
-            <div className="flex justify-between items-center bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm">
+            <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                 <div>
-                    <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                        <Globe className="w-6 h-6 text-blue-400" />
+                    <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">
+                        <Globe className="w-6 h-6 text-blue-600" />
                         Ustawienia Konfiguratora 3D
                     </h2>
-                    <p className="text-gray-400 text-sm mt-1 font-medium">Zarządzaj opcjami wizualizacji i ich cenami w wielu językach.</p>
+                    <p className="text-gray-500 text-sm mt-1 font-medium">Zarządzaj opcjami wizualizacji i ich cenami w wielu językach.</p>
                 </div>
                 <div className="flex gap-4">
-                    <Button onClick={handleSave} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white font-black px-6">
+                    <Button onClick={handleSave} disabled={isSaving} className="bg-green-600 hover:bg-green-700 text-white font-black px-6 shadow-lg shadow-green-600/20">
                         {isSaving ? 'Zapisywanie...' : 'Zapisz Wszystkie Zmiany'}
                     </Button>
                 </div>
             </div>
 
             {/* Language Switcher */}
-            <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 p-2 rounded-2xl">
+            <div className="flex items-center justify-between bg-gray-100 border border-gray-200 p-2 rounded-2xl">
                 <div className="flex gap-2">
                     {['pl', 'en', 'de'].map((loc) => (
                         <button
@@ -173,7 +173,7 @@ export default function ConfiguratorSettings() {
                             onClick={() => setActiveTab(loc as 'pl' | 'en' | 'de')}
                             className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === loc
                                 ? 'bg-red-600 text-white shadow-lg'
-                                : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                                 }`}
                         >
                             {loc === 'pl' ? '🇵🇱 PL' : loc === 'en' ? '🇬🇧 EN' : '🇩🇪 DE'}
@@ -187,10 +187,10 @@ export default function ConfiguratorSettings() {
                         size="sm"
                         onClick={() => handleTranslateAll(activeTab as 'en' | 'de')}
                         disabled={!!isTranslating}
-                        className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 font-bold gap-2 mr-2"
+                        className="bg-white border-blue-200 text-blue-600 hover:bg-blue-50 font-bold gap-2 mr-2"
                     >
                         {isTranslating === activeTab ? (
-                            <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                         ) : (
                             <Sparkles className="w-4 h-4" />
                         )}
@@ -201,8 +201,8 @@ export default function ConfiguratorSettings() {
 
             <div className="grid grid-cols-1 gap-8">
                 {/* Dedykacja */}
-                <Card className="p-8 bg-neutral-950 border-neutral-800 shadow-2xl">
-                    <h3 className="text-lg font-black text-white mb-6 uppercase tracking-wider flex items-center gap-2">
+                <Card className="p-8 bg-white border-gray-200 shadow-xl">
+                    <h3 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-wider flex items-center gap-2">
                         <span className="w-2 h-6 bg-red-600 rounded-full" />
                         1. Opcje Dodatkowe
                     </h3>
@@ -214,33 +214,33 @@ export default function ConfiguratorSettings() {
                                 step="0.01"
                                 value={config.addons.textPrice}
                                 onChange={(e) => updateAddon('textPrice', parseFloat(e.target.value))}
-                                className="bg-neutral-900 border-neutral-800 text-white font-bold h-12 text-lg"
+                                className="bg-gray-50 border-gray-200 text-gray-900 font-bold h-12 text-lg focus:bg-white transition-colors"
                             />
                         </div>
                     </div>
                 </Card>
 
                 {/* Rozmiary */}
-                <Card className="p-8 bg-neutral-950 border-neutral-800 shadow-2xl">
+                <Card className="p-8 bg-white border-gray-200 shadow-xl">
                     <div className="flex justify-between items-center mb-8">
-                        <h3 className="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                        <h3 className="text-lg font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
                             <span className="w-2 h-6 bg-blue-600 rounded-full" />
                             2. Rozmiary Bombek
                         </h3>
-                        <Button size="sm" onClick={addSize} className="bg-blue-600 hover:bg-blue-700 text-white font-black px-4">
+                        <Button size="sm" onClick={addSize} className="bg-blue-600 hover:bg-blue-700 text-white font-black px-4 shadow-lg shadow-blue-600/20">
                             <Plus className="w-4 h-4 mr-2" /> Dodaj Nowy Rozmiar
                         </Button>
                     </div>
 
                     <div className="space-y-4">
                         {config.sizes.map((size, index) => (
-                            <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-neutral-900 p-6 rounded-2xl border border-neutral-800/50 hover:border-neutral-700 transition-all group">
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50/50 p-6 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all group hover:bg-white hover:shadow-md">
                                 <div className="md:col-span-4 space-y-2">
                                     <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Etykieta ({activeTab.toUpperCase()})</label>
                                     <Input
                                         value={(size.label as MultilingualLabel)[activeTab]}
                                         onChange={(e) => updateSizeLabel(index, activeTab, e.target.value)}
-                                        className="bg-neutral-800 border-neutral-700 text-white font-bold"
+                                        className="bg-white border-gray-200 text-gray-900 font-bold"
                                         placeholder="np. Średnica 10cm"
                                     />
                                 </div>
@@ -251,7 +251,7 @@ export default function ConfiguratorSettings() {
                                         step="0.01"
                                         value={size.basePrice}
                                         onChange={(e) => updateSizeField(index, 'basePrice', parseFloat(e.target.value))}
-                                        className="bg-neutral-800 border-neutral-700 text-white font-mono"
+                                        className="bg-white border-gray-200 text-gray-900 font-mono"
                                     />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
@@ -261,7 +261,7 @@ export default function ConfiguratorSettings() {
                                         step="0.05"
                                         value={size.scale}
                                         onChange={(e) => updateSizeField(index, 'scale', parseFloat(e.target.value))}
-                                        className="bg-neutral-800 border-neutral-700 text-white font-mono"
+                                        className="bg-white border-gray-200 text-gray-900 font-mono"
                                     />
                                 </div>
                                 <div className="md:col-span-3 space-y-2">
@@ -269,7 +269,7 @@ export default function ConfiguratorSettings() {
                                     <Input
                                         value={size.id}
                                         onChange={(e) => updateSizeField(index, 'id', e.target.value)}
-                                        className="bg-neutral-800 border-neutral-700 text-gray-400 font-mono text-xs uppercase"
+                                        className="bg-white border-gray-200 text-gray-400 font-mono text-xs uppercase"
                                     />
                                 </div>
                                 <div className="md:col-span-1 flex justify-end">
@@ -287,23 +287,23 @@ export default function ConfiguratorSettings() {
                 </Card>
 
                 {/* Kolory */}
-                <Card className="p-8 bg-neutral-950 border-neutral-800 shadow-2xl">
+                <Card className="p-8 bg-white border-gray-200 shadow-xl">
                     <div className="flex justify-between items-center mb-8">
-                        <h3 className="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                        <h3 className="text-lg font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
                             <span className="w-2 h-6 bg-orange-600 rounded-full" />
                             3. Kolory Szkła
                         </h3>
-                        <Button size="sm" onClick={addColor} className="bg-orange-600 hover:bg-orange-700 text-white font-black px-4">
+                        <Button size="sm" onClick={addColor} className="bg-orange-600 hover:bg-orange-700 text-white font-black px-4 shadow-lg shadow-orange-600/20">
                             <Plus className="w-4 h-4 mr-2" /> Dodaj Nowy Kolor
                         </Button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {config.colors.map((color, index) => (
-                            <div key={index} className="flex gap-6 items-start bg-neutral-900 p-6 rounded-2xl border border-neutral-800/50 hover:border-neutral-700 transition-all group">
+                            <div key={index} className="flex gap-6 items-start bg-gray-50/50 p-6 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all group hover:bg-white hover:shadow-md">
                                 <div className="flex flex-col items-center gap-3">
-                                    <div className="w-16 h-16 rounded-2xl border-4 border-white/10 shadow-xl group-hover:scale-110 transition-transform" style={{ backgroundColor: color.hex }} />
-                                    <div className="font-mono text-[10px] text-gray-500 font-bold uppercase">{color.hex}</div>
+                                    <div className="w-16 h-16 rounded-2xl border-4 border-white shadow-xl group-hover:scale-110 transition-transform" style={{ backgroundColor: color.hex }} />
+                                    <div className="font-mono text-[10px] text-gray-400 font-bold uppercase">{color.hex}</div>
                                 </div>
 
                                 <div className="flex-grow space-y-4">
@@ -314,7 +314,7 @@ export default function ConfiguratorSettings() {
                                                 value={(color.name as MultilingualLabel)[activeTab]}
                                                 onChange={(e) => updateColorName(index, activeTab, e.target.value)}
                                                 placeholder="Nazwa koloru"
-                                                className="bg-neutral-800 border-neutral-700 text-white font-bold"
+                                                className="bg-white border-gray-200 text-gray-900 font-bold"
                                             />
                                         </div>
                                         <div className="space-y-1">
@@ -323,21 +323,21 @@ export default function ConfiguratorSettings() {
                                                 value={color.hex}
                                                 onChange={(e) => updateColorField(index, 'hex', e.target.value)}
                                                 placeholder="#HEX"
-                                                className="bg-neutral-800 border-neutral-700 text-gray-300 font-mono"
+                                                className="bg-white border-gray-200 text-gray-600 font-mono"
                                             />
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3 bg-neutral-800 px-3 py-1.5 rounded-xl border border-neutral-700">
+                                        <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl border border-gray-200">
                                             <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Dopłata:</label>
                                             <Input
                                                 type="number"
                                                 step="0.01"
                                                 value={color.price}
                                                 onChange={(e) => updateColorField(index, 'price', parseFloat(e.target.value))}
-                                                className="w-20 bg-transparent border-none p-0 text-white font-black text-right focus:ring-0"
+                                                className="w-20 bg-transparent border-none p-0 text-gray-900 font-black text-right focus:ring-0"
                                             />
-                                            <span className="text-xs font-bold text-gray-500">PLN</span>
+                                            <span className="text-xs font-bold text-gray-400">PLN</span>
                                         </div>
                                         <button
                                             type="button"
@@ -355,7 +355,7 @@ export default function ConfiguratorSettings() {
             </div>
 
             <div className="pt-8 text-center">
-                <p className="text-gray-500 text-xs font-medium tracking-wide flex items-center justify-center gap-2">
+                <p className="text-gray-400 text-xs font-medium tracking-wide flex items-center justify-center gap-2">
                     <Sparkles className="w-3 h-3 text-blue-400" />
                     Wszystkie zmiany wymagają kliknięcia &quot;Zapisz Wszystkie Zmiany&quot;, aby zostały zastosowane w sklepie.
                 </p>

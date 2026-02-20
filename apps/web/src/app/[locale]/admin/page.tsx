@@ -147,7 +147,7 @@ export default async function AdminDashboardPage() {
                                     <Link key={link.path} href={link.path}>
                                         <div className="group flex items-center justify-between p-3 rounded-xl hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-100 transition-all">
                                             <div className="flex items-center gap-3">
-                                                <span className="p-1.5 bg-gray-50 rounded-lg group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
+                                                <span className="p-1.5 bg-gray-50 text-gray-400 rounded-lg group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
                                                     {link.icon}
                                                 </span>
                                                 <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900">{link.name}</span>
