@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 pricePLN={product.price}
                                 discountPercent={product.discountPercent}
                                 showOriginal={true}
-                                className="mt-1"
+                                className="text-3xl font-bold text-gray-900 mt-1"
                             />
                             <p className="text-sm text-gray-500 mt-1">{t('priceInclVat')}</p>
                         </div>
