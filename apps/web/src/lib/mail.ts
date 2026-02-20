@@ -29,8 +29,6 @@ export async function getTransporter() {
         return null;
     }
 
-    console.log(`--- SMTP Config: ${config[EMAIL_SETTING_KEYS.SMTP_HOST]}:${config[EMAIL_SETTING_KEYS.SMTP_PORT]} (SSL/TLS: ${config[EMAIL_SETTING_KEYS.SMTP_PORT] === '465'}) ---`);
-
     return nodemailer.createTransport({
         host: config[EMAIL_SETTING_KEYS.SMTP_HOST],
         port: parseInt(config[EMAIL_SETTING_KEYS.SMTP_PORT]) || 587,
@@ -252,9 +250,33 @@ export async function sendBookingUpdateEmail(booking: any) {
 }
 
 export async function sendOrderConfirmationEmail(order: any, locale: string = 'pl') {
+    console.log(`--- [MAIL] Starting confirmation for Order: ${order?.id}, Locale: ${locale} ---`);
     try {
+        if (!order?.id) {
+            console.error('[MAIL] ERROR: No order ID provided to sendOrderConfirmationEmail');
+            return;
+        }
+
+        // Ensure we have items (Prisma create doesn't include them by default)
+        let fullOrder = order;
+        if (!order.items || order.items.length === 0) {
+            console.log(`[MAIL] Order items missing or empty, fetching from DB for: ${order.id}`);
+            fullOrder = await prisma.order.findUnique({
+                where: { id: order.id },
+                include: { items: true }
+            });
+        }
+
+        if (!fullOrder) {
+            console.error(`[MAIL] ERROR: Could not find order ${order.id} in DB to send email.`);
+            return;
+        }
+
         const transporter = await getTransporter();
-        if (!transporter) return;
+        if (!transporter) {
+            console.error(`[MAIL] ERROR: Aborting mail send - no transporter available.`);
+            return;
+        }
 
         let subjectKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_PL;
         let bodyKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_PL;
@@ -293,7 +315,9 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
         let body = config[bodyKey] || defaultBodies[locale] || defaultBodies.pl;
         const from = config[fromKey] || config[EMAIL_SETTING_KEYS.SMTP_USER];
 
-        const itemsList = order.items.map((item: any) => `- ${item.name} (x${item.quantity}) - ${item.price.toFixed(2)} PLN`).join('\n');
+        console.log(`[MAIL] Preparing content for ${fullOrder.email} using SubjectKey: ${subjectKey}`);
+
+        const itemsList = (fullOrder.items || []).map((item: any) => `- ${item.name} (x${item.quantity}) - ${item.price.toFixed(2)} PLN`).join('\n');
 
         const replacements: Record<string, string> = {
             '{{id}}': fullOrder.id.substring(0, 8),
@@ -325,8 +349,8 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
             html: html
         });
 
-        console.log(`Order confirmation sent to ${order.email}. Response: ${info.response}`);
+        console.log(`[MAIL] Order confirmation SUCCESSFULLY sent to ${fullOrder.email}. Response: ${info.response}`);
     } catch (error: unknown) {
-        console.error('Failed to send order confirmation email:', error);
+        console.error('[MAIL] CRITICAL ERROR in sendOrderConfirmationEmail:', error);
     }
 }
