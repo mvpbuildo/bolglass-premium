@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Input, Card } from '@bolglass/ui';
-import { getSystemSettings, updateSystemSetting } from '../app/[locale]/actions';
+import { Button, Card } from '@bolglass/ui';
+import { getSystemSettings, updateSystemSetting } from '@/app/[locale]/actions';
 import { Bot, Key, Sparkles, Save, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminAiSettings() {

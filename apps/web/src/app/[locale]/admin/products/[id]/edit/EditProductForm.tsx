@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { Product } from '@prisma/client';
 
 import { compressImage } from '@/utils/imageCompression';
-import { translateText } from '../../translations/actions';
+import { translateText } from '@/app/[locale]/admin/translations/actions';
 import { Sparkles, Globe, AlertCircle } from 'lucide-react';
 
 type ProductWithTranslations = Product & {
@@ -115,8 +115,9 @@ export default function EditProductForm({ product }: EditProductFormProps) {
                     }));
                 }
             }
-        } catch (err: any) {
-            alert(err.message || 'Błąd podczas tłumaczenia.');
+        } catch (err: unknown) {
+            const error = err as { message?: string };
+            alert(error.message || 'Błąd podczas tłumaczenia.');
         } finally {
             setIsTranslating(null);
         }
@@ -177,7 +178,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
                                 <button
                                     key={loc}
                                     type="button"
-                                    onClick={() => setActiveTab(loc as any)}
+                                    onClick={() => setActiveTab(loc as 'pl' | 'en' | 'de')}
                                     className={`pb-3 text-sm font-bold uppercase tracking-wider transition-all relative whitespace-nowrap ${activeTab === loc
                                         ? 'text-red-600 border-b-2 border-red-600'
                                         : 'text-gray-400 hover:text-gray-600'

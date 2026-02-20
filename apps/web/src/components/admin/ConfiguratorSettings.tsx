@@ -5,7 +5,7 @@ import { Button, Card, Input } from '@bolglass/ui';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, updateConfiguratorSettings, type BaubleConfig, type MultilingualLabel } from '@/app/[locale]/admin/settings/3d/actions';
 import { Trash2, Plus, Sparkles, Globe } from 'lucide-react';
-import { translateText } from '../../app/[locale]/admin/translations/actions';
+import { translateText } from '@/app/[locale]/admin/translations/actions';
 
 export default function ConfiguratorSettings() {
     const [config, setConfig] = useState<BaubleConfig | null>(null);
@@ -22,7 +22,7 @@ export default function ConfiguratorSettings() {
         try {
             const data = await getConfiguratorSettings();
             setConfig(data);
-        } catch (error) {
+        } catch {
             toast.error('Błąd ładowania ustawień');
         } finally {
             setIsLoading(false);
@@ -35,7 +35,7 @@ export default function ConfiguratorSettings() {
         try {
             await updateConfiguratorSettings(config);
             toast.success('Zapisano ustawienia');
-        } catch (error) {
+        } catch {
             toast.error('Błąd zapisu');
         } finally {
             setIsSaving(false);
@@ -72,7 +72,7 @@ export default function ConfiguratorSettings() {
 
             setConfig(newConfig);
             toast.success(`Przetłumaczono na język: ${targetLocale.toUpperCase()}`);
-        } catch (error) {
+        } catch {
             toast.error('Błąd podczas tłumaczenia AI');
         } finally {
             setIsTranslating(null);
@@ -111,7 +111,7 @@ export default function ConfiguratorSettings() {
         setConfig({ ...config, sizes: newSizes });
     };
 
-    const updateSizeField = (index: number, field: 'basePrice' | 'scale' | 'id', value: any) => {
+    const updateSizeField = (index: number, field: 'basePrice' | 'scale' | 'id', value: string | number) => {
         const newSizes = [...config.sizes];
         newSizes[index] = { ...newSizes[index], [field]: value };
         setConfig({ ...config, sizes: newSizes });
@@ -141,7 +141,7 @@ export default function ConfiguratorSettings() {
         setConfig({ ...config, colors: newColors });
     };
 
-    const updateColorField = (index: number, field: 'hex' | 'price', value: any) => {
+    const updateColorField = (index: number, field: 'hex' | 'price', value: string | number) => {
         const newColors = [...config.colors];
         newColors[index] = { ...newColors[index], [field]: value };
         setConfig({ ...config, colors: newColors });
@@ -170,10 +170,10 @@ export default function ConfiguratorSettings() {
                     {['pl', 'en', 'de'].map((loc) => (
                         <button
                             key={loc}
-                            onClick={() => setActiveTab(loc as any)}
+                            onClick={() => setActiveTab(loc as 'pl' | 'en' | 'de')}
                             className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === loc
-                                    ? 'bg-red-600 text-white shadow-lg'
-                                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                                ? 'bg-red-600 text-white shadow-lg'
+                                : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                                 }`}
                         >
                             {loc === 'pl' ? '🇵🇱 PL' : loc === 'en' ? '🇬🇧 EN' : '🇩🇪 DE'}
@@ -357,7 +357,7 @@ export default function ConfiguratorSettings() {
             <div className="pt-8 text-center">
                 <p className="text-gray-500 text-xs font-medium tracking-wide flex items-center justify-center gap-2">
                     <Sparkles className="w-3 h-3 text-blue-400" />
-                    Wszystkie zmiany wymagają kliknięcia "Zapisz Wszystkie Zmiany", aby zostały zastosowane w sklepie.
+                    Wszystkie zmiany wymagają kliknięcia &quot;Zapisz Wszystkie Zmiany&quot;, aby zostały zastosowane w sklepie.
                 </p>
             </div>
         </div>

@@ -7,7 +7,7 @@ import { createProduct } from './actions';
 import Image from 'next/image';
 
 import { compressImage } from '@/utils/imageCompression';
-import { translateText } from '../../translations/actions';
+import { translateText } from '@/app/[locale]/admin/translations/actions';
 import { Sparkles, Globe, AlertCircle, Plus } from 'lucide-react';
 
 export default function NewProductForm() {
@@ -142,7 +142,7 @@ export default function NewProductForm() {
                                 <button
                                     key={loc}
                                     type="button"
-                                    onClick={() => setActiveTab(loc as any)}
+                                    onClick={() => setActiveTab(loc as 'pl' | 'en' | 'de')}
                                     className={`pb-3 text-sm font-bold uppercase tracking-wider transition-all relative whitespace-nowrap ${activeTab === loc
                                         ? 'text-red-600 border-b-2 border-red-600'
                                         : 'text-gray-400 hover:text-gray-600'
