@@ -9,7 +9,13 @@ import { useCart } from '@/context/CartContext';
 import { compressDataURL } from '@/utils/imageCompression';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
-import { calculateBaublePrice } from '@/services/pricing';
+import { useParams } from 'next/navigation';
+
+type MultilingualLabel = {
+    pl: string;
+    en: string;
+    de: string;
+};
 
 
 function Bauble({ color, text, scale, isCapturing }: { color: string, text: string, scale: number, isCapturing?: boolean }) {
@@ -126,6 +132,9 @@ function ScreenshotHandler({ onCapture }: { onCapture: (fn: () => string) => voi
 }
 
 export default function BaubleConfigurator() {
+    const params = useParams();
+    const locale = (params?.locale as string) || 'pl';
+
     const [config, setConfig] = useState<BaubleConfig | null>(null);
     const [selectedSizeId, setSelectedSizeId] = useState<string>('');
     const [color, setColor] = useState('#D91A1A'); // Default Red
@@ -133,6 +142,12 @@ export default function BaubleConfigurator() {
     const [isCapturing, setIsCapturing] = useState(false);
     const { addItem } = useCart();
     const captureRef = useRef<() => string>(() => ''); // Ref to hold capture function
+
+    const getLocalizedLabel = (labelObj: MultilingualLabel | string) => {
+        if (!labelObj) return '';
+        if (typeof labelObj === 'string') return labelObj;
+        return labelObj[locale as keyof MultilingualLabel] || labelObj['pl'] || '';
+    };
 
     useEffect(() => {
         getConfiguratorSettings().then(data => {
@@ -189,18 +204,18 @@ export default function BaubleConfigurator() {
 
         addItem({
             id: `config-${crypto.randomUUID()}`,
-            name: `Bombka ${selectedSize.label} (${selectedColor.name})`,
+            name: `Bombka ${getLocalizedLabel(selectedSize.label)} (${getLocalizedLabel(selectedColor.name)})`,
             price: currentPrice,
             slug: 'bombka-personalizowana',
             quantity: 1,
             image: screenshot, // Use (compressed) captured screenshot
             configuration: JSON.stringify({
-                size: selectedSize.label,
-                color: selectedColor.name,
+                size: getLocalizedLabel(selectedSize.label),
+                color: getLocalizedLabel(selectedColor.name),
                 text: text
             })
         });
-        toast.success(`Dodano do koszyka: ${selectedSize.label} - ${selectedColor.name}`);
+        toast.success(`Dodano do koszyka: ${getLocalizedLabel(selectedSize.label)} - ${getLocalizedLabel(selectedColor.name)}`);
     };
 
     return (
@@ -232,7 +247,7 @@ export default function BaubleConfigurator() {
                                         : 'bg-transparent text-gray-400 border-white/10 hover:border-white/30'
                                         }`}
                                 >
-                                    {size.label}
+                                    {getLocalizedLabel(size.label)}
                                 </button>
                             ))}
                         </div>
@@ -265,7 +280,7 @@ export default function BaubleConfigurator() {
                             ))}
                         </div>
                         <p className="mt-2 text-sm text-gray-300 font-medium">
-                            {selectedColor?.name}
+                            {getLocalizedLabel(selectedColor?.name)}
                         </p>
                     </div>
 
@@ -275,7 +290,7 @@ export default function BaubleConfigurator() {
                             Twoja Dedykacja <span className="text-amber-500">(+{config.addons.textPrice} PLN)</span>
                         </label>
                         <Input
-                            placeholder="Np. Dla Babci Zosi"
+                            placeholder={locale === 'en' ? "e.g. For Grandma Jane" : locale === 'de' ? "z.B. Für Oma Jane" : "Np. Dla Babci Zosi"}
                             maxLength={15}
                             value={text}
                             onChange={(e) => setText(e.target.value)}

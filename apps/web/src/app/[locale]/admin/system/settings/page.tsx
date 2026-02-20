@@ -1,6 +1,7 @@
 
 import AdminSmtpSettings from '../../../../../components/AdminSmtpSettings';
 import AdminContactSettings from '../../../../../components/AdminContactSettings';
+import AdminAiSettings from '../../../../../components/AdminAiSettings';
 import AdminNavigation from '../../../../../components/AdminNavigation';
 
 export default function AdminSystemSettingsPage() {
@@ -14,6 +15,7 @@ export default function AdminSystemSettingsPage() {
                     <p className="text-gray-500 mb-8 font-medium">Konfiguracja danych firmy, social media oraz serwera pocztowego.</p>
 
                     <div className="space-y-12">
+                        <AdminAiSettings />
                         <AdminContactSettings />
                         <AdminSmtpSettings />
                     </div>

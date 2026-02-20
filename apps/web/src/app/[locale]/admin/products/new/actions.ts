@@ -95,29 +95,49 @@ export async function createProduct(formData: FormData) {
         // Generate a simple slug from name
         const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
         const sku = `BG-${Math.floor(Math.random() * 10000)}`;
-        console.log("Generated SKU/Slug:", { sku, slug });
 
-        console.log("Attempting to create product in Prisma...");
-        await prisma.product.create({
-            data: {
-                name,
-                description,
-                ean,
-                manufacturerCode,
-                priceNet,
-                vatRate,
-                price: priceGross, // Mapping internal priceGross to schema field 'price'
-                weight,
-                height,
-                width,
-                depth,
-                packaging,
-                isConfigurable,
-                discountPercent,
-                stock,
-                images: imageUrls, // Mapping internal imageUrls to schema field 'images'
-                slug: `${slug}-${Date.now()}`, // Keep the unique slug generation
-                sku,
+        // Parse translations
+        const translationsRaw = formData.get('translations') as string;
+        const translations = JSON.parse(translationsRaw || '{}');
+
+        console.log("Attempting to create product in Prisma with translations...");
+
+        await prisma.$transaction(async (tx) => {
+            const product = await tx.product.create({
+                data: {
+                    name, // Keep Polish name as default
+                    description, // Keep Polish description as default
+                    ean,
+                    manufacturerCode,
+                    priceNet,
+                    vatRate,
+                    price: priceGross,
+                    weight,
+                    height,
+                    width,
+                    depth,
+                    packaging,
+                    isConfigurable,
+                    discountPercent,
+                    stock,
+                    images: imageUrls,
+                    slug: `${slug}-${Date.now()}`,
+                    sku,
+                }
+            });
+
+            // Create translations
+            const translationData = Object.entries(translations).map(([locale, data]: [string, any]) => ({
+                productId: product.id,
+                locale,
+                name: data.name || name,
+                description: data.description || description
+            }));
+
+            if (translationData.length > 0) {
+                await tx.productTranslation.createMany({
+                    data: translationData
+                });
             }
         });
 

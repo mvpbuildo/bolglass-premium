@@ -15,7 +15,8 @@ import {
     Files,
     ArrowRight,
     Phone,
-    TrendingUp
+    TrendingUp,
+    Bot
 } from 'lucide-react';
 import { prisma } from '@bolglass/database';
 import { format } from 'date-fns';
@@ -96,6 +97,7 @@ export default async function AdminDashboardPage() {
             bg: 'bg-gray-900',
             links: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+                { name: 'Sztuczna Inteligencja', path: '/admin/system/settings', icon: <Bot className="w-4 h-4" /> },
                 { name: 'Ustawienia', path: '/admin/system/settings', icon: <Settings className="w-4 h-4" /> },
             ]
         },

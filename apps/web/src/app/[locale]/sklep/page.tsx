@@ -9,14 +9,26 @@ const getProducts = unstable_cache(
         return await prisma.product.findMany({
             where: { stock: { gt: 0 } },
             orderBy: { createdAt: 'desc' },
+            include: { translations: true }
         });
     },
     ['shop-products-cache'],
     { tags: ['products'], revalidate: 3600 }
 );
 
-export default async function ShopPage() {
+export default async function ShopPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
     const products = await getProducts();
+
+    const localizedProducts = products.map(product => {
+        const translation = product.translations.find(t => t.locale === locale);
+        return {
+            ...product,
+            name: translation?.name || product.name,
+            description: translation?.description || product.description,
+            image: product.images?.[0] || null
+        };
+    });
 
     return (
         <main className="min-h-screen bg-[#050505] pt-20">
@@ -49,14 +61,14 @@ export default async function ShopPage() {
                     <span className="text-amber-500/40 text-xs font-bold uppercase tracking-widest">{products.length} Przedmiotów</span>
                 </div>
 
-                {products.length === 0 ? (
+                {localizedProducts.length === 0 ? (
                     <div className="text-center py-32 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-md">
                         <p className="text-amber-200/40 text-xl font-serif italic">Jeszcze nie dodano żadnych produktów.</p>
                         <p className="text-amber-500/20 text-xs mt-2 font-black uppercase tracking-widest">Zajrzyj do panelu administratora.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {products.map((product) => (
+                        {localizedProducts.map((product) => (
                             <ProductCard
                                 key={product.id}
                                 product={{
@@ -64,7 +76,7 @@ export default async function ShopPage() {
                                     name: product.name,
                                     price: product.price,
                                     slug: product.slug,
-                                    image: (product.images && product.images[0]) || null,
+                                    image: product.image,
                                     priceNet: product.priceNet || 0,
                                     vatRate: product.vatRate || 23,
                                     discountPercent: product.discountPercent || 0

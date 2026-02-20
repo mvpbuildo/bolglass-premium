@@ -11,17 +11,25 @@ export const dynamic = 'force-dynamic';
 async function getProduct(slug: string) {
     const product = await prisma.product.findFirst({
         where: { slug },
+        include: { translations: true }
     });
     return product;
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
+export default async function ProductPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+    const { slug, locale } = await params;
     const product = await getProduct(slug);
 
     if (!product) {
         notFound();
     }
+
+    const translation = product.translations.find(t => t.locale === locale);
+    const localizedProduct = {
+        ...product,
+        name: translation?.name || product.name,
+        description: translation?.description || product.description
+    };
 
     return (
         <main className="min-h-screen bg-white py-12">
@@ -34,7 +42,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                     {/* Product Info */}
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{product.name}</h1>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{localizedProduct.name}</h1>
 
                         <div className="mt-3">
                             <h2 className="sr-only">Product information</h2>
@@ -58,7 +66,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                         <div className="mt-6">
                             <h3 className="sr-only">Description</h3>
-                            <div className="text-base text-gray-700 space-y-6" dangerouslySetInnerHTML={{ __html: product.description }} />
+                            <div className="text-base text-gray-700 space-y-6" dangerouslySetInnerHTML={{ __html: localizedProduct.description }} />
                         </div>
 
                         <div className="mt-6">

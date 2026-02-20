@@ -138,8 +138,21 @@ model Category {
   slug        String    @unique
   description String?
   products    Product[]
+  translations CategoryTranslation[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model CategoryTranslation {
+  id          String   @id @default(cuid())
+  categoryId  String
+  locale      String   // "en", "de", "pl"
+  name        String
+  description String?  @db.Text
+  
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  @@unique([categoryId, locale])
 }
 
 model Product {
@@ -176,10 +189,23 @@ model Product {
   baseConfig     String?   // Default JSON configuration
   technicalSpecs Json?     // Flexible storage for extra technical data
 
+  translations   ProductTranslation[]
   orderItems     OrderItem[]
   cartItems      CartItem[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+model ProductTranslation {
+  id          String   @id @default(cuid())
+  productId   String
+  locale      String   // "en", "de", "pl"
+  name        String
+  description String   @db.Text
+  
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([productId, locale])
 }
 
 model Order {
