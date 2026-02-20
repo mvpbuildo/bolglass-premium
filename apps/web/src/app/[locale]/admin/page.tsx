@@ -65,6 +65,7 @@ export default async function AdminDashboardPage() {
                 { name: 'Produkty', path: '/admin/products', icon: <Package className="w-4 h-4" /> },
                 { name: 'Zamówienia', path: '/admin/orders', icon: <ShoppingCart className="w-4 h-4" /> },
                 { name: 'Konfigurator 3D', path: '/admin/settings/3d', icon: <Settings className="w-4 h-4" /> },
+                { name: 'Ustawienia', path: '/admin/settings/shop', icon: <Settings className="w-4 h-4" /> },
             ]
         },
         {

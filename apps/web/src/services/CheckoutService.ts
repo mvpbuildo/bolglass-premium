@@ -137,6 +137,13 @@ export class CheckoutService {
                 }
             }
 
+            // --- Send Confirmation Email ---
+            const locale = formData.get('locale') as string || 'pl';
+            const { sendOrderConfirmationEmail } = await import('@/lib/mail');
+            // We do not await this to avoid blocking the response, or we can await to ensure it's sent.
+            // In a real system, this would be a queue. For now, let's just trigger it.
+            sendOrderConfirmationEmail(order, locale).catch(err => console.error("Email send failed:", err));
+
             return {
                 orderId: order.id,
                 success: true,

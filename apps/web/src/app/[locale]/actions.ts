@@ -41,7 +41,16 @@ export async function getAdminEmailSettings() {
             [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_REMINDER]: 'Przypomnienie o wizycie w Bolglass',
             [EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER]: 'Dzień dobry!\nPrzypominamy o rezerwacji na jutro.\nData: {{date}}\nLiczba osób: {{people}}\nSuma do zapłaty: {{total}} zł',
             [EMAIL_SETTING_KEYS.EMAIL_SUBJECT_UPDATE]: 'Aktualizacja Twojej rezerwacji w Bolglass',
-            [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}'
+            [EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE]: 'Dzień dobry!\nTwoja rezerwacja została zaktualizowana.\nNowa liczba osób: {{people}}\nData: {{date}}',
+            // Order defaults PL
+            [EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_PL]: 'Potwierdzenie zamówienia nr {{id}}',
+            [EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_PL]: 'Dziękujemy za zakupy w Bolglass!\nTwoje zamówienie nr {{id}} na kwotę {{total}} PLN zostało przyjęte do realizacji.\n\nProdukty:\n{{items}}',
+            // Order defaults EN
+            [EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_EN]: 'Order confirmation #{{id}}',
+            [EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_EN]: 'Thank you for shopping at Bolglass!\nYour order #{{id}} for {{total}} PLN has been accepted for processing.\n\nItems:\n{{items}}',
+            // Order defaults DE
+            [EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_DE]: 'Bestellbestätigung nr. {{id}}',
+            [EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_DE]: 'Vielen Dank für Ihren Einkauf bei Bolglass!\nIhre Bestellung Nr. {{id}} über {{total}} PLN wurde zur Bearbeitung angenommen.\n\nProdukte:\n{{items}}'
         };
 
         // Initialize with defaults

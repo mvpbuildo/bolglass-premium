@@ -11,5 +11,14 @@ export const EMAIL_SETTING_KEYS = {
     EMAIL_SUBJECT_REMINDER: 'email_subject_reminder',
     EMAIL_BODY_REMINDER: 'email_body_reminder',
     EMAIL_SUBJECT_UPDATE: 'email_subject_update',
-    EMAIL_BODY_UPDATE: 'email_body_update'
+    EMAIL_BODY_UPDATE: 'email_body_update',
+    // Order confirmation PL
+    ORDER_CONFIRM_SUBJECT_PL: 'order_confirm_subject_pl',
+    ORDER_CONFIRM_BODY_PL: 'order_confirm_body_pl',
+    // Order confirmation EN
+    ORDER_CONFIRM_SUBJECT_EN: 'order_confirm_subject_en',
+    ORDER_CONFIRM_BODY_EN: 'order_confirm_body_en',
+    // Order confirmation DE
+    ORDER_CONFIRM_SUBJECT_DE: 'order_confirm_subject_de',
+    ORDER_CONFIRM_BODY_DE: 'order_confirm_body_de'
 };

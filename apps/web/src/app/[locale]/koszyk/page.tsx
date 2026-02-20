@@ -8,9 +8,10 @@ import { useState, useEffect } from 'react';
 import { placeOrder, getShippingRates, getPaymentMethods } from './actions';
 import Image from 'next/image';
 import { useCurrency } from '@/hooks/useCurrency';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function CheckoutPage() {
+    const locale = useLocale();
     const { items, updateQuantity, removeItem, total, clearCart } = useCart();
     const { data: session } = useSession();
     const router = useRouter();
@@ -177,6 +178,7 @@ export default function CheckoutPage() {
                             )}
 
                             <form action={handleSubmit} className="space-y-4">
+                                <input type="hidden" name="locale" value={locale} />
                                 <div className="grid grid-cols-2 gap-4 mb-6">
                                     <button
                                         type="button"

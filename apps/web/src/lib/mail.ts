@@ -51,7 +51,7 @@ export async function sendBookingConfirmation(booking: any) {
         const bodyKey = isWorkshop ? EMAIL_SETTING_KEYS.EMAIL_BODY_WORKSHOP : EMAIL_SETTING_KEYS.EMAIL_BODY_SIGHTSEEING;
         const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
 
-        // @ts-ignore
+        // @ts-expect-error
         const settings = await prisma.systemSetting.findMany({
             where: {
                 key: { in: [subjectKey, bodyKey, fromKey] }
@@ -123,7 +123,7 @@ export async function sendBookingReminderEmail(booking: any) {
         const bodyKey = EMAIL_SETTING_KEYS.EMAIL_BODY_REMINDER;
         const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
 
-        // @ts-ignore
+        // @ts-expect-error
         const settings = await prisma.systemSetting.findMany({
             where: {
                 key: { in: [subjectKey, bodyKey, fromKey] }
@@ -191,7 +191,7 @@ export async function sendBookingUpdateEmail(booking: any) {
         const bodyKey = EMAIL_SETTING_KEYS.EMAIL_BODY_UPDATE;
         const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
 
-        // @ts-ignore
+        // @ts-expect-error
         const settings = await prisma.systemSetting.findMany({
             where: {
                 key: { in: [subjectKey, bodyKey, fromKey] }
@@ -247,5 +247,86 @@ export async function sendBookingUpdateEmail(booking: any) {
         console.log(`Booking update email sent to ${booking.email}. Response: ${info.response}`);
     } catch (error: unknown) {
         console.error('Failed to send booking update email:', error);
+    }
+}
+
+export async function sendOrderConfirmationEmail(order: any, locale: string = 'pl') {
+    try {
+        const transporter = await getTransporter();
+        if (!transporter) return;
+
+        let subjectKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_PL;
+        let bodyKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_PL;
+
+        if (locale === 'en') {
+            subjectKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_EN;
+            bodyKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_EN;
+        } else if (locale === 'de') {
+            subjectKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_SUBJECT_DE;
+            bodyKey = EMAIL_SETTING_KEYS.ORDER_CONFIRM_BODY_DE;
+        }
+
+        const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
+
+        // @ts-ignore
+        const settings = await prisma.systemSetting.findMany({
+            where: {
+                key: { in: [subjectKey, bodyKey, fromKey] }
+            }
+        });
+
+        const config = Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
+
+        const defaultSubjects: Record<string, string> = {
+            pl: 'Potwierdzenie zamówienia nr {{id}}',
+            en: 'Order confirmation #{{id}}',
+            de: 'Bestellbestätigung nr. {{id}}'
+        };
+
+        const defaultBodies: Record<string, string> = {
+            pl: 'Dziękujemy za zakupy w Bolglass!\nTwoje zamówienie nr {{id}} na kwotę {{total}} PLN zostało przyjęte do realizacji.\n\nProdukty:\n{{items}}',
+            en: 'Thank you for shopping at Bolglass!\nYour order #{{id}} for {{total}} PLN has been accepted for processing.\n\nItems:\n{{items}}',
+            de: 'Vielen Dank für Ihren Einkauf bei Bolglass!\nIhre Bestellung Nr. {{id}} über {{total}} PLN wurde zur Bearbeitung angenommen.\n\nProdukte:\n{{items}}'
+        };
+
+        let subject = config[subjectKey] || defaultSubjects[locale] || defaultSubjects.pl;
+        let body = config[bodyKey] || defaultBodies[locale] || defaultBodies.pl;
+        const from = config[fromKey] || config[EMAIL_SETTING_KEYS.SMTP_USER];
+
+        const itemsList = order.items.map((item: any) => `- ${item.name} (x${item.quantity}) - ${item.price.toFixed(2)} PLN`).join('\n');
+
+        const replacements: Record<string, string> = {
+            '{{id}}': order.id.substring(0, 8),
+            '{{total}}': order.total.toFixed(2),
+            '{{items}}': itemsList,
+            '{{email}}': order.email,
+            '{{date}}': new Date(order.createdAt).toLocaleString(locale === 'pl' ? 'pl-PL' : locale === 'de' ? 'de-DE' : 'en-GB')
+        };
+
+        Object.entries(replacements).forEach(([tag, val]) => {
+            subject = (subject || '').replace(new RegExp(tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), val);
+            body = (body || '').replace(new RegExp(tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), val);
+        });
+
+        const html = `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #ffffff;">
+                <h2 style="color: #333333;">${subject}</h2>
+                <div style="white-space: pre-wrap; line-height: 1.6; color: #333333;">${body}</div>
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;" />
+                <p style="font-size: 12px; color: #999999;">Wiadomość wysłana automatycznie przez system Bolglass. Nie odpowiadaj na ten e-mail.</p>
+            </div>
+        `;
+
+        const info = await transporter.sendMail({
+            from: `"Bolglass" <${from}>`,
+            to: order.email,
+            subject: subject,
+            text: body,
+            html: html
+        });
+
+        console.log(`Order confirmation sent to ${order.email}. Response: ${info.response}`);
+    } catch (error: unknown) {
+        console.error('Failed to send order confirmation email:', error);
     }
 }
