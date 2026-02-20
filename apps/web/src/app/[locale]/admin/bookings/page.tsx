@@ -1,15 +1,11 @@
-import { Link } from '@/i18n/navigation';
 import AdminBookingList from '../../../../components/AdminBookingList';
 import AdminCalendar from '../../../../components/AdminCalendar';
 import AdminStats from '../../../../components/AdminStats';
-import AdminNavigation from '../../../../components/AdminNavigation';
 
 export default function AdminBookingsPage() {
     return (
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4">
-                <AdminNavigation />
-
                 <div className="mb-12">
                     <AdminStats />
                 </div>

@@ -1,12 +1,10 @@
 import AdminShopSettings from '@/components/AdminShopSettings';
-import AdminNavigation from '@/components/AdminNavigation';
 
 export default function AdminShopSettingsPage() {
     return (
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-4xl mx-auto px-4 space-y-12">
                 <div>
-                    <AdminNavigation />
 
                     <div className="mb-10 mt-8">
                         <h1 className="text-4xl font-black text-gray-900 tracking-tight">Ustawienia Sklepu</h1>

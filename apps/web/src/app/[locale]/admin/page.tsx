@@ -1,4 +1,3 @@
-import AdminNavigation from '@/components/AdminNavigation';
 import { Link } from '@/i18n/navigation';
 import { Card } from '@bolglass/ui';
 import {
@@ -127,8 +126,6 @@ export default async function AdminDashboardPage() {
     return (
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4">
-                <AdminNavigation />
-
                 <div className="mb-10">
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">Witaj w Panelu Admina</h1>
                     <p className="text-gray-500 mt-2">Wybierz moduł, którym chcesz dzisiaj zarządzać.</p>

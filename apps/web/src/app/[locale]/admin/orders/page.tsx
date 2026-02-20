@@ -1,6 +1,5 @@
 import { prisma } from '@bolglass/database';
 import OrderCard from './OrderCard';
-import AdminNavigation from '@/components/AdminNavigation';
 import { Card, Button } from '@bolglass/ui';
 import { Link } from '@/i18n/navigation';
 
@@ -61,7 +60,6 @@ export default async function AdminOrdersPage(props: { searchParams: Promise<{ s
 
     return (
         <div className="space-y-6">
-            <AdminNavigation />
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-white">Zamówienia</h1>
             </div>

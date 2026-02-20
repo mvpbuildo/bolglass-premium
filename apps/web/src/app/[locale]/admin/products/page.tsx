@@ -1,5 +1,4 @@
 import { Link } from '@/i18n/navigation';
-import AdminNavigation from '../../../../components/AdminNavigation';
 import { prisma } from '@bolglass/database';
 import { Button } from '@bolglass/ui';
 import ProductCard from './ProductCard';
@@ -18,8 +17,6 @@ export default async function AdminProductsPage() {
     return (
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4">
-                <AdminNavigation />
-
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Produkty</h2>

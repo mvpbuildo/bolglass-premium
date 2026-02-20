@@ -1,9 +1,7 @@
 import { getDashboardStats } from './actions';
 import { Card } from '@bolglass/ui';
-import { AreaChart, BarChart, TrendingUp, Users, ShoppingCart, CreditCard } from 'lucide-react';
-import { format } from 'date-fns';
+import { TrendingUp, Users, ShoppingCart, CreditCard } from 'lucide-react';
 
-import AdminNavigation from '@/components/AdminNavigation';
 
 export default async function AnalyticsPage() {
     const stats = await getDashboardStats();
@@ -14,7 +12,6 @@ export default async function AnalyticsPage() {
 
     return (
         <div className="space-y-8">
-            <AdminNavigation />
             <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-8">Analityka i Statystyki</h1>
 
             {/* KPI Cards */}

@@ -1,6 +1,5 @@
 import { prisma } from '@bolglass/database';
 import { auth } from '@/auth';
-import AdminNavigation from '@/components/AdminNavigation';
 import UserCard from './UserCard';
 import UserCreationForm from './UserCreationForm';
 import { Users } from 'lucide-react';
@@ -21,7 +20,6 @@ export default async function AdminUsersPage() {
     return (
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4">
-                <AdminNavigation />
 
                 <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>

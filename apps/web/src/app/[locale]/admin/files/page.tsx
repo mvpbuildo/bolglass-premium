@@ -1,4 +1,3 @@
-import AdminNavigation from '@/components/AdminNavigation';
 import { listFiles } from './actions';
 import FileGrid from './FileGrid';
 import { Card } from '@bolglass/ui';
@@ -12,7 +11,6 @@ export default async function AdminFilesPage() {
     return (
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4">
-                <AdminNavigation />
 
                 <div className="mb-8 flex justify-between items-end">
                     <div>
