@@ -1,8 +1,9 @@
-'use server'
+'use server';
 
 import { prisma } from '@bolglass/database';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { revalidateTag, revalidatePath } from 'next/cache';
 
 export async function createProduct(formData: FormData) {
     console.log("createProduct action started");
@@ -119,6 +120,8 @@ export async function createProduct(formData: FormData) {
             }
         });
 
+        revalidateTag('products');
+        revalidatePath('/admin/products', 'page');
         return { success: true };
     } catch (error: unknown) {
         console.error("Create product failed:", error);

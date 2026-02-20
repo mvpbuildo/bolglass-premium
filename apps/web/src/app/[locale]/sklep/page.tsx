@@ -1,14 +1,19 @@
 import ProductCard from '@/components/shop/ProductCard';
 import { prisma } from '@bolglass/database';
+import { unstable_cache } from 'next/cache';
 
 export const dynamic = 'force-dynamic'; // Ensure we see latest products
 
-async function getProducts() {
-    return await prisma.product.findMany({
-        where: { stock: { gt: 0 } }, // Only show in-stock items? Or all for now? Let's show all.
-        orderBy: { createdAt: 'desc' },
-    });
-}
+const getProducts = unstable_cache(
+    async () => {
+        return await prisma.product.findMany({
+            where: { stock: { gt: 0 } },
+            orderBy: { createdAt: 'desc' },
+        });
+    },
+    ['shop-products-cache'],
+    { tags: ['products'], revalidate: 3600 }
+);
 
 export default async function ShopPage() {
     const products = await getProducts();
@@ -60,9 +65,9 @@ export default async function ShopPage() {
                                     price: product.price,
                                     slug: product.slug,
                                     image: (product.images && product.images[0]) || null,
-                                    priceNet: (product as any).priceNet || 0,
-                                    vatRate: (product as any).vatRate || 23,
-                                    discountPercent: (product as any).discountPercent || 0
+                                    priceNet: product.priceNet || 0,
+                                    vatRate: product.vatRate || 23,
+                                    discountPercent: product.discountPercent || 0
                                 }}
                             />
                         ))}

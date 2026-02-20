@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@bolglass/database';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
 // import { writeFile } from 'fs/promises'; // Not used in this version but kept for ref
@@ -86,7 +86,8 @@ export async function createProduct(formData: FormData) {
             }
         });
 
-        revalidatePath('/admin/products');
+        revalidateTag('products');
+        revalidatePath('/admin/products', 'page');
         return { success: true };
 
     } catch (error) {
@@ -170,8 +171,9 @@ export async function updateProduct(id: string, formData: FormData) {
             }
         });
 
-        revalidatePath('/admin/products');
-        revalidatePath(`/sklep/produkt`); // Revalidate all products since we don't have slug easily here without fetching
+        revalidateTag('products');
+        revalidatePath('/admin/products', 'page');
+        revalidatePath(`/sklep/produkt`, 'page');
         return { success: true };
 
     } catch (error) {
@@ -218,7 +220,8 @@ export async function deleteProduct(id: string) {
             where: { id }
         });
 
-        revalidatePath('/admin/products');
+        revalidateTag('products');
+        revalidatePath('/admin/products', 'page');
         return { success: true };
     } catch (error) {
         console.error("Delete product failed:", error);
@@ -232,8 +235,9 @@ export async function updateProductDiscount(id: string, discountPercent: number)
             where: { id },
             data: { discountPercent }
         });
-        revalidatePath('/admin/products');
-        revalidatePath(`/sklep/produkt`);
+        revalidateTag('products');
+        revalidatePath('/admin/products', 'page');
+        revalidatePath(`/sklep/produkt`, 'page');
         return { success: true };
     } catch (error) {
         console.error("Update discount failed:", error);

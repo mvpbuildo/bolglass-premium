@@ -6,6 +6,7 @@ import { OrbitControls, Environment, ContactShadows, Text, Float, Decal, RenderT
 import * as THREE from 'three';
 import { Button, Input } from '@bolglass/ui';
 import { useCart } from '@/context/CartContext';
+import { compressDataURL } from '@/utils/imageCompression';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
 import { calculateBaublePrice } from '@/services/pricing';
@@ -172,7 +173,16 @@ export default function BaubleConfigurator() {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         // Capture screenshot
-        const screenshot = captureRef.current ? captureRef.current() : '/bauble-placeholder.png';
+        let screenshot = captureRef.current ? captureRef.current() : '/bauble-placeholder.png';
+
+        // Compress if it's a dataURL
+        if (screenshot.startsWith('data:')) {
+            try {
+                screenshot = await compressDataURL(screenshot, 400, 400, 0.6);
+            } catch (e) {
+                console.error("Compression failed", e);
+            }
+        }
 
         // End capture mode
         setIsCapturing(false);
@@ -183,7 +193,7 @@ export default function BaubleConfigurator() {
             price: currentPrice,
             slug: 'bombka-personalizowana',
             quantity: 1,
-            image: screenshot, // Use captured screenshot
+            image: screenshot, // Use (compressed) captured screenshot
             configuration: JSON.stringify({
                 size: selectedSize.label,
                 color: selectedColor.name,

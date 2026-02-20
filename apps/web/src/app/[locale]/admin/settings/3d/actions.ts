@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@bolglass/database';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
 
 const CONFIG_KEY = 'bauble_config';
 
@@ -46,22 +46,26 @@ const DEFAULT_CONFIG: BaubleConfig = {
     }
 };
 
-export async function getConfiguratorSettings(): Promise<BaubleConfig> {
-    const setting = await prisma.systemSetting.findUnique({
-        where: { key: CONFIG_KEY }
-    });
+export const getConfiguratorSettings = unstable_cache(
+    async (): Promise<BaubleConfig> => {
+        const setting = await prisma.systemSetting.findUnique({
+            where: { key: CONFIG_KEY }
+        });
 
-    if (!setting) {
-        return DEFAULT_CONFIG;
-    }
+        if (!setting) {
+            return DEFAULT_CONFIG;
+        }
 
-    try {
-        return JSON.parse(setting.value) as BaubleConfig;
-    } catch (error) {
-        console.error('Failed to parse bauble config:', error);
-        return DEFAULT_CONFIG;
-    }
-}
+        try {
+            return JSON.parse(setting.value) as BaubleConfig;
+        } catch (error) {
+            console.error('Failed to parse bauble config:', error);
+            return DEFAULT_CONFIG;
+        }
+    },
+    ['bauble-config-cache'],
+    { tags: ['bauble-config'], revalidate: 3600 }
+);
 
 export async function updateConfiguratorSettings(config: BaubleConfig) {
     await prisma.systemSetting.upsert({
@@ -70,6 +74,7 @@ export async function updateConfiguratorSettings(config: BaubleConfig) {
         create: { key: CONFIG_KEY, value: JSON.stringify(config) }
     });
 
+    revalidateTag('bauble-config');
     revalidatePath('/[locale]/admin/settings/3d', 'page');
     revalidatePath('/[locale]', 'layout'); // Revalidate potential cached pages using config
 }

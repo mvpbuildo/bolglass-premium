@@ -3,7 +3,7 @@
 import { prisma } from '@bolglass/database';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function updateProduct(id: string, formData: FormData) {
     try {
@@ -96,8 +96,9 @@ export async function updateProduct(id: string, formData: FormData) {
             }
         });
 
-        revalidatePath('/admin/products');
-        revalidatePath(`/admin/products/${id}`);
+        revalidateTag('products');
+        revalidatePath('/admin/products', 'page');
+        revalidatePath(`/admin/products/${id}`, 'page');
 
         return { success: true };
     } catch (error: unknown) {
