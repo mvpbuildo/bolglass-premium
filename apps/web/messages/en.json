@@ -8,7 +8,11 @@
             "studio3d": "3D Studio",
             "shop": "Shop",
             "gallery": "Gallery",
-            "contact": "Contact"
+            "contact": "Contact",
+            "account": "Account",
+            "admin": "Admin",
+            "login": "Login",
+            "cart": "Cart"
         },
         "footer": {
             "tagline": "For 78 years we have been creating the magic of glass Christmas ornaments, blending traditional craftsmanship with modern design.",
@@ -19,60 +23,6 @@
             "terms": "Terms of Service",
             "privacy": "Privacy Policy",
             "copyright": "All rights reserved."
-        }
-    },
-    "Booking": {
-        "title": "Online Booking",
-        "steps": {
-            "package_people": "Package & Group Size",
-            "date_time": "Choose Date",
-            "details": "Your Details",
-            "success": "Done"
-        },
-        "step1": {
-            "title": "1. Choose a package and group size",
-            "sightseeing_title": "Factory Tour",
-            "sightseeing_desc": "Guided walk along the educational path. See the blowing and decorating process.",
-            "workshop_title": "Tour + Workshop",
-            "workshop_desc": "Factory tour and hand-painting of ornaments under the guidance of an artist.",
-            "recommended": "Recommended",
-            "people_label": "How many people would you like to book for?",
-            "max_capacity": "The maximum capacity of the workshop room is 92 people.",
-            "check_dates": "Check Availability"
-        },
-        "step2": {
-            "title": "2. Choose a date",
-            "change_params": "Change parameters",
-            "available_days": "Available days:",
-            "select_day_placeholder": "Select a day from the list",
-            "hours_label": "Hours",
-            "no_slots": "No available time slots for this group",
-            "next": "Next"
-        },
-        "step3": {
-            "summary_title": "Booking Summary",
-            "package": "Package",
-            "date": "Date",
-            "participants": "Participants",
-            "total_price": "Total to pay",
-            "name_label": "Full Name",
-            "name_placeholder": "John Smith",
-            "email_label": "Email Address",
-            "email_placeholder": "john@example.com",
-            "group_invoice": "Group Booking (Invoice)",
-            "institution_name": "Institution Name",
-            "institution_address": "Institution Address (for invoice)",
-            "back": "Back",
-            "confirm": "Confirm Booking",
-            "processing": "Processing...",
-            "payment_info": "Payment on site (cash/card) or by bank transfer (details in email)."
-        },
-        "success": {
-            "title": "Booking Confirmed!",
-            "message": "Thank you, {name}. We sent a confirmation to",
-            "details_title": "Booking Details",
-            "invoice_data": "Invoice Data (Group)",
-            "back_home": "Back to Home"
         }
     },
     "HomePage": {
@@ -95,6 +45,7 @@
         "subtitle": "We are at your disposal. Feel free to reach us by phone, email or visit us in person at our headquarters.",
         "location": "Location",
         "contact": "Contact",
+        "address": "Address",
         "hours": "Opening Hours",
         "weekdays": "Monday - Friday",
         "socialMedia": "Social Media",
@@ -106,15 +57,21 @@
     },
     "Gallery": {
         "badge": "Bolglass",
-        "title": "Gallery",
-        "subtitle": "Each ornament is a separate story told through glass and color.",
+        "magicOfCreation": "Magic of Creation",
+        "viewAll": "See full gallery",
         "loading": "Loading gallery...",
         "empty": "The gallery is empty.",
-        "lightboxClose": "Close"
+        "lightboxClose": "Close",
+        "close": "Close",
+        "prev": "Previous",
+        "next": "Next",
+        "defaultTitle": "Bolglass Manufactory"
     },
     "Shop": {
         "title": "Bolglass Shop",
-        "badge": "Collection",
+        "badge": "Bolglass Collection",
+        "heroTitle": "The Magic of Glass Christmas",
+        "heroSubtitle": "Hand-blown, artistically painted since 1946.",
         "subtitle": "Hand-blown glass baubles. Each one unique.",
         "filterAll": "All",
         "sortLabel": "Sort",
@@ -124,8 +81,12 @@
             "priceDesc": "Price: descending"
         },
         "noProducts": "No products in this category.",
+        "allProducts": "All Products",
+        "itemsCount": "Items",
+        "emptyShop": "No products have been added yet.",
+        "emptyShopAdmin": "Add products in the admin panel.",
         "addToCart": "Add to Cart",
-        "addedToCart": "In Cart ✓",
+        "addedToCart": "In Cart \u2713",
         "configure": "Configure 3D",
         "outOfStock": "Out of stock",
         "productDetails": "Product details",
@@ -134,7 +95,17 @@
         "backToShop": "Back to shop",
         "quantity": "Quantity",
         "buy": "Buy now",
-        "relatedProducts": "Related products"
+        "relatedProducts": "Related products",
+        "priceInclVat": "Gross price (VAT included)",
+        "inStock": "In stock",
+        "configurable3d": "\u2728 3D Configurable Product",
+        "configurable3dDesc": "You can personalize this product in our 3D creator before purchase.",
+        "openConfigurator": "Open Configurator",
+        "manufacturerCodeLabel": "Manufacturer Code",
+        "dimensionsLabel": "Dimensions (HxWxD)",
+        "weightLabel": "Weight",
+        "promo": "Sale",
+        "grossPrice": "Gross Price"
     },
     "Auth": {
         "login": {
@@ -248,7 +219,15 @@
         "guestCheckout": "Continue as guest",
         "loadingShipping": "Loading shipping methods...",
         "freeShipping": "Free shipping",
-        "configuredProduct": "Personalized product"
+        "configuredProduct": "Personalized product",
+        "cartAndCheckout": "Cart and Checkout",
+        "selectedProducts": "Selected Products",
+        "shippingDetails": "Shipping Details",
+        "guestNotice": "You are buying as a Guest.",
+        "loginToSave": "Log in to save the order in your history.",
+        "orderAndPay": "Order and Pay",
+        "acceptTerms": "By clicking \"{buttonText}\" you accept the store terms.",
+        "errorPlacingOrder": "An error occurred while placing the order."
     },
     "Checkout": {
         "orderPlaced": "Thank you for your order!",
@@ -289,10 +268,18 @@
             "emptySubtitle": "When you place an order, it will appear here.",
             "order": "Order",
             "total": "Amount due",
-            "date": "Order date",
+            "date": "Date placed",
             "paymentMethod": "Payment method",
             "details": "Details",
             "return": "Return",
+            "subtitle": "Browse your purchase history and track statuses.",
+            "goToShop": "Go to shop",
+            "paymentMethods": {
+                "manual_transfer": "Bank transfer",
+                "transfer": "Bank transfer",
+                "payu": "Online payment (PayU)",
+                "card": "Payment card"
+            },
             "returnUnavailable": "Return unavailable",
             "returnUnavailableInvoice": "Company order (Invoice)",
             "returnUnavailablePersonalized": "Personalized products",
@@ -307,7 +294,23 @@
                 "DELIVERED": "Delivered",
                 "RETURN_REQUESTED": "Return requested",
                 "RETURNED": "Returned"
-            }
+            },
+            "backToList": "Back to list",
+            "orderItems": "Order items",
+            "product": "Product",
+            "quantity": "Quantity",
+            "unitPrice": "Total",
+            "totalLabel": "Total:",
+            "payment": "Payment",
+            "method": "Method",
+            "unknown": "Unknown",
+            "paymentStatus": "Payment status",
+            "paid": "Paid",
+            "waiting": "Waiting",
+            "shipping": "Shipping",
+            "shippingAddress": "Shipping address",
+            "placedAt": "Placed at",
+            "inscription": "Inscription"
         },
         "orderDetail": {
             "back": "Back to orders",
@@ -371,21 +374,98 @@
         }
     },
     "Configurator": {
-        "title": "3D Bauble Configurator",
-        "subtitle": "Design your unique Christmas ornament",
-        "sizeLabel": "Size",
-        "colorLabel": "Color",
-        "textLabel": "Text on ornament",
-        "textPlaceholder": "e.g. Merry Christmas",
+        "title": "Ornament Creator",
+        "subtitle": "Design a unique Christmas ornament. Choose size, color and add a personal dedication.",
+        "loading": "Loading configurator...",
+        "sizeLabel": "Choose Size",
+        "colorLabel": "Choose Glass Color",
+        "textLabel": "Your Dedication",
+        "textPlaceholder": "e.g. For Grandma Jane",
         "basePrice": "Base price",
-        "finalPrice": "Final price",
+        "finalPrice": "Total price",
         "addToCart": "Add to cart",
+        "addedToCart": "Added to cart",
         "adding": "Adding...",
-        "previewLabel": "3D Preview",
+        "previewLabel": "Live 3D Preview",
         "configLabel": "Configuration",
         "optionsLabel": "Options",
         "decorLabel": "Decoration",
         "noDecor": "None",
         "colorOptions": "Color Options"
+    },
+    "ProductionProcess": {
+        "step1": {
+            "title": "Heating",
+            "desc": "Glass is heated until red-hot, becoming a plastic material ready for magic."
+        },
+        "step2": {
+            "title": "Blowing",
+            "desc": "The master glassblower shapes the bauble in a single breath. This is how the soul of the ornament is born."
+        },
+        "step3": {
+            "title": "Silvering",
+            "desc": "The interior is filled with silver nitrate. The ornament gains its mirrored heart."
+        },
+        "step4": {
+            "title": "Lacquering",
+            "desc": "After silvering, baubles are lacquered to give them unique, vivid colors."
+        },
+        "step5": {
+            "title": "Decorating",
+            "desc": "Artists apply patterns with surgical precision. Each brushstroke tells a story."
+        }
+    },
+    "Booking": {
+        "title": "Online Booking",
+        "steps": {
+            "package_people": "Package & People",
+            "date_time": "Date & Time",
+            "details": "Your Details"
+        },
+        "step1": {
+            "title": "1. Choose package and group size",
+            "sightseeing_title": "Factory Tour",
+            "sightseeing_desc": "Guided educational path. See the blowing and decorating process.",
+            "workshop_title": "Tour + Workshop",
+            "workshop_desc": "Tour and hands-on bauble painting under artist supervision.",
+            "recommended": "Recommended",
+            "people_label": "How many people are coming?",
+            "max_capacity": "Maximum workshop capacity is 92 people.",
+            "check_dates": "Check Dates"
+        },
+        "step2": {
+            "title": "2. Choose date",
+            "change_params": "Change parameters",
+            "available_days": "Available days:",
+            "hours_label": "Hours",
+            "select_day_placeholder": "Select a day from the list",
+            "no_slots": "No available slots for group of",
+            "next": "Next"
+        },
+        "step3": {
+            "summary_title": "Booking Summary",
+            "package": "Package",
+            "date": "Date",
+            "participants": "Participants",
+            "total_price": "Total to pay",
+            "name_label": "Full Name",
+            "name_placeholder": "John Smith",
+            "email_label": "Email Address",
+            "email_placeholder": "john@example.com",
+            "group_invoice": "Group Booking (Invoice)",
+            "institution_name": "Institution Name",
+            "institution_address": "Institution Address (for invoice)",
+            "back": "Back",
+            "processing": "Processing...",
+            "confirm": "Confirm Booking",
+            "payment_info": "Payment on site (cash/card) or by bank transfer (details in email)."
+        },
+        "success": {
+            "title": "Booking Confirmed!",
+            "message": "Thank you, {name}. Confirmation sent to",
+            "details_title": "Booking Details",
+            "invoice_data": "Invoice Data (Group)",
+            "back_home": "Back to Home"
+        }
     }
 }

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { ShoppingCart } from 'lucide-react';
 import { useCurrency } from '@/hooks/useCurrency';
+import { useTranslations } from 'next-intl';
 
 type ProductProps = {
     id: string;
@@ -21,6 +22,7 @@ type ProductProps = {
 export default function ProductCard({ product }: { product: ProductProps }) {
     const { addItem } = useCart();
     const { formatPrice } = useCurrency();
+    const t = useTranslations('Shop');
 
     const handleAddToCart = () => {
         const effectivePrice = product.price * (1 - (product.discountPercent || 0) / 100);
@@ -72,14 +74,14 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                                         {formatPrice(product.price)}
                                     </span>
                                 </div>
-                                <span className="text-[10px] text-red-400/80 font-medium uppercase tracking-tight">Promocja -{product.discountPercent}%</span>
+                                <span className="text-[10px] text-red-400/80 font-medium uppercase tracking-tight">{t('promo')} -{product.discountPercent}%</span>
                             </>
                         ) : (
                             <>
                                 <span className="text-2xl font-black text-white tracking-tighter">
                                     {formatPrice(product.price)}
                                 </span>
-                                <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">Cena Brutto</span>
+                                <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">{t('grossPrice')}</span>
                             </>
                         )}
                     </div>
@@ -87,7 +89,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         onClick={handleAddToCart}
                         size="sm"
                         className="rounded-full h-11 w-11 p-0 bg-white/5 border border-white/10 hover:bg-amber-500 hover:text-black hover:border-amber-500 transition-all shadow-lg hover:shadow-amber-500/20"
-                        title="Dodaj do koszyka"
+                        title={t('addToCart')}
                     >
                         <ShoppingCart className="w-4 h-4" />
                     </Button>

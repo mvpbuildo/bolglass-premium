@@ -2,79 +2,74 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const steps = [
-    {
-        id: 1,
-        title: "Ogrzewanie (Heating)",
-        description: "Szkło ogrzewane jest do czerwoności, stając się plastycznym materiałem gotowym na magię.",
-        color: "from-orange-500 to-red-600",
-        image: "/production/heating.png"
-    },
-    {
-        id: 2,
-        title: "Dmuchanie (Blowing)",
-        description: "Mistrz dmuchacz jednym tchem nadaje kształt. Tak rodzi się dusza bombki.",
-        color: "from-blue-400 to-cyan-300",
-        image: "/production/blowing.png"
-    },
-    {
-        id: 3,
-        title: "Srebrzenie (Silvering)",
-        description: "Wnętrze wypełniane jest azotanem srebra. Bombka zyskuje swoje lustrzane serce.",
-        color: "from-gray-300 to-gray-100",
-        image: "/production/silvering.png"
-    },
-    {
-        id: 4,
-        title: "Lakierowanie (Lacquering)",
-        description: "Po srebrzeniu bombki są lakierowane, aby nadać im niepowtarzalne kolory.",
-        color: "from-red-600 to-rose-900",
-        image: "/production/lacquering.png"
-    },
-    {
-        id: 5,
-        title: "Dekorowanie (Decorating)",
-        description: "Artystki nanoszą wzory z chirurgiczną precyzją. Każde pociągnięcie pędzla to historia.",
-        color: "from-purple-500 to-pink-500",
-        image: "/production/decorating.png"
-    }
-];
+import { useTranslations } from "next-intl";
 
 export default function ProductionProcess() {
+    const t = useTranslations('ProductionProcess');
     const [activeStep, setActiveStep] = useState(0);
     const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-        const stepDuration = 5000; // 5 seconds per step
-        const intervalTime = 50; // Update progress every 50ms
+    const steps = [
+        {
+            id: 1,
+            title: t('step1.title'),
+            description: t('step1.desc'),
+            color: "from-orange-500 to-red-600",
+            image: "/production/heating.png"
+        },
+        {
+            id: 2,
+            title: t('step2.title'),
+            description: t('step2.desc'),
+            color: "from-blue-400 to-cyan-300",
+            image: "/production/blowing.png"
+        },
+        {
+            id: 3,
+            title: t('step3.title'),
+            description: t('step3.desc'),
+            color: "from-gray-300 to-gray-100",
+            image: "/production/silvering.png"
+        },
+        {
+            id: 4,
+            title: t('step4.title'),
+            description: t('step4.desc'),
+            color: "from-red-600 to-rose-900",
+            image: "/production/lacquering.png"
+        },
+        {
+            id: 5,
+            title: t('step5.title'),
+            description: t('step5.desc'),
+            color: "from-purple-500 to-pink-500",
+            image: "/production/decorating.png"
+        }
+    ];
 
+    useEffect(() => {
+        const stepDuration = 5000;
+        const intervalTime = 50;
         let currentProgress = 0;
 
         const timer = setInterval(() => {
             currentProgress += (intervalTime / stepDuration) * 100;
-
             if (currentProgress >= 100) {
                 setActiveStep((prev) => (prev + 1) % steps.length);
                 currentProgress = 0;
             }
-
             setProgress(currentProgress);
         }, intervalTime);
 
-        // Reset progress when activeStep changes manually
-        // But here we want continuous flow, so we handle it within interval or effect deps
         return () => clearInterval(timer);
-    }, [activeStep]); // Reset timer when step changes
+    }, [activeStep]);
 
-    // Reset progress specifically when activeStep changes to avoid jump
     useEffect(() => {
         setProgress(0);
     }, [activeStep]);
 
     return (
         <section className="relative min-h-screen py-20 bg-[#050505] text-white flex items-center justify-center overflow-hidden">
-            {/* Background Atmosphere - Bolglass Premium Theme */}
             <div className="absolute inset-0 bg-[#0a0500]" />
             <div className="absolute inset-0 w-full h-full z-0">
                 <img
@@ -87,9 +82,7 @@ export default function ProductionProcess() {
             </div>
 
             <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-center min-h-[600px]">
-                {/* Auto-play Visualization */}
                 <div className="w-full flex flex-col md:flex-row items-center gap-12">
-                    {/* Image Area */}
                     <div className="relative w-full md:w-1/2 aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
                         <AnimatePresence mode="wait">
                             <motion.img
@@ -108,7 +101,6 @@ export default function ProductionProcess() {
                         <div className="absolute inset-0 border border-white/10 rounded-2xl z-20 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]" />
                     </div>
 
-                    {/* Text Area */}
                     <div className="w-full md:w-1/2 text-left">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -129,7 +121,6 @@ export default function ProductionProcess() {
                     </div>
                 </div>
 
-                {/* Progress Indicators */}
                 <div className="flex gap-4 mt-16 z-20">
                     {steps.map((step, index) => (
                         <button

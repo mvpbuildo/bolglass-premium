@@ -8,7 +8,11 @@
             "studio3d": "3D-Studio",
             "shop": "Shop",
             "gallery": "Galerie",
-            "contact": "Kontakt"
+            "contact": "Kontakt",
+            "account": "Konto",
+            "admin": "Admin",
+            "login": "Einloggen",
+            "cart": "Warenkorb"
         },
         "footer": {
             "tagline": "Seit 78 Jahren erschaffen wir die Magie gläserner Weihnachtsornamente und verbinden traditionelles Handwerk mit modernem Design.",
@@ -19,60 +23,6 @@
             "terms": "Nutzungsbedingungen",
             "privacy": "Datenschutzrichtlinie",
             "copyright": "Alle Rechte vorbehalten."
-        }
-    },
-    "Booking": {
-        "title": "Online-Buchung",
-        "steps": {
-            "package_people": "Paket & Gruppengröße",
-            "date_time": "Termin wählen",
-            "details": "Ihre Daten",
-            "success": "Fertig"
-        },
-        "step1": {
-            "title": "1. Wählen Sie ein Paket und eine Gruppengröße",
-            "sightseeing_title": "Fabrikbesichtigung",
-            "sightseeing_desc": "Geführter Rundgang auf dem Lehrpfad. Erleben Sie das Blasen und Dekorieren.",
-            "workshop_title": "Besichtigung + Workshop",
-            "workshop_desc": "Fabrikbesichtigung und eigenhändiges Bemalen von Kugeln unter Anleitung einer Künstlerin.",
-            "recommended": "Empfohlen",
-            "people_label": "Für wie viele Personen möchten Sie buchen?",
-            "max_capacity": "Die maximale Kapazität des Workshopraums beträgt 92 Personen.",
-            "check_dates": "Verfügbarkeit prüfen"
-        },
-        "step2": {
-            "title": "2. Termin wählen",
-            "change_params": "Parameter ändern",
-            "available_days": "Verfügbare Tage:",
-            "select_day_placeholder": "Tag aus der Liste auswählen",
-            "hours_label": "Uhrzeiten",
-            "no_slots": "Keine freien Zeitfenster für diese Gruppe",
-            "next": "Weiter"
-        },
-        "step3": {
-            "summary_title": "Buchungsübersicht",
-            "package": "Paket",
-            "date": "Termin",
-            "participants": "Teilnehmer",
-            "total_price": "Zu zahlen",
-            "name_label": "Vor- und Nachname",
-            "name_placeholder": "Max Mustermann",
-            "email_label": "E-Mail-Adresse",
-            "email_placeholder": "max@beispiel.de",
-            "group_invoice": "Gruppenbuchung (Rechnung)",
-            "institution_name": "Name der Institution",
-            "institution_address": "Adresse der Institution (für Rechnung)",
-            "back": "Zurück",
-            "confirm": "Buchung bestätigen",
-            "processing": "Verarbeitung...",
-            "payment_info": "Zahlung vor Ort (Bar/Karte) oder per Überweisung (Details per E-Mail)."
-        },
-        "success": {
-            "title": "Buchung bestätigt!",
-            "message": "Danke, {name}. Wir haben eine Bestätigung gesendet an",
-            "details_title": "Buchungsdetails",
-            "invoice_data": "Rechnungsdaten (Gruppe)",
-            "back_home": "Zurück zur Startseite"
         }
     },
     "HomePage": {
@@ -95,6 +45,7 @@
         "subtitle": "Wir stehen Ihnen zur Verfügung. Kontaktieren Sie uns telefonisch, per E-Mail oder besuchen Sie uns persönlich in unserem Hauptsitz.",
         "location": "Standort",
         "contact": "Kontakt",
+        "address": "Adresse",
         "hours": "Öffnungszeiten",
         "weekdays": "Montag – Freitag",
         "socialMedia": "Social Media",
@@ -106,15 +57,21 @@
     },
     "Gallery": {
         "badge": "Bolglass",
-        "title": "Galerie",
-        "subtitle": "Jeder Schmuck ist eine eigene Geschichte, erzählt durch Glas und Farbe.",
+        "magicOfCreation": "Magie der Schöpfung",
+        "viewAll": "Vollständige Galerie ansehen",
         "loading": "Galerie wird geladen...",
         "empty": "Die Galerie ist leer.",
-        "lightboxClose": "Schließen"
+        "lightboxClose": "Schließen",
+        "close": "Schließen",
+        "prev": "Zurück",
+        "next": "Weiter",
+        "defaultTitle": "Bolglass Manufaktur"
     },
     "Shop": {
         "title": "Bolglass Shop",
-        "badge": "Kollektion",
+        "badge": "Bolglass Kollektion",
+        "heroTitle": "Die Magie gläserner Weihnachten",
+        "heroSubtitle": "Mundgeblasen, künstlerisch bemalt seit 1946.",
         "subtitle": "Mundgeblasene Glaskugeln. Jede einzigartig.",
         "filterAll": "Alle",
         "sortLabel": "Sortieren",
@@ -124,6 +81,10 @@
             "priceDesc": "Preis: absteigend"
         },
         "noProducts": "Keine Produkte in dieser Kategorie.",
+        "allProducts": "Alle Produkte",
+        "itemsCount": "Artikel",
+        "emptyShop": "Es wurden noch keine Produkte hinzugefügt.",
+        "emptyShopAdmin": "Fügen Sie Produkte im Admin-Panel hinzu.",
         "addToCart": "In den Warenkorb",
         "addedToCart": "Im Warenkorb ✓",
         "configure": "3D Konfigurieren",
@@ -134,7 +95,17 @@
         "backToShop": "Zurück zum Shop",
         "quantity": "Menge",
         "buy": "Jetzt kaufen",
-        "relatedProducts": "Ähnliche Produkte"
+        "relatedProducts": "Ähnliche Produkte",
+        "priceInclVat": "Bruttopreis (inkl. MwSt.)",
+        "inStock": "Auf Lager",
+        "configurable3d": "✨ 3D-konfigurierbares Produkt",
+        "configurable3dDesc": "Sie können dieses Produkt in unserem 3D-Creator vor dem Kauf personalisieren.",
+        "openConfigurator": "Konfigurator öffnen",
+        "manufacturerCodeLabel": "Herstellercode",
+        "dimensionsLabel": "Abmessungen (HxBxT)",
+        "weightLabel": "Gewicht",
+        "promo": "Aktion",
+        "grossPrice": "Bruttopreis"
     },
     "Auth": {
         "login": {
@@ -248,7 +219,15 @@
         "guestCheckout": "Als Gast fortfahren",
         "loadingShipping": "Versandmethoden werden geladen...",
         "freeShipping": "Kostenloser Versand",
-        "configuredProduct": "Personalisiertes Produkt"
+        "configuredProduct": "Personalisiertes Produkt",
+        "cartAndCheckout": "Warenkorb und Kasse",
+        "selectedProducts": "Ausgew\u00e4hlte Produkte",
+        "shippingDetails": "Versanddetails",
+        "guestNotice": "Sie kaufen als Gast ein.",
+        "loginToSave": "Melden Sie sich an, um die Bestellung in Ihrer Historie zu speichern.",
+        "orderAndPay": "Bestellen und Bezahlen",
+        "acceptTerms": "Mit dem Klick auf \"{buttonText}\" akzeptieren Sie die Ladenbedingungen.",
+        "errorPlacingOrder": "Beim Aufgeben der Bestellung ist ein Fehler aufgetreten."
     },
     "Checkout": {
         "orderPlaced": "Vielen Dank für Ihre Bestellung!",
@@ -293,6 +272,14 @@
             "paymentMethod": "Zahlungsmethode",
             "details": "Details",
             "return": "Zurückgeben",
+            "subtitle": "Durchsuchen Sie Ihre Kaufhistorie und verfolgen Sie den Status.",
+            "goToShop": "Zum Shop",
+            "paymentMethods": {
+                "manual_transfer": "Banküberweisung",
+                "transfer": "Banküberweisung",
+                "payu": "Online-Zahlung (PayU)",
+                "card": "Zahlungskarte"
+            },
             "returnUnavailable": "Rückgabe nicht möglich",
             "returnUnavailableInvoice": "Firmenbestellung (Rechnung)",
             "returnUnavailablePersonalized": "Personalisierte Produkte",
@@ -305,9 +292,25 @@
                 "PAID": "Bezahlt",
                 "SHIPPED": "Versandt",
                 "DELIVERED": "Geliefert",
-                "RETURN_REQUESTED": "Rückgabe beantragt",
+                "RETURN_REQUESTED": "Rückgabe angefordert",
                 "RETURNED": "Zurückgegeben"
-            }
+            },
+            "backToList": "Zurück zur Liste",
+            "orderItems": "Bestellpositionen",
+            "product": "Produkt",
+            "quantity": "Menge",
+            "unitPrice": "Summe",
+            "totalLabel": "Gesamt:",
+            "payment": "Zahlung",
+            "method": "Methode",
+            "unknown": "Unbekannt",
+            "paymentStatus": "Zahlungsstatus",
+            "paid": "Bezahlt",
+            "waiting": "Warten",
+            "shipping": "Versand",
+            "shippingAddress": "Lieferadresse",
+            "placedAt": "Aufgegeben am",
+            "inscription": "Inschrift"
         },
         "orderDetail": {
             "back": "Zurück zu Bestellungen",
@@ -371,21 +374,98 @@
         }
     },
     "Configurator": {
-        "title": "3D-Kugel-Konfigurator",
-        "subtitle": "Gestalten Sie Ihre einzigartige Weihnachtskugel",
-        "sizeLabel": "Größe",
-        "colorLabel": "Farbe",
-        "textLabel": "Text auf der Kugel",
-        "textPlaceholder": "z.B. Frohe Weihnachten",
+        "title": "Ornament-Gestalter",
+        "subtitle": "Entwerfen Sie einen einzigartigen Weihnachtsschmuck. Wählen Sie Größe, Farbe und fügen Sie eine persönliche Widmung hinzu.",
+        "loading": "Konfigurator wird geladen...",
+        "sizeLabel": "Größe wählen",
+        "colorLabel": "Glasfarbe wählen",
+        "textLabel": "Ihre Widmung",
+        "textPlaceholder": "z.B. Für Oma Rosemarie",
         "basePrice": "Grundpreis",
-        "finalPrice": "Endpreis",
+        "finalPrice": "Gesamtpreis",
         "addToCart": "In den Warenkorb",
+        "addedToCart": "In den Warenkorb gelegt",
         "adding": "Wird hinzugefügt...",
-        "previewLabel": "3D-Vorschau",
+        "previewLabel": "Live-3D-Vorschau",
         "configLabel": "Konfiguration",
         "optionsLabel": "Optionen",
         "decorLabel": "Dekoration",
         "noDecor": "Keine",
         "colorOptions": "Farboptionen"
+    },
+    "ProductionProcess": {
+        "step1": {
+            "title": "Erhitzen (Heating)",
+            "desc": "Das Glas wird rotglühend erhitzt und wird zu einem plastischen Material, bereit für Magie."
+        },
+        "step2": {
+            "title": "Blasen (Blowing)",
+            "desc": "Der Meistergläser gibt der Kugel mit einem einzigen Atemzug ihre Form. So wird die Seele der Kugel geboren."
+        },
+        "step3": {
+            "title": "Versilbern (Silvering)",
+            "desc": "Das Innere wird mit Silbernitrat gefüllt. Die Kugel erhält ihr verspiegeltes Herz."
+        },
+        "step4": {
+            "title": "Lackieren (Lacquering)",
+            "desc": "Nach dem Versilbern werden die Kugeln lackiert, um ihnen einzigartige Farben zu verleihen."
+        },
+        "step5": {
+            "title": "Dekorieren (Decorating)",
+            "desc": "Künstlerinnen tragen Muster mit chirurgischer Präzision auf. Jeder Pinselstrich erzählt eine Geschichte."
+        }
+    },
+    "Booking": {
+        "title": "Online-Buchung",
+        "steps": {
+            "package_people": "Paket & Personen",
+            "date_time": "Datum & Uhrzeit",
+            "details": "Ihre Daten"
+        },
+        "step1": {
+            "title": "1. Paket und Gruppengröße wählen",
+            "sightseeing_title": "Fabrikbesichtigung",
+            "sightseeing_desc": "Geführter Lehrpfad. Sehen Sie den Blas- und Dekorationsprozess.",
+            "workshop_title": "Besichtigung + Workshop",
+            "workshop_desc": "Besichtigung und praktisches Bemalen von Kugeln unter Aufsicht von Künstlern.",
+            "recommended": "Empfohlen",
+            "people_label": "Für wie viele Personen möchten Sie buchen?",
+            "max_capacity": "Die maximale Kapazität des Workshops beträgt 92 Personen.",
+            "check_dates": "Termine prüfen"
+        },
+        "step2": {
+            "title": "2. Termin wählen",
+            "change_params": "Parameter ändern",
+            "available_days": "Verfügbare Tage:",
+            "hours_label": "Stunden",
+            "select_day_placeholder": "Wählen Sie einen Tag aus der Liste",
+            "no_slots": "Keine freien Termine für eine Gruppe von",
+            "next": "Weiter"
+        },
+        "step3": {
+            "summary_title": "Buchungszusammenfassung",
+            "package": "Paket",
+            "date": "Datum",
+            "participants": "Teilnehmer",
+            "total_price": "Zu zahlen",
+            "name_label": "Vor- und Nachname",
+            "name_placeholder": "Max Mustermann",
+            "email_label": "E-Mail-Adresse",
+            "email_placeholder": "max@beispiel.de",
+            "group_invoice": "Gruppenbuchung (Rechnung)",
+            "institution_name": "Name der Institution",
+            "institution_address": "Adresse der Institution (für Rechnung)",
+            "back": "Zurück",
+            "processing": "Verarbeitung...",
+            "confirm": "Buchung bestätigen",
+            "payment_info": "Zahlung vor Ort (Bar/Karte) oder per Banküberweisung (Details in E-Mail)."
+        },
+        "success": {
+            "title": "Buchung bestätigt!",
+            "message": "Vielen Dank, {name}. Bestätigung gesendet an",
+            "details_title": "Buchungsdetails",
+            "invoice_data": "Rechnungsdaten (Gruppe)",
+            "back_home": "Zurück zur Startseite"
+        }
     }
 }

@@ -5,7 +5,7 @@ import { Mail, Phone, MapPin, Facebook, Instagram, Youtube } from 'lucide-react'
 import { getSystemSettings } from '@/app/[locale]/actions';
 
 export default async function Footer() {
-    const t = await getTranslations('Common.nav');
+    const t = await getTranslations('Common');
     const settings = await getSystemSettings();
 
     const contactInfo = {
@@ -21,7 +21,6 @@ export default async function Footer() {
 
     return (
         <footer className="bg-[#050505] border-t border-white/5 pt-20 pb-10 relative overflow-hidden">
-            {/* Background glowing effects */}
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -39,7 +38,7 @@ export default async function Footer() {
                             </div>
                         </Link>
                         <p className="text-amber-200/40 text-sm leading-relaxed font-light italic">
-                            Od 78 lat tworzymy magię szklanych ozdób choinkowych, łącząc tradycyjne rzemiosło z nowoczesnym designem.
+                            {t('footer.tagline')}
                         </p>
                         <div className="flex gap-4">
                             {contactInfo.ig && (
@@ -62,30 +61,30 @@ export default async function Footer() {
 
                     {/* Quick Links */}
                     <div className="space-y-6">
-                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('about')}</h4>
+                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('nav.about')}</h4>
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
-                            <li><Link href="/o-nas" className="hover:text-amber-500 transition-colors">{t('about')}</Link></li>
-                            <li><Link href="/galeria" className="hover:text-amber-500 transition-colors">{t('gallery')}</Link></li>
-                            <li><Link href="/sklep" className="hover:text-amber-500 transition-colors">{t('shop')}</Link></li>
-                            <li><Link href="/#booking" className="hover:text-amber-500 transition-colors">{t('workshops')}</Link></li>
+                            <li><Link href="/o-nas" className="hover:text-amber-500 transition-colors">{t('nav.about')}</Link></li>
+                            <li><Link href="/galeria" className="hover:text-amber-500 transition-colors">{t('nav.gallery')}</Link></li>
+                            <li><Link href="/sklep" className="hover:text-amber-500 transition-colors">{t('nav.shop')}</Link></li>
+                            <li><Link href="/#booking" className="hover:text-amber-500 transition-colors">{t('nav.workshops')}</Link></li>
                         </ul>
                     </div>
 
-                    {/* Shop Info */}
+                    {/* Account Links */}
                     <div className="space-y-6">
-                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">Twoje Konto</h4>
+                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('footer.account')}</h4>
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
-                            <li><Link href="/moje-konto" className="hover:text-amber-500 transition-colors">Moje Zamówienia</Link></li>
-                            <li><Link href="/koszyk" className="hover:text-amber-500 transition-colors">Mój Koszyk</Link></li>
-                            <li><Link href="/kontakt" className="hover:text-amber-500 transition-colors">{t('contact')}</Link></li>
-                            <li><Link href="#" className="hover:text-amber-500 transition-colors">Regulamin</Link></li>
-                            <li><Link href="#" className="hover:text-amber-500 transition-colors">Polityka Prywatności</Link></li>
+                            <li><Link href="/moje-konto" className="hover:text-amber-500 transition-colors">{t('footer.myOrders')}</Link></li>
+                            <li><Link href="/koszyk" className="hover:text-amber-500 transition-colors">{t('footer.myCart')}</Link></li>
+                            <li><Link href="/kontakt" className="hover:text-amber-500 transition-colors">{t('nav.contact')}</Link></li>
+                            <li><Link href="#" className="hover:text-amber-500 transition-colors">{t('footer.terms')}</Link></li>
+                            <li><Link href="#" className="hover:text-amber-500 transition-colors">{t('footer.privacy')}</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact */}
                     <div className="space-y-6">
-                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('contact')}</h4>
+                        <h4 className="text-white text-[10px] font-black uppercase tracking-[0.3em]">{t('nav.contact')}</h4>
                         <ul className="space-y-4 text-amber-200/40 text-sm font-light">
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
@@ -105,7 +104,7 @@ export default async function Footer() {
 
                 <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-[10px] text-amber-500/20 font-bold uppercase tracking-widest">
-                        © {new Date().getFullYear()} Bolglass Sp. z o.o. Wszystkie prawa zastrzeżone.
+                        © {new Date().getFullYear()} Bolglass Sp. z o.o. {t('footer.copyright')}
                     </p>
                     <div className="flex items-center gap-4 grayscale opacity-30">
                         <Image src="/payments/payu.png" alt="PayU" width={40} height={20} className="object-contain" />

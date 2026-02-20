@@ -7,28 +7,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
 export default function BookingCalendar() {
-    // Wizard State
-    const [step, setStep] = useState(0);
-    // 0: Type & People Selection
-    // 1: Date & Time Selection
-    // 2: Details Form
-    // 3: Success
+    const t = useTranslations('Booking');
 
+    const [step, setStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Data State
     const [prices, setPrices] = useState({ sightseeing: 35, workshop: 60 });
-    const [monthAvailability, setMonthAvailability] = useState<any[]>([]); // For calendar dots (heuristic)
-    const [daySlots, setDaySlots] = useState<string[]>([]); // Specific start times for selected day
+    const [monthAvailability, setMonthAvailability] = useState<any[]>([]);
+    const [daySlots, setDaySlots] = useState<string[]>([]);
 
-    // User Selection State
     const [bookingType, setBookingType] = useState<'SIGHTSEEING' | 'WORKSHOP'>('SIGHTSEEING');
-    const [people, setPeople] = useState('1'); // Input is string, parsed to number
-    const [selectedDate, setSelectedDate] = useState<string | null>(null); // YYYY-MM-DD
-    const [selectedTime, setSelectedTime] = useState<string | null>(null); // ISO String of start time
+    const [people, setPeople] = useState('1');
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-    // Contact Form State
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [isGroup, setIsGroup] = useState(false);
@@ -42,21 +35,18 @@ export default function BookingCalendar() {
                 getSystemSettings()
             ]);
             setMonthAvailability(availableSlots);
-
             if (settings.price_sightseeing) setPrices(p => ({ ...p, sightseeing: parseInt(settings.price_sightseeing) }));
             if (settings.price_workshop) setPrices(p => ({ ...p, workshop: parseInt(settings.price_workshop) }));
         }
         init();
     }, []);
 
-    // Scroll to top on step change
     useEffect(() => {
         if (step > 0 && containerRef.current) {
             containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }, [step]);
 
-    // Fetch slots when date is selected
     useEffect(() => {
         async function fetchDailySlots() {
             if (!selectedDate) return;
@@ -70,7 +60,7 @@ export default function BookingCalendar() {
             if (res.success && res.slots) {
                 setDaySlots(res.slots);
             } else {
-                alert('Błąd pobierania terminów: ' + res.error);
+                alert('Error: ' + res.error);
             }
         }
 
@@ -85,7 +75,7 @@ export default function BookingCalendar() {
         setLoading(true);
         try {
             const result = await createBooking({
-                date: selectedTime, // New: Passing exact ISO time
+                date: selectedTime,
                 name,
                 email,
                 people: parseInt(people) || 1,
@@ -98,20 +88,15 @@ export default function BookingCalendar() {
             if (result.success) {
                 setStep(3);
             } else {
-                alert('Błąd rezerwacji: ' + result.error);
+                alert('Error: ' + result.error);
             }
         } catch (err: any) {
             setLoading(false);
             console.error('Client booking error:', err);
-            alert('Wystąpił błąd techniczny: ' + (err.message || 'Nieznany błąd'));
+            alert('Technical error: ' + (err.message || 'Unknown error'));
         }
     };
 
-    // Helper to get unique dates from monthAvailability for calendar viz
-    // Actually, monthAvailability comes from old `getAvailableSlots` which depends on old logic.
-    // It might show days as available even if fully booked by new logic.
-    // But better than nothing. Alternatively, we generate simple calendar list for next 30 days.
-    // Let's generate next 30 days and mark them based on basics.
     const today = new Date();
     const next30Days = Array.from({ length: 45 }, (_, i) => {
         const d = new Date(today);
@@ -120,10 +105,6 @@ export default function BookingCalendar() {
     });
 
     const currentPrice = bookingType === 'WORKSHOP' ? prices.workshop : prices.sightseeing;
-
-    const t = useTranslations('Booking');
-
-    // ... (keep state) ...
 
     return (
         <section ref={containerRef} className="py-24 bg-white text-black scroll-mt-20">
@@ -165,16 +146,15 @@ export default function BookingCalendar() {
                                 {/* STEP 0: TYPE & PEOPLE */}
                                 {step === 0 && (
                                     <motion.div key="step0" {...fadeIn} className="space-y-8">
-                                        <h3 className="text-xl font-bold">1. Wybierz pakiet i wielkość grupy</h3>
+                                        <h3 className="text-xl font-bold">{t('step1.title')}</h3>
 
-                                        {/* Type Selection */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <TypeButton
                                                 selected={bookingType === 'SIGHTSEEING'}
                                                 onClick={() => setBookingType('SIGHTSEEING')}
                                                 icon="👀"
-                                                title="Zwiedzanie Fabryki"
-                                                desc="Przejście ścieżką edukacyjną z przewodnikiem. Zobacz proces dmuchania i dekorowania."
+                                                title={t('step1.sightseeing_title')}
+                                                desc={t('step1.sightseeing_desc')}
                                                 price={prices.sightseeing}
                                                 duration="30 min"
                                             />
@@ -182,18 +162,17 @@ export default function BookingCalendar() {
                                                 selected={bookingType === 'WORKSHOP'}
                                                 onClick={() => setBookingType('WORKSHOP')}
                                                 icon="🎨"
-                                                title="Zwiedzanie + Warsztaty"
-                                                desc="Zwiedzanie oraz własnoręczne malowanie bombek pod okiem artystki."
+                                                title={t('step1.workshop_title')}
+                                                desc={t('step1.workshop_desc')}
                                                 price={prices.workshop}
                                                 duration="80 min"
-                                                badge="Polecane"
+                                                badge={t('step1.recommended')}
                                             />
                                         </div>
 
-                                        {/* People Input */}
                                         <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
                                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                                Dla ilu osób chcesz zarezerwować wejście?
+                                                {t('step1.people_label')}
                                             </label>
                                             <div className="flex items-center gap-4">
                                                 <input
@@ -216,13 +195,13 @@ export default function BookingCalendar() {
                                                 </div>
                                             </div>
                                             <p className="text-xs text-center md:text-left text-gray-400 mt-2">
-                                                Maksymalna pojemność sali warsztatowej to 92 osoby.
+                                                {t('step1.max_capacity')}
                                             </p>
                                         </div>
 
                                         <div className="flex justify-end">
                                             <Button variant="primary" size="lg" onClick={() => setStep(1)}>
-                                                Sprawdź Terminy &rarr;
+                                                {t('step1.check_dates')} &rarr;
                                             </Button>
                                         </div>
                                     </motion.div>
@@ -232,14 +211,13 @@ export default function BookingCalendar() {
                                 {step === 1 && (
                                     <motion.div key="step1" {...fadeIn} className="space-y-6">
                                         <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-xl font-bold">2. Wybierz termin</h3>
-                                            <button onClick={() => setStep(0)} className="text-sm text-gray-400 hover:text-red-600 underline">Zmień parametry</button>
+                                            <h3 className="text-xl font-bold">{t('step2.title')}</h3>
+                                            <button onClick={() => setStep(0)} className="text-sm text-gray-400 hover:text-red-600 underline">{t('step2.change_params')}</button>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[400px]">
-                                            {/* Date List */}
                                             <div className="border-r border-gray-100 pr-4 overflow-y-auto custom-scrollbar">
-                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 sticky top-0 bg-white z-10 py-2">Dostępne dni:</p>
+                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 sticky top-0 bg-white z-10 py-2">{t('step2.available_days')}</p>
                                                 <div className="space-y-2">
                                                     {next30Days.map(dateStr => {
                                                         const date = new Date(dateStr);
@@ -257,23 +235,22 @@ export default function BookingCalendar() {
                                                 </div>
                                             </div>
 
-                                            {/* Time Slots */}
                                             <div className="overflow-y-auto custom-scrollbar relative">
                                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 sticky top-0 bg-white z-10 py-2 relative">
-                                                    {selectedDate ? `Godziny (${new Date(selectedDate).toLocaleDateString('pl-PL')}):` : 'Wybierz dzień...'}
+                                                    {selectedDate ? `${t('step2.hours_label')} (${new Date(selectedDate).toLocaleDateString('pl-PL')}):` : t('step2.select_day_placeholder')}
                                                 </p>
 
                                                 {loading && <div className="absolute inset-0 bg-white/80 z-20 flex items-center justify-center"><div className="animate-spin text-red-600 text-2xl">⚡</div></div>}
 
                                                 {!selectedDate ? (
                                                     <div className="h-full flex items-center justify-center text-gray-300 italic text-sm border-2 border-dashed border-gray-100 rounded-xl">
-                                                        &larr; Wybierz dzień z listy
+                                                        &larr; {t('step2.select_day_placeholder')}
                                                     </div>
                                                 ) : (
                                                     <div className="grid grid-cols-2 gap-3 pb-4">
                                                         {daySlots.length === 0 && !loading ? (
                                                             <div className="col-span-2 text-center py-8 text-gray-400 text-xs">
-                                                                Brak wolnych godzin dla grupy {people} os.
+                                                                {t('step2.no_slots')} {people} os.
                                                             </div>
                                                         ) : (
                                                             daySlots.map(timeStr => (
@@ -294,13 +271,8 @@ export default function BookingCalendar() {
                                         </div>
 
                                         <div className="pt-4 border-t border-gray-100 flex justify-end">
-                                            <Button
-                                                variant="primary"
-                                                size="lg"
-                                                disabled={!selectedTime}
-                                                onClick={() => setStep(2)}
-                                            >
-                                                Dalej
+                                            <Button variant="primary" size="lg" disabled={!selectedTime} onClick={() => setStep(2)}>
+                                                {t('step2.next')}
                                             </Button>
                                         </div>
                                     </motion.div>
@@ -310,14 +282,14 @@ export default function BookingCalendar() {
                                 {step === 2 && (
                                     <motion.div key="step2" {...fadeIn} className="space-y-6">
                                         <div className="bg-gradient-to-r from-red-50 to-white p-6 rounded-xl border border-red-100 shadow-sm">
-                                            <h4 className="font-bold text-red-900 text-xs uppercase tracking-wider mb-4">Podsumowanie Rezerwacji</h4>
+                                            <h4 className="font-bold text-red-900 text-xs uppercase tracking-wider mb-4">{t('step3.summary_title')}</h4>
                                             <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
                                                 <div>
-                                                    <span className="text-gray-500 block text-xs">Pakiet</span>
-                                                    <strong className="text-gray-900 text-lg">{bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</strong>
+                                                    <span className="text-gray-500 block text-xs">{t('step3.package')}</span>
+                                                    <strong className="text-gray-900 text-lg">{bookingType === 'WORKSHOP' ? t('step1.workshop_title') : t('step1.sightseeing_title')}</strong>
                                                 </div>
                                                 <div>
-                                                    <span className="text-gray-500 block text-xs">Termin</span>
+                                                    <span className="text-gray-500 block text-xs">{t('step3.date')}</span>
                                                     <strong className="text-gray-900 text-lg">
                                                         {selectedTime && new Date(selectedTime).toLocaleDateString('pl-PL')}
                                                         <span className="mx-2 text-gray-300">|</span>
@@ -325,19 +297,19 @@ export default function BookingCalendar() {
                                                     </strong>
                                                 </div>
                                                 <div>
-                                                    <span className="text-gray-500 block text-xs">Uczestnicy</span>
+                                                    <span className="text-gray-500 block text-xs">{t('step3.participants')}</span>
                                                     <strong className="text-gray-900 text-lg">{people} os.</strong>
                                                 </div>
                                                 <div className="ml-auto text-right">
-                                                    <span className="text-gray-500 block text-xs">Do zapłaty</span>
+                                                    <span className="text-gray-500 block text-xs">{t('step3.total_price')}</span>
                                                     <strong className="text-red-600 text-2xl font-black">{currentPrice * parseInt(people)} zł</strong>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <Input label="Imię i Nazwisko" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jan Kowalski" />
-                                            <Input label="Adres Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jan@przykład.pl" />
+                                            <Input label={t('step3.name_label')} value={name} onChange={(e) => setName(e.target.value)} placeholder={t('step3.name_placeholder')} />
+                                            <Input label={t('step3.email_label')} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('step3.email_placeholder')} />
                                         </div>
 
                                         <div className="border-t border-gray-100 pt-4">
@@ -346,15 +318,15 @@ export default function BookingCalendar() {
                                                     <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isGroup ? 'translate-x-6' : ''}`} />
                                                     <input type="checkbox" className="sr-only" checked={isGroup} onChange={(e) => setIsGroup(e.target.checked)} />
                                                 </div>
-                                                <span className="font-bold text-sm text-gray-700 group-hover:text-red-600 transition-colors">Rezerwacja Grupowa (Faktura)</span>
+                                                <span className="font-bold text-sm text-gray-700 group-hover:text-red-600 transition-colors">{t('step3.group_invoice')}</span>
                                             </label>
 
                                             <AnimatePresence>
                                                 {isGroup && (
                                                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4 pt-4 overflow-hidden">
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                            <Input label="Nazwa Instytucji" value={institutionName} onChange={(e) => setInstitutionName(e.target.value)} placeholder="np. Szkoła Podstawowa nr 1" required={isGroup} />
-                                                            <Input label="Adres Instytucji (do faktury)" value={institutionAddress} onChange={(e) => setInstitutionAddress(e.target.value)} placeholder="Ulica, Miasto, NIP" required={isGroup} />
+                                                            <Input label={t('step3.institution_name')} value={institutionName} onChange={(e) => setInstitutionName(e.target.value)} placeholder="np. Szkoła Podstawowa nr 1" required={isGroup} />
+                                                            <Input label={t('step3.institution_address')} value={institutionAddress} onChange={(e) => setInstitutionAddress(e.target.value)} placeholder="Ulica, Miasto, NIP" required={isGroup} />
                                                         </div>
                                                     </motion.div>
                                                 )}
@@ -362,12 +334,12 @@ export default function BookingCalendar() {
                                         </div>
 
                                         <div className="flex gap-4 pt-4">
-                                            <Button variant="outline" onClick={() => setStep(1)} className="w-1/3">Wróć</Button>
+                                            <Button variant="outline" onClick={() => setStep(1)} className="w-1/3">{t('step3.back')}</Button>
                                             <Button variant="primary" onClick={handleBooking} disabled={loading || !name || !email} className="w-2/3">
-                                                {loading ? 'Przetwarzanie...' : 'Potwierdź Rezerwację'}
+                                                {loading ? t('step3.processing') : t('step3.confirm')}
                                             </Button>
                                         </div>
-                                        <p className="text-xs text-center text-gray-400 mt-2">Płatność na miejscu (gotówka/karta) lub przelewem (dane w mailu).</p>
+                                        <p className="text-xs text-center text-gray-400 mt-2">{t('step3.payment_info')}</p>
                                     </motion.div>
                                 )}
 
@@ -375,14 +347,14 @@ export default function BookingCalendar() {
                                 {step === 3 && (
                                     <motion.div key="step3" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-8">
                                         <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl mb-6 shadow-sm">✓</div>
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Rezerwacja Potwierdzona!</h3>
-                                        <p className="text-gray-500 mb-8">Dziękujemy, {name}. Potwierdzenie wysłaliśmy na adres <strong>{email}</strong>.</p>
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('success.title')}</h3>
+                                        <p className="text-gray-500 mb-8">{t('success.message', { name })} <strong>{email}</strong>.</p>
 
                                         <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 text-left max-w-md mx-auto space-y-4 shadow-inner">
-                                            <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-2 mb-2">Szczegóły Rezerwacji</h4>
+                                            <h4 className="font-bold text-gray-900 border-b border-gray-200 pb-2 mb-2">{t('success.details_title')}</h4>
 
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500 text-sm">Termin:</span>
+                                                <span className="text-gray-500 text-sm">{t('step3.date')}:</span>
                                                 <span className="font-bold text-gray-900">
                                                     {selectedTime && new Date(selectedTime).toLocaleDateString('pl-PL')}
                                                     <span className="mx-1"> </span>
@@ -391,31 +363,31 @@ export default function BookingCalendar() {
                                             </div>
 
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500 text-sm">Pakiet:</span>
-                                                <span className="font-bold text-gray-900">{bookingType === 'WORKSHOP' ? 'Warsztaty' : 'Zwiedzanie'}</span>
+                                                <span className="text-gray-500 text-sm">{t('step3.package')}:</span>
+                                                <span className="font-bold text-gray-900">{bookingType === 'WORKSHOP' ? t('step1.workshop_title') : t('step1.sightseeing_title')}</span>
                                             </div>
 
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500 text-sm">Liczba osób:</span>
+                                                <span className="text-gray-500 text-sm">{t('step3.participants')}:</span>
                                                 <span className="font-bold text-gray-900">{people} os.</span>
                                             </div>
 
                                             {isGroup && (
                                                 <div className="border-t border-gray-200 pt-2 mt-2">
-                                                    <div className="text-xs font-bold text-red-600 uppercase mb-1">Dane do faktury (Grupa)</div>
+                                                    <div className="text-xs font-bold text-red-600 uppercase mb-1">{t('success.invoice_data')}</div>
                                                     <div className="text-sm text-gray-700">{institutionName}</div>
                                                     <div className="text-xs text-gray-500">{institutionAddress}</div>
                                                 </div>
                                             )}
 
                                             <div className="border-t border-gray-200 pt-4 mt-2 flex justify-between items-center">
-                                                <span className="text-gray-500 font-medium">Do zapłaty:</span>
+                                                <span className="text-gray-500 font-medium">{t('step3.total_price')}:</span>
                                                 <span className="text-2xl font-black text-red-600">{currentPrice * parseInt(people)} zł</span>
                                             </div>
                                         </div>
 
                                         <div className="mt-8">
-                                            <Button variant="outline" onClick={() => window.location.reload()}>Wróć do strony głównej</Button>
+                                            <Button variant="outline" onClick={() => window.location.reload()}>{t('success.back_home')}</Button>
                                         </div>
                                     </motion.div>
                                 )}
@@ -428,7 +400,6 @@ export default function BookingCalendar() {
     );
 }
 
-// UI Components
 function StepCard({ step, currentStep, label, setStep, subText }: any) {
     const isActive = currentStep === step;
     const isCompleted = currentStep > step;

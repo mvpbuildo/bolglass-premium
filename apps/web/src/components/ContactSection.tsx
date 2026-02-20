@@ -1,8 +1,10 @@
 import { getSystemSettings } from '@/app/[locale]/actions';
 import { Facebook, Instagram, Mail, Phone, MapPin, Clock } from 'lucide-react';
 import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 
 export default async function ContactSection() {
+    const t = await getTranslations('Contact');
     const settings = await getSystemSettings();
 
     const contactInfo = {
@@ -21,7 +23,7 @@ export default async function ContactSection() {
         <section id="contact" className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold mb-4 uppercase tracking-tighter">Kontakt</h2>
+                    <h2 className="text-4xl font-bold mb-4 uppercase tracking-tighter">{t('title')}</h2>
                     <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-amber-500 mx-auto rounded-full"></div>
                 </div>
 
@@ -31,7 +33,7 @@ export default async function ContactSection() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div className="space-y-8">
                                 <section>
-                                    <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">Adres</h2>
+                                    <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">{t('address')}</h2>
                                     <div className="flex gap-4">
                                         <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 flex-shrink-0">
                                             <MapPin size={24} />
@@ -45,13 +47,13 @@ export default async function ContactSection() {
                                 </section>
 
                                 <section>
-                                    <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">Godziny Otwarcia</h2>
+                                    <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">{t('hours')}</h2>
                                     <div className="flex gap-4">
                                         <div className="w-12 h-12 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0">
                                             <Clock size={24} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-900 truncate">Poniedziałek - Piątek</p>
+                                            <p className="font-bold text-gray-900 truncate">{t('weekdays')}</p>
                                             <p className="text-gray-600">08:00 - 16:00</p>
                                         </div>
                                     </div>
@@ -60,7 +62,7 @@ export default async function ContactSection() {
 
                             <div className="space-y-8">
                                 <section>
-                                    <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">Kontakt</h2>
+                                    <h2 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-4">{t('contact')}</h2>
                                     <div className="space-y-4">
                                         {contactInfo.phones.map((phone, idx) => (
                                             <div key={idx} className="flex gap-4 items-center">
@@ -123,7 +125,7 @@ export default async function ContactSection() {
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-gray-400 bg-gray-200">
                                     <MapPin size={48} className="mb-4 animate-bounce" />
-                                    <p className="font-bold">Skonfiguruj mapę w panelu admina</p>
+                                    <p className="font-bold">{t('mapPlaceholder')}</p>
                                 </div>
                             )}
                             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/20 to-transparent h-12 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>

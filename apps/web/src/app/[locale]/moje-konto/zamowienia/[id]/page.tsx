@@ -4,7 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { format } from "date-fns";
 import { Link } from "@/i18n/navigation";
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Button } from "@bolglass/ui";
-import { ChevronLeft, Package, Clock, CreditCard, Truck } from "lucide-react";
+import { ChevronLeft, Package, CreditCard, Truck } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 async function getOrder(id: string, userId: string) {
     return await prisma.order.findUnique({
@@ -22,8 +23,9 @@ async function getOrder(id: string, userId: string) {
     });
 }
 
-export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+export default async function OrderDetailPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
+    const { id, locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'Account.orders' });
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -37,16 +39,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     }
 
     const getStatusLabel = (status: string) => {
-        const labels: Record<string, string> = {
-            'PENDING': 'Oczekujące',
-            'PROCESSING': 'W trakcie',
-            'COMPLETED': 'Zakończone',
-            'CANCELLED': 'Anulowane',
-            'PAID': 'Opłacone',
-            'SHIPPED': 'Wysłane',
-            'DELIVERED': 'Dostarczone'
-        };
-        return labels[status] || status;
+        return t(`statuses.${status}`) || status;
     };
 
     const getStatusColor = (status: string) => {
@@ -68,7 +61,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 <Link href="/moje-konto/zamowienia">
                     <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-900 hover:bg-gray-100 hover:text-red-600">
                         <ChevronLeft className="w-4 h-4" />
-                        Wróć do listy
+                        {t('backToList')}
                     </Button>
                 </Link>
             </div>
@@ -77,9 +70,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                         <Package className="w-7 h-7 text-red-600" />
-                        Zamówienie #{order.id.substring(0, 8)}
+                        {t('order')} #{order.id.substring(0, 8)}
                     </h1>
-                    <p className="text-gray-500 text-sm">Złożone {format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</p>
+                    <p className="text-gray-500 text-sm">{t('placedAt')} {format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</p>
                 </div>
                 <div className={`px-4 py-2 rounded-full text-sm font-bold w-fit ${getStatusColor(order.status)}`}>
                     {getStatusLabel(order.status)}
@@ -90,14 +83,14 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 {/* Order Summary */}
                 <Card className="lg:col-span-2 divide-y divide-gray-100">
                     <div className="p-6">
-                        <h3 className="text-lg font-bold mb-4">Pozycje zamówienia</h3>
+                        <h3 className="text-lg font-bold mb-4">{t('orderItems')}</h3>
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Produkt</TableHead>
-                                        <TableHead className="text-center">Ilość</TableHead>
-                                        <TableHead className="text-right">Suma</TableHead>
+                                        <TableHead>{t('product')}</TableHead>
+                                        <TableHead className="text-center">{t('quantity')}</TableHead>
+                                        <TableHead className="text-right">{t('unitPrice')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -113,7 +106,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                                                 try {
                                                                     const config = JSON.parse(item.configuration as string);
                                                                     return Object.entries(config).map(([key, value]) => {
-                                                                        const labels: Record<string, string> = { size: 'Rozmiar', color: 'Kolor', text: 'Napis' };
+                                                                        const labels: Record<string, string> = {
+                                                                            size: t('size') ?? 'Rozmiar',
+                                                                            color: t('color') ?? 'Kolor',
+                                                                            text: t('inscription') ?? 'Napis'
+                                                                        };
                                                                         return (
                                                                             <div key={key} className="flex gap-2">
                                                                                 <span className="font-semibold">{labels[key] || key}:</span>
@@ -121,7 +118,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                                                             </div>
                                                                         );
                                                                     });
-                                                                } catch (e) {
+                                                                } catch {
                                                                     return null;
                                                                 }
                                                             })()}
@@ -142,7 +139,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
                     <div className="p-6 bg-gray-50/50">
                         <div className="flex justify-between items-center text-lg">
-                            <span className="font-bold text-gray-900">Łącznie:</span>
+                            <span className="font-bold text-gray-900">{t('totalLabel')}</span>
                             <span className="font-black text-red-600">{order.total.toFixed(2)} PLN</span>
                         </div>
                     </div>
@@ -154,17 +151,21 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     <Card className="p-6 space-y-4">
                         <div className="flex items-center gap-3 text-gray-900 font-bold border-b pb-3">
                             <CreditCard className="w-5 h-5 text-red-600" />
-                            Płatność
+                            {t('payment')}
                         </div>
                         <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-gray-500">Metoda:</span>
-                                <span className="font-medium">{order.paymentProvider || 'Nieznana'}</span>
+                                <span className="text-gray-500">{t('method')}:</span>
+                                <span className="font-medium">
+                                    {t.has(`paymentMethods.${order.paymentProvider}`)
+                                        ? t(`paymentMethods.${order.paymentProvider}`)
+                                        : (order.paymentProvider || t('unknown'))}
+                                </span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-500">Status:</span>
+                                <span className="text-gray-500">{t('paymentStatus')}:</span>
                                 <span className={`font-bold ${order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-yellow-600'}`}>
-                                    {order.paymentStatus === 'PAID' ? 'Opłacone' : 'Oczekiwanie'}
+                                    {order.paymentStatus === 'PAID' ? t('paid') : t('waiting')}
                                 </span>
                             </div>
                         </div>
@@ -174,15 +175,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     <Card className="p-6 space-y-4">
                         <div className="flex items-center gap-3 text-gray-900 font-bold border-b pb-3">
                             <Truck className="w-5 h-5 text-red-600" />
-                            Dostawa
+                            {t('shipping')}
                         </div>
                         <div className="space-y-4 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-gray-500">Metoda:</span>
+                                <span className="text-gray-500">{t('method')}:</span>
                                 <span className="font-medium">{order.shippingMethod}</span>
                             </div>
                             <div className="space-y-1">
-                                <span className="text-gray-500 block">Adres dostawy:</span>
+                                <span className="text-gray-500 block">{t('shippingAddress')}:</span>
                                 <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 italic text-gray-700">
                                     <p className="font-bold not-italic">{shippingAddress.name}</p>
                                     <p>{shippingAddress.street}</p>

@@ -6,9 +6,11 @@ import { Link } from "@/i18n/navigation";
 import { Card, Button } from "@bolglass/ui";
 import { Package } from "lucide-react";
 import OrderCard from "./OrderCard";
+import { getTranslations } from "next-intl/server";
 
 export default async function OrderHistoryPage() {
     const session = await auth();
+    const t = await getTranslations('Account.orders');
 
     if (!session?.user?.id) {
         redirect("/login");
@@ -31,8 +33,8 @@ export default async function OrderHistoryPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Moje Zamówienia</h1>
-                <p className="text-gray-500 text-sm">Przeglądaj historię swoich zakupów i śledź statusy.</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+                <p className="text-gray-500 text-sm">{t('subtitle')}</p>
             </div>
 
             {orders.length === 0 ? (
@@ -40,9 +42,9 @@ export default async function OrderHistoryPage() {
                     <div className="bg-gray-50 p-4 rounded-full w-fit mx-auto">
                         <Package className="w-8 h-8 text-gray-400" />
                     </div>
-                    <p className="text-gray-700 font-medium">Nie masz jeszcze żadnych zamówień.</p>
+                    <p className="text-gray-700 font-medium">{t('empty')}</p>
                     <Link href="/sklep">
-                        <Button variant="primary">Przejdź do sklepu</Button>
+                        <Button variant="primary">{t('goToShop')}</Button>
                     </Link>
                 </Card>
             ) : (

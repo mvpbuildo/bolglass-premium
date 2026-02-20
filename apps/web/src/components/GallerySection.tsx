@@ -2,8 +2,10 @@ import { getHomeGalleryItems } from '@/app/[locale]/admin/gallery/actions';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import GalleryHomeGrid from './GalleryHomeGrid';
+import { getTranslations } from 'next-intl/server';
 
 export default async function GallerySection() {
+    const t = await getTranslations('Gallery');
     const items = await getHomeGalleryItems();
 
     if (items.length === 0) return null;
@@ -18,18 +20,18 @@ export default async function GallerySection() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                     <div className="space-y-4">
                         <h2 className="text-4xl md:text-5xl font-serif text-gray-900">
-                            Magia <span className="text-orange-600 italic">Tworzenia</span>
+                            {t('magicOfCreation').split(' ')[0]} <span className="text-orange-600 italic">{t('magicOfCreation').split(' ')[1]}</span>
                         </h2>
                         <div className="w-20 h-1.5 bg-orange-600 rounded-full" />
                         <p className="text-gray-500 max-w-xl text-lg">
-                            Odkryj tajemnice naszej manufaktury. Od płynnego szkła po gotowe, ręcznie malowane arcydzieła.
+                            {t('subtitle')}
                         </p>
                     </div>
                     <Link
                         href="/galeria"
                         className="group flex items-center gap-3 text-orange-600 font-bold uppercase tracking-widest hover:text-orange-700 transition-colors"
                     >
-                        Zobacz pełną galerię
+                        {t('viewAll')}
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                     </Link>
                 </div>

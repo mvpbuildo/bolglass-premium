@@ -72,7 +72,9 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
                 <div className="pt-2 border-t border-gray-50">
                     <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">{t('paymentMethod')}</p>
                     <p className="text-xs text-gray-600 italic">
-                        {order.paymentProvider || t('transfer')}
+                        {t.has(`paymentMethods.${order.paymentProvider}`)
+                            ? t(`paymentMethods.${order.paymentProvider}`)
+                            : (order.paymentProvider || t('transfer'))}
                     </p>
                 </div>
 

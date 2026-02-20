@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { GalleryItem } from '@/types/gallery';
 import Image from 'next/image';
 import { VideoIcon, ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface GalleryHomeGridProps {
     items: GalleryItem[];
 }
 
 export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
+    const t = useTranslations('Gallery');
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
     const openLightbox = (index: number) => setSelectedIndex(index);
@@ -56,7 +58,7 @@ export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
 
                         {/* Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                            <p className="text-white font-medium text-sm md:text-base">{item.title || 'Manufaktura Bolglass'}</p>
+                            <p className="text-white font-medium text-sm md:text-base">{item.title || t('defaultTitle')}</p>
                             {item.description && (
                                 <p className="text-white/60 text-[10px] md:text-xs mt-1 line-clamp-2">{item.description}</p>
                             )}
@@ -75,7 +77,7 @@ export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
                     <button
                         onClick={closeLightbox}
                         className="absolute top-6 right-6 p-3 rounded-full bg-white/5 hover:bg-white/10 text-white z-[110]"
-                        aria-label="Zamknij"
+                        aria-label={t('close')}
                     >
                         <X className="w-8 h-8" />
                     </button>
@@ -83,7 +85,7 @@ export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
                     <button
                         onClick={prevMedia}
                         className="absolute left-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-white/5 hover:bg-white/10 text-white z-[110]"
-                        aria-label="Poprzednie"
+                        aria-label={t('prev')}
                     >
                         <ChevronLeft className="w-10 h-10" />
                     </button>
@@ -91,7 +93,7 @@ export default function GalleryHomeGrid({ items }: GalleryHomeGridProps) {
                     <button
                         onClick={nextMedia}
                         className="absolute right-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-white/5 hover:bg-white/10 text-white z-[110]"
-                        aria-label="Następne"
+                        aria-label={t('next')}
                     >
                         <ChevronRight className="w-10 h-10" />
                     </button>

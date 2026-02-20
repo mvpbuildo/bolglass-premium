@@ -8,7 +8,11 @@
       "studio3d": "Studio 3D",
       "shop": "Sklep",
       "gallery": "Galeria",
-      "contact": "Kontakt"
+      "contact": "Kontakt",
+      "account": "Konto",
+      "admin": "Admin",
+      "login": "Zaloguj",
+      "cart": "Koszyk"
     },
     "footer": {
       "tagline": "Od 78 lat tworzymy magię szklanych ozdób choinkowych, łącząc tradycyjne rzemiosło z nowoczesnym designem.",
@@ -19,60 +23,6 @@
       "terms": "Regulamin",
       "privacy": "Polityka Prywatności",
       "copyright": "Wszystkie prawa zastrzeżone."
-    }
-  },
-  "Booking": {
-    "title": "Rezerwacja online",
-    "steps": {
-      "package_people": "Pakiet i Liczba Osób",
-      "date_time": "Wybór Terminu",
-      "details": "Twoje Dane",
-      "success": "Gotowe"
-    },
-    "step1": {
-      "title": "1. Wybierz pakiet i wielkość grupy",
-      "sightseeing_title": "Zwiedzanie Fabryki",
-      "sightseeing_desc": "Przejście ścieżką edukacyjną z przewodnikiem. Zobacz proces dmuchania i dekorowania.",
-      "workshop_title": "Zwiedzanie + Warsztaty",
-      "workshop_desc": "Zwiedzanie oraz własnoręczne malowanie bombek pod okiem artystki.",
-      "recommended": "Polecane",
-      "people_label": "Dla ilu osób chcesz zarezerwować wejście?",
-      "max_capacity": "Maksymalna pojemność sali warsztatowej to 92 osoby.",
-      "check_dates": "Sprawdź Terminy"
-    },
-    "step2": {
-      "title": "2. Wybierz termin",
-      "change_params": "Zmień parametry",
-      "available_days": "Dostępne dni:",
-      "select_day_placeholder": "Wybierz dzień z listy",
-      "hours_label": "Godziny",
-      "no_slots": "Brak wolnych godzin dla grupy",
-      "next": "Dalej"
-    },
-    "step3": {
-      "summary_title": "Podsumowanie Rezerwacji",
-      "package": "Pakiet",
-      "date": "Termin",
-      "participants": "Uczestnicy",
-      "total_price": "Do zapłaty",
-      "name_label": "Imię i Nazwisko",
-      "name_placeholder": "Jan Kowalski",
-      "email_label": "Adres Email",
-      "email_placeholder": "jan@przykład.pl",
-      "group_invoice": "Rezerwacja Grupowa (Faktura)",
-      "institution_name": "Nazwa Instytucji",
-      "institution_address": "Adres Instytucji (do faktury)",
-      "back": "Wróć",
-      "confirm": "Potwierdź Rezerwację",
-      "processing": "Przetwarzanie...",
-      "payment_info": "Płatność na miejscu (gotówka/karta) lub przelewem (dane w mailu)."
-    },
-    "success": {
-      "title": "Rezerwacja Potwierdzona!",
-      "message": "Dziękujemy, {name}. Potwierdzenie wysłaliśmy na adres",
-      "details_title": "Szczegóły Rezerwacji",
-      "invoice_data": "Dane do faktury (Grupa)",
-      "back_home": "Wróć do strony głównej"
     }
   },
   "HomePage": {
@@ -95,6 +45,7 @@
     "subtitle": "Jesteśmy do Twojej dyspozycji. Zapraszamy do kontaktu telefonicznego, mailowego lub osobistego w naszej siedzibie.",
     "location": "Lokalizacja",
     "contact": "Kontakt",
+    "address": "Adres",
     "hours": "Godziny Otwarcia",
     "weekdays": "Poniedziałek - Piątek",
     "socialMedia": "Social Media",
@@ -106,15 +57,21 @@
   },
   "Gallery": {
     "badge": "Bolglass",
-    "title": "Galeria",
-    "subtitle": "Każda ozdoba to osobna historia opowiedziana przez szkło i kolor.",
+    "magicOfCreation": "Magia Tworzenia",
+    "viewAll": "Zobacz pełną galerię",
     "loading": "Ładowanie galerii...",
     "empty": "Galeria jest pusta.",
-    "lightboxClose": "Zamknij"
+    "lightboxClose": "Zamknij",
+    "close": "Zamknij",
+    "prev": "Poprzednie",
+    "next": "Następne",
+    "defaultTitle": "Manufaktura Bolglass"
   },
   "Shop": {
     "title": "Sklep Bolglass",
-    "badge": "Kolekcja",
+    "badge": "Kolekcja Bolglass",
+    "heroTitle": "Magia Szklanych Świąt",
+    "heroSubtitle": "Ręcznie dmuchane, artystycznie malowane od 1946 roku.",
     "subtitle": "Ręcznie dmuchane bombki szklane. Każda wyjątkowa.",
     "filterAll": "Wszystkie",
     "sortLabel": "Sortuj",
@@ -124,6 +81,10 @@
       "priceDesc": "Cena: malejąco"
     },
     "noProducts": "Brak produktów w tej kategorii.",
+    "allProducts": "Wszystkie Produkty",
+    "itemsCount": "Przedmiotów",
+    "emptyShop": "Jeszcze nie dodano żadnych produktów.",
+    "emptyShopAdmin": "Dodaj produkty w panelu admina.",
     "addToCart": "Do Koszyka",
     "addedToCart": "W Koszyku ✓",
     "configure": "Konfiguruj 3D",
@@ -134,7 +95,17 @@
     "backToShop": "Wróć do sklepu",
     "quantity": "Ilość",
     "buy": "Kup teraz",
-    "relatedProducts": "Podobne produkty"
+    "relatedProducts": "Podobne produkty",
+    "priceInclVat": "Cena brutto (zawiera VAT)",
+    "inStock": "Dostępny w magazynie",
+    "configurable3d": "✨ Produkt Konfigurowalny 3D",
+    "configurable3dDesc": "Ten produkt możesz spersonalizować w naszym kreatorze 3D przed zakupem.",
+    "openConfigurator": "Otwórz Konfigurator",
+    "manufacturerCodeLabel": "Kod Producenta",
+    "dimensionsLabel": "Wymiary (WxSxG)",
+    "weightLabel": "Waga",
+    "promo": "Promocja",
+    "grossPrice": "Cena Brutto"
   },
   "Auth": {
     "login": {
@@ -248,7 +219,15 @@
     "guestCheckout": "Kontynuuj bez logowania",
     "loadingShipping": "Ładowanie metod dostawy...",
     "freeShipping": "Darmowa dostawa",
-    "configuredProduct": "Produkt personalizowany"
+    "configuredProduct": "Produkt personalizowany",
+    "cartAndCheckout": "Koszyk i Zamówienie",
+    "selectedProducts": "Wybrane Produkty",
+    "shippingDetails": "Dane do Dostawy",
+    "guestNotice": "Kupujesz jako Gość.",
+    "loginToSave": "Zaloguj się, aby zapisać zamówienie w swojej historii.",
+    "orderAndPay": "Zamawiam i Płacę",
+    "acceptTerms": "Klikając \"{buttonText}\" akceptujesz regulamin sklepu.",
+    "errorPlacingOrder": "Wystąpił błąd podczas składania zamówienia."
   },
   "Checkout": {
     "orderPlaced": "Dziękujemy za złożenie zamówienia!",
@@ -293,6 +272,14 @@
       "paymentMethod": "Metoda płatności",
       "details": "Szczegóły",
       "return": "Zwróć",
+      "subtitle": "Przeglądaj historię swoich zakupów i śledź statusy.",
+      "goToShop": "Przejdź do sklepu",
+      "paymentMethods": {
+        "manual_transfer": "Przelew tradycyjny",
+        "transfer": "Przelew tradycyjny",
+        "payu": "Płatność online (PayU)",
+        "card": "Karta płatnicza"
+      },
       "returnUnavailable": "Zwrot niedostępny",
       "returnUnavailableInvoice": "Zamówienie na firmę (Faktura)",
       "returnUnavailablePersonalized": "Produkty personalizowane",
@@ -307,7 +294,23 @@
         "DELIVERED": "Dostarczone",
         "RETURN_REQUESTED": "Zwrot zgłoszony",
         "RETURNED": "Zwrócono"
-      }
+      },
+      "backToList": "Wróć do listy",
+      "orderItems": "Pozycje zamówienia",
+      "product": "Produkt",
+      "quantity": "Ilość",
+      "unitPrice": "Suma",
+      "totalLabel": "Łącznie:",
+      "payment": "Płatność",
+      "method": "Metoda",
+      "unknown": "Nieznana",
+      "paymentStatus": "Status płatności",
+      "paid": "Opłacone",
+      "waiting": "Oczekiwanie",
+      "shipping": "Dostawa",
+      "shippingAddress": "Adres dostawy",
+      "placedAt": "Złożone",
+      "inscription": "Napis"
     },
     "orderDetail": {
       "back": "Wróć do zamówień",
@@ -371,21 +374,98 @@
     }
   },
   "Configurator": {
-    "title": "Konfigurator Bombki 3D",
-    "subtitle": "Zaprojektuj swoją unikalną bombkę choinkową",
-    "sizeLabel": "Rozmiar",
-    "colorLabel": "Kolor",
-    "textLabel": "Napis na bombce",
-    "textPlaceholder": "np. Wesołych Świąt",
+    "title": "Kreator Ozdób",
+    "subtitle": "Zaprojektuj unikalną ozdobę choinkową. Wybierz rozmiar, kolor i dodaj osobistą dedykację.",
+    "loading": "Ładowanie konfiguratora...",
+    "sizeLabel": "Wybierz Rozmiar",
+    "colorLabel": "Wybierz Kolor Szkła",
+    "textLabel": "Twoja Dedykacja",
+    "textPlaceholder": "Np. Dla Babci Zosi",
     "basePrice": "Cena podstawowa",
-    "finalPrice": "Cena końcowa",
+    "finalPrice": "Cena całkowita",
     "addToCart": "Dodaj do koszyka",
+    "addedToCart": "Dodano do koszyka",
     "adding": "Dodawanie...",
-    "previewLabel": "Podgląd 3D",
+    "previewLabel": "Podgląd 3D na żywo",
     "configLabel": "Konfiguracja",
     "optionsLabel": "Opcje",
     "decorLabel": "Dekoracja",
     "noDecor": "Brak",
     "colorOptions": "Opcje Kolorystyczne"
+  },
+  "ProductionProcess": {
+    "step1": {
+      "title": "Ogrzewanie (Heating)",
+      "desc": "Szkło ogrzewane jest do czerwoności, stając się plastycznym materiałem gotowym na magię."
+    },
+    "step2": {
+      "title": "Dmuchanie (Blowing)",
+      "desc": "Mistrz dmuchacz jednym tchem nadaje kształt. Tak rodzi się dusza bombki."
+    },
+    "step3": {
+      "title": "Srebrzenie (Silvering)",
+      "desc": "Wnętrze wypełniane jest azotanem srebra. Bombka zyskuje swoje lustrzane serce."
+    },
+    "step4": {
+      "title": "Lakierowanie (Lacquering)",
+      "desc": "Po srebrzeniu bombki są lakierowane, aby nadać im niepowtarzalne kolory."
+    },
+    "step5": {
+      "title": "Dekorowanie (Decorating)",
+      "desc": "Artystki nanoszą wzory z chirurgiczną precyzją. Każde pociągnięcie pędzla to historia."
+    }
+  },
+  "Booking": {
+    "title": "Rezerwacja Online",
+    "steps": {
+      "package_people": "Pakiet i Osoby",
+      "date_time": "Termin i Godzina",
+      "details": "Twoje Dane"
+    },
+    "step1": {
+      "title": "1. Wybierz pakiet i wielkość grupy",
+      "sightseeing_title": "Zwiedzanie Fabryki",
+      "sightseeing_desc": "Przejście ścieżką edukacyjną z przewodnikiem. Zobacz proces dmuchania i dekorowania.",
+      "workshop_title": "Zwiedzanie + Warsztaty",
+      "workshop_desc": "Zwiedzanie oraz własnoręczne malowanie bombek pod okiem artystki.",
+      "recommended": "Polecane",
+      "people_label": "Dla ilu osób chcesz zarezerwować wejście?",
+      "max_capacity": "Maksymalna pojemność sali warsztatowej to 92 osoby.",
+      "check_dates": "Sprawdź Terminy"
+    },
+    "step2": {
+      "title": "2. Wybierz termin",
+      "change_params": "Zmień parametry",
+      "available_days": "Dostępne dni:",
+      "hours_label": "Godziny",
+      "select_day_placeholder": "Wybierz dzień z listy",
+      "no_slots": "Brak wolnych godzin dla grupy",
+      "next": "Dalej"
+    },
+    "step3": {
+      "summary_title": "Podsumowanie Rezerwacji",
+      "package": "Pakiet",
+      "date": "Termin",
+      "participants": "Uczestnicy",
+      "total_price": "Do zapłaty",
+      "name_label": "Imię i Nazwisko",
+      "name_placeholder": "Jan Kowalski",
+      "email_label": "Adres Email",
+      "email_placeholder": "jan@przykład.pl",
+      "group_invoice": "Rezerwacja Grupowa (Faktura)",
+      "institution_name": "Nazwa Instytucji",
+      "institution_address": "Adres Instytucji (do faktury)",
+      "back": "Wróć",
+      "processing": "Przetwarzanie...",
+      "confirm": "Potwierdź Rezerwację",
+      "payment_info": "Płatność na miejscu (gotówka/karta) lub przelewem (dane w mailu)."
+    },
+    "success": {
+      "title": "Rezerwacja Potwierdzona!",
+      "message": "Dziękujemy, {name}. Potwierdzenie wysłaliśmy na adres",
+      "details_title": "Szczegóły Rezerwacji",
+      "invoice_data": "Dane do faktury (Grupa)",
+      "back_home": "Wróć do strony głównej"
+    }
   }
 }

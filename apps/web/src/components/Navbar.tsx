@@ -107,13 +107,13 @@ export default function Navbar({ logoUrl }: { logoUrl?: string }) {
                             <div className="flex items-center gap-2">
                                 <Link href="/moje-konto" className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 text-white/70 hover:text-white hover:bg-white/10 transition-all">
                                     <User className="w-4 h-4" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">{session.user?.name?.split(' ')[0] || 'Konto'}</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">{session.user?.name?.split(' ')[0] || t('account')}</span>
                                 </Link>
                                 {session.user?.role === 'ADMIN' && (
                                     <Link href="/admin">
                                         <Button variant="ghost" size="sm" className="h-9 px-4 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/10">
                                             <LayoutDashboard className="w-3.5 h-3.5 mr-2" />
-                                            Admin
+                                            {t('admin')}
                                         </Button>
                                     </Link>
                                 )}
@@ -127,7 +127,7 @@ export default function Navbar({ logoUrl }: { logoUrl?: string }) {
                         ) : (
                             <Link href="/sklep/login">
                                 <Button className="h-9 px-6 rounded-full bg-amber-500 hover:bg-amber-600 text-black text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-                                    Zaloguj
+                                    {t('login')}
                                 </Button>
                             </Link>
                         )}
@@ -176,11 +176,11 @@ export default function Navbar({ logoUrl }: { logoUrl?: string }) {
                         <div className="flex items-center gap-6">
                             <Link href="/koszyk" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-amber-500">
                                 <ShoppingCart />
-                                <span className="font-bold">Koszyk ({itemCount})</span>
+                                <span className="font-bold">{t('cart')} ({itemCount})</span>
                             </Link>
                             <Link href="/moje-konto" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-amber-500">
                                 <User />
-                                <span className="font-bold">Konto</span>
+                                <span className="font-bold">{t('account')}</span>
                             </Link>
                         </div>
                     </div>

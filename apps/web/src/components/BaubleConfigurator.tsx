@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
 import { calculateBaublePrice } from '@/services/pricing';
 import { useCurrency } from '@/hooks/useCurrency';
+import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
 type MultilingualLabel = {
@@ -134,6 +135,7 @@ function ScreenshotHandler({ onCapture }: { onCapture: (fn: () => string) => voi
 }
 
 export default function BaubleConfigurator() {
+    const t = useTranslations('Configurator');
     const params = useParams();
     const locale = (params?.locale as string) || 'pl';
 
@@ -166,7 +168,7 @@ export default function BaubleConfigurator() {
         });
     }, []);
 
-    if (!config) return <div className="h-[90vh] bg-neutral-950 flex items-center justify-center text-white">Ładowanie konfiguratora...</div>;
+    if (!config) return <div className="h-[90vh] bg-neutral-950 flex items-center justify-center text-white">{t('loading')}</div>;
 
     const selectedSize = config.sizes.find(s => s.id === selectedSizeId) || config.sizes[0];
     const selectedColor = config.colors.find(c => c.hex === color) || config.colors[0];
@@ -218,7 +220,7 @@ export default function BaubleConfigurator() {
                 text: text
             })
         });
-        toast.success(`Dodano do koszyka: ${getLocalizedLabel(selectedSize.label)} - ${getLocalizedLabel(selectedColor.name)}`);
+        toast.success(`${t('addedToCart')}: ${getLocalizedLabel(selectedSize.label)} - ${getLocalizedLabel(selectedColor.name)}`);
     };
 
     return (
@@ -227,10 +229,10 @@ export default function BaubleConfigurator() {
             <div className="w-full md:w-1/3 min-w-[350px] bg-neutral-900/80 backdrop-blur-md p-8 flex flex-col justify-center z-10 border-r border-white/5 overflow-y-auto">
                 <div className="mb-6">
                     <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-amber-500 mb-2">
-                        Kreator Ozdób
+                        {t('title')}
                     </h2>
                     <p className="text-gray-400 text-sm">
-                        Zaprojektuj unikalną ozdobę choinkową. Wybierz rozmiar, kolor i dodaj osobistą dedykację.
+                        {t('subtitle')}
                     </p>
                 </div>
 
@@ -238,7 +240,7 @@ export default function BaubleConfigurator() {
                     {/* Size Selection */}
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block">
-                            Wybierz Rozmiar
+                            {t('sizeLabel')}
                         </label>
                         <div className="flex flex-wrap gap-2">
                             {config.sizes.map(size => (
@@ -255,14 +257,14 @@ export default function BaubleConfigurator() {
                             ))}
                         </div>
                         <p className="mt-2 text-xs text-amber-500 font-bold">
-                            Cena podstawowa: {formatPrice(selectedSize?.basePrice || 0)}
+                            {t('basePrice')}: {formatPrice(selectedSize?.basePrice || 0)}
                         </p>
                     </div>
 
                     {/* Color Selection */}
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block">
-                            Wybierz Kolor Szkła
+                            {t('colorLabel')}
                         </label>
                         <div className="grid grid-cols-4 gap-3">
                             {config.colors.map(c => (
@@ -290,17 +292,17 @@ export default function BaubleConfigurator() {
                     {/* Text Input */}
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 block">
-                            Twoja Dedykacja <span className="text-amber-500">(+{config.addons.textPrice} PLN)</span>
+                            {t('textLabel')} <span className="text-amber-500">(+{config.addons.textPrice} PLN)</span>
                         </label>
                         <Input
-                            placeholder={locale === 'en' ? "e.g. For Grandma Jane" : locale === 'de' ? "z.B. Für Oma Jane" : "Np. Dla Babci Zosi"}
+                            placeholder={t('textPlaceholder')}
                             maxLength={15}
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                             className="bg-black/50 border-white/10 focus:border-amber-500 text-white"
                         />
                         <p className="text-xs text-gray-500 mt-2 text-right">
-                            {text.length}/15 znaków
+                            {text.length}/15
                         </p>
                     </div>
                 </div>
@@ -308,7 +310,7 @@ export default function BaubleConfigurator() {
                 {/* Summary & Action */}
                 <div className="pt-6 border-t border-white/10 mt-4">
                     <div className="flex justify-between items-end mb-6">
-                        <span className="text-sm text-gray-400">Cena całkowita</span>
+                        <span className="text-sm text-gray-400">{t('finalPrice')}</span>
                         <span className="text-3xl font-bold text-white">{formatPrice(currentPrice)}</span>
                     </div>
 
@@ -319,7 +321,7 @@ export default function BaubleConfigurator() {
                         onClick={handleAddToCart}
                         className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-amber-900/20"
                     >
-                        DODAJ DO KOSZYKA
+                        {t('addToCart').toUpperCase()}
                     </Button>
                 </div>
             </div>
@@ -356,7 +358,7 @@ export default function BaubleConfigurator() {
 
                 {/* 3D Label */}
                 <div className="absolute top-6 right-6 px-4 py-2 bg-black/30 backdrop-blur rounded-full border border-white/10 pointer-events-none">
-                    <span className="text-xs font-bold text-white/50 tracking-widest uppercase">Podgląd 3D na żywo</span>
+                    <span className="text-xs font-bold text-white/50 tracking-widest uppercase">{t('previewLabel')}</span>
                 </div>
             </div>
         </section>
