@@ -40,6 +40,22 @@ model User {
   resetPasswordToken   String?   @unique
   resetPasswordExpires DateTime?
 
+  // Personal Address (Resident)
+  personalPhone         String?
+  personalStreet        String?
+  personalCity          String?
+  personalZipCode       String?
+  personalCountry       String?   @default("PL")
+
+  // Shipping Address
+  shippingFirstName     String?
+  shippingLastName      String?
+  shippingPhone         String?
+  shippingStreet        String?
+  shippingCity          String?
+  shippingZipCode       String?
+  shippingCountry       String?   @default("PL")
+
   accounts      Account[]
   sessions      Session[]
   

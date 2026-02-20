@@ -20,6 +20,20 @@ export async function updateProfile(formData: FormData) {
     const companyCity = formData.get('companyCity') as string;
     const companyZip = formData.get('companyZip') as string;
 
+    // New Personal Address Fields
+    const personalPhone = formData.get('personalPhone') as string;
+    const personalStreet = formData.get('personalStreet') as string;
+    const personalCity = formData.get('personalCity') as string;
+    const personalZipCode = formData.get('personalZipCode') as string;
+
+    // New Shipping Address Fields
+    const shippingFirstName = formData.get('shippingFirstName') as string;
+    const shippingLastName = formData.get('shippingLastName') as string;
+    const shippingPhone = formData.get('shippingPhone') as string;
+    const shippingStreet = formData.get('shippingStreet') as string;
+    const shippingCity = formData.get('shippingCity') as string;
+    const shippingZipCode = formData.get('shippingZipCode') as string;
+
     await prisma.user.update({
         where: { id: userId },
         data: {
@@ -30,6 +44,18 @@ export async function updateProfile(formData: FormData) {
             companyStreet: isCompany ? companyStreet : null,
             companyCity: isCompany ? companyCity : null,
             companyZip: isCompany ? companyZip : null,
+            // Personal
+            personalPhone,
+            personalStreet,
+            personalCity,
+            personalZipCode,
+            // Shipping
+            shippingFirstName,
+            shippingLastName,
+            shippingPhone,
+            shippingStreet,
+            shippingCity,
+            shippingZipCode,
         }
     });
 

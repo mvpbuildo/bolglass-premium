@@ -17,8 +17,8 @@ export default async function ProfilePage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Mój Profil</h1>
-                <p className="text-gray-500 text-sm">Zarządzaj swoimi danymi osobowymi i firmowymi.</p>
+                <h1 className="text-2xl font-bold text-white">Mój Profil</h1>
+                <p className="text-gray-400 text-sm">Zarządzaj swoimi danymi osobowymi i firmowymi.</p>
             </div>
 
             <Card className="p-8">

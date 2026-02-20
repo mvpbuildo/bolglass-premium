@@ -2,55 +2,138 @@
 
 import { useState } from 'react';
 import { Card, Button } from "@bolglass/ui";
-import { Settings, Trash2, AlertTriangle } from "lucide-react";
+import { Settings, Trash2, AlertTriangle, Key, CheckCircle2 } from "lucide-react";
 import { deleteCurrentUserAccount } from '../../actions';
+import { changePassword } from './actions';
 import { signOut } from 'next-auth/react';
 
 export default function SettingsPage() {
+    // Delete Account states
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+
+    // Password Change states
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
 
     const handleDeleteAccount = async () => {
         setIsDeleting(true);
-        setError(null);
+        setDeleteError(null);
         try {
             const res = await deleteCurrentUserAccount();
             if (res.success) {
-                // Logout and redirect
                 await signOut({ callbackUrl: '/' });
             } else {
-                setError(res.error || "Wystąpił nieoczekiwany błąd.");
+                setDeleteError(res.error || "Wystąpił nieoczekiwany błąd.");
                 setIsDeleting(false);
                 setIsConfirmingDelete(false);
             }
         } catch (err: any) {
-            setError(err.message || "Błąd połączenia.");
+            setDeleteError(err.message || "Błąd połączenia.");
             setIsDeleting(false);
             setIsConfirmingDelete(false);
         }
     };
 
+    const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsChangingPassword(true);
+        setPasswordError(null);
+        setPasswordSuccess(false);
+
+        const formData = new FormData(e.currentTarget);
+        try {
+            const res = await changePassword(formData);
+            if (res.success) {
+                setPasswordSuccess(true);
+                e.currentTarget.reset();
+            } else {
+                setPasswordError(res.error || "Błąd zmiany hasła.");
+            }
+        } catch (err: any) {
+            setPasswordError("Błąd serwera.");
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
+
+    const inputClasses = "w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none text-gray-900 placeholder-gray-400 bg-white transition-all mb-4";
+    const labelClasses = "block text-sm font-semibold text-gray-700 mb-1.5";
+
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Ustawienia Konta</h1>
-                <p className="text-gray-500 text-sm">Zarządzaj swoim kontem i preferencjami.</p>
+                <h1 className="text-2xl font-bold text-white">Ustawienia Konta</h1>
+                <p className="text-gray-400 text-sm">Zarządzaj swoim kontem i preferencjami.</p>
             </div>
 
+            {/* Password Change Section */}
             <Card className="p-6 space-y-6">
                 <div className="flex items-center gap-3 pb-4 border-b">
                     <div className="bg-blue-50 p-2 rounded-lg">
-                        <Settings className="w-5 h-5 text-blue-600" />
+                        <Key className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h2 className="font-semibold text-gray-800">Hasło i Zabezpieczenia</h2>
+                    <h2 className="font-semibold text-gray-800">Zmiana Hasła</h2>
                 </div>
 
-                <p className="text-sm text-gray-500">
-                    Opcja zmiany hasła zostanie udostępniona wkrótce. Skorzystaj z opcji "Przypomnij hasło" przy logowaniu, jeśli chcesz je teraz zresetować.
-                </p>
+                <form onSubmit={handlePasswordChange} className="max-w-md">
+                    <div>
+                        <label className={labelClasses}>Aktualne Hasło</label>
+                        <input
+                            type="password"
+                            name="currentPassword"
+                            className={inputClasses}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className={labelClasses}>Nowe Hasło</label>
+                        <input
+                            type="password"
+                            name="newPassword"
+                            className={inputClasses}
+                            required
+                            minLength={6}
+                        />
+                    </div>
+                    <div>
+                        <label className={labelClasses}>Potwierdź Nowe Hasło</label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            className={inputClasses}
+                            required
+                        />
+                    </div>
+
+                    {passwordError && (
+                        <div className="p-3 bg-red-50 border border-red-100 rounded text-red-700 text-sm flex items-center gap-2 mb-4">
+                            <AlertTriangle className="w-4 h-4" />
+                            {passwordError}
+                        </div>
+                    )}
+
+                    {passwordSuccess && (
+                        <div className="p-3 bg-green-50 border border-green-100 rounded text-green-700 text-sm flex items-center gap-2 mb-4">
+                            <CheckCircle2 className="w-4 h-4" />
+                            Hasło zostało pomyślnie zmienione!
+                        </div>
+                    )}
+
+                    <Button
+                        type="submit"
+                        disabled={isChangingPassword}
+                        variant="primary"
+                        className="w-full md:w-auto"
+                    >
+                        {isChangingPassword ? "Zmienianie..." : "Zaktualizuj Hasło"}
+                    </Button>
+                </form>
             </Card>
 
+            {/* Danger Zone Section */}
             <Card className="p-6 space-y-6 border-red-100 bg-red-50/30">
                 <div className="flex items-center gap-3 pb-4 border-b border-red-100">
                     <div className="bg-red-100 p-2 rounded-lg">
@@ -99,10 +182,10 @@ export default function SettingsPage() {
                     )}
                 </div>
 
-                {error && (
+                {deleteError && (
                     <div className="p-3 bg-red-100 border border-red-200 rounded text-red-700 text-sm flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4" />
-                        {error}
+                        {deleteError}
                     </div>
                 )}
             </Card>
