@@ -17,6 +17,8 @@ const getProducts = unstable_cache(
     { tags: ['products'], revalidate: 3600 }
 );
 
+import ConfiguratorBanner from '@/components/shop/ConfiguratorBanner';
+
 export default async function ShopPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const products = await getProducts();
@@ -56,7 +58,11 @@ export default async function ShopPage({ params }: { params: Promise<{ locale: s
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
+            <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+                <div className="mb-20">
+                    <ConfiguratorBanner />
+                </div>
+
                 <div className="flex items-center justify-between mb-12 border-b border-white/5 pb-8">
                     <h2 className="text-white text-xs font-black uppercase tracking-[0.3em]">{t('allProducts')}</h2>
                     <div className="h-px flex-1 bg-white/5 mx-8" />

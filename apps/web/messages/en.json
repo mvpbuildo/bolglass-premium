@@ -105,6 +105,10 @@
         "dimensionsLabel": "Dimensions (HxWxD)",
         "weightLabel": "Weight",
         "promo": "Sale",
+        "promoTitle": "Design Your Magic",
+        "promoSubtitle": "Your own bauble in our 3D creator",
+        "promoDescription": "Personalize colors, sizes and add your own dedication. Create a keepsake for years.",
+        "promoCTA": "Open Configurator",
         "grossPrice": "Gross Price"
     },
     "Auth": {

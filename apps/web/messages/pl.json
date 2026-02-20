@@ -105,6 +105,10 @@
     "dimensionsLabel": "Wymiary (WxSxG)",
     "weightLabel": "Waga",
     "promo": "Promocja",
+    "promoTitle": "Zaprojektuj Magię",
+    "promoSubtitle": "Twoja własna bombka w naszym kreatorze 3D",
+    "promoDescription": "Personalizuj kolory, rozmiary i dodaj własną dedykację. Stwórz pamiątkę na lata.",
+    "promoCTA": "Otwórz Konfigurator",
     "grossPrice": "Cena Brutto"
   },
   "Auth": {

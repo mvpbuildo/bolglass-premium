@@ -105,6 +105,10 @@
         "dimensionsLabel": "Abmessungen (HxBxT)",
         "weightLabel": "Gewicht",
         "promo": "Aktion",
+        "promoTitle": "Gestalte deine Magie",
+        "promoSubtitle": "Deine eigene Kugel in unserem 3D-Gestalter",
+        "promoDescription": "Personalisiere Farben, Größen und füge deine eigene Widmung hinzu. Schaffe ein Andenken für Jahre.",
+        "promoCTA": "Konfigurator öffnen",
         "grossPrice": "Bruttopreis"
     },
     "Auth": {
