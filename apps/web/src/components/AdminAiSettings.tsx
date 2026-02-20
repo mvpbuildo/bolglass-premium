@@ -72,7 +72,7 @@ export default function AdminAiSettings() {
                         <div className="relative">
                             <input
                                 type={showKey ? "text" : "password"}
-                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none transition-all pr-12"
+                                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none transition-all pr-12"
                                 value={settings.openai_api_key}
                                 onChange={(e) => setSettings({ ...settings, openai_api_key: e.target.value })}
                                 placeholder="sk-..."
@@ -96,7 +96,7 @@ export default function AdminAiSettings() {
                             <Sparkles className="w-4 h-4" /> Globalny Prompt Tłumaczenia
                         </label>
                         <textarea
-                            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl h-40 text-sm leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner"
+                            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl h-40 text-sm text-gray-900 placeholder-gray-400 leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner"
                             value={settings.ai_translation_prompt}
                             onChange={(e) => setSettings({ ...settings, ai_translation_prompt: e.target.value })}
                             placeholder="Wpisz instrukcje dla AI..."

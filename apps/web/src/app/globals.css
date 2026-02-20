@@ -25,7 +25,6 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--color-primary);
   --color-surface: var(--color-surface);
-
   --font-sans: var(--font-inter);
 }
 
@@ -46,4 +45,41 @@ body {
 
 html {
   overflow-x: hidden;
+}
+
+/**
+ * SYSTEMIC INPUT VISIBILITY FIX
+ * ---
+ * The app uses a dark global theme (white foreground text on dark backgrounds).
+ * Problem: when an input/textarea/select is placed on a white or light-gray admin
+ * panel card (bg-white, bg-gray-50, etc.), it inherits the global white foreground
+ * color, making the text invisible against the light background.
+ *
+ * Solution: CSS attribute selectors that target inputs NOT on dark backgrounds
+ * and force dark text (#111827 = gray-900) and a visible border.
+ *
+ * This rule is intentionally broad and applies globally — no individual component
+ * needs to add "text-gray-900" manually. The dark-mode inputs (bg-black, bg-neutral,
+ * bg-amber, bg-white/5, etc.) are excluded via the :not() chain.
+ *
+ * If you add a new input with a light background, it will automatically be readable.
+ * If you add a new input with a dark background, explicitly add "bg-neutral-*" or
+ * "bg-black" to its className so it is excluded from this rule.
+ */
+
+/* Light-background inputs get dark text automatically */
+input:not([class*="bg-white/"]):not([class*="bg-neutral"]):not([class*="bg-black"]):not([class*="bg-transparent"]):not([class*="bg-amber"]),
+textarea:not([class*="bg-neutral"]):not([class*="bg-black"]):not([class*="bg-transparent"]),
+select:not([class*="bg-neutral"]):not([class*="bg-black"]):not([class*="bg-transparent"]) {
+  color: #111827;
+  /* gray-900 - always readable on light bg */
+  border-color: #d1d5db;
+  /* gray-300 - visible border (not invisible white) */
+}
+
+/* Placeholder text on light-background fields: gray-400 */
+input:not([class*="bg-neutral"]):not([class*="bg-black"])::placeholder,
+textarea:not([class*="bg-neutral"]):not([class*="bg-black"])::placeholder {
+  color: #9ca3af;
+  opacity: 1;
 }
