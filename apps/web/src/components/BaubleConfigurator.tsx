@@ -10,6 +10,7 @@ import { compressDataURL } from '@/utils/imageCompression';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
 import { calculateBaublePrice } from '@/services/pricing';
+import { useCurrency } from '@/hooks/useCurrency';
 import { useParams } from 'next/navigation';
 
 type MultilingualLabel = {
@@ -141,6 +142,7 @@ export default function BaubleConfigurator() {
     const [color, setColor] = useState('#D91A1A'); // Default Red
     const [text, setText] = useState('');
     const [isCapturing, setIsCapturing] = useState(false);
+    const { formatPrice } = useCurrency();
     const { addItem } = useCart();
     const captureRef = useRef<() => string>(() => ''); // Ref to hold capture function
 
@@ -253,7 +255,7 @@ export default function BaubleConfigurator() {
                             ))}
                         </div>
                         <p className="mt-2 text-xs text-amber-500 font-bold">
-                            Cena podstawowa: {selectedSize?.basePrice} PLN
+                            Cena podstawowa: {formatPrice(selectedSize?.basePrice || 0)}
                         </p>
                     </div>
 
@@ -307,7 +309,7 @@ export default function BaubleConfigurator() {
                 <div className="pt-6 border-t border-white/10 mt-4">
                     <div className="flex justify-between items-end mb-6">
                         <span className="text-sm text-gray-400">Cena całkowita</span>
-                        <span className="text-3xl font-bold text-white">{currentPrice.toFixed(2)} zł</span>
+                        <span className="text-3xl font-bold text-white">{formatPrice(currentPrice)}</span>
                     </div>
 
                     <Button

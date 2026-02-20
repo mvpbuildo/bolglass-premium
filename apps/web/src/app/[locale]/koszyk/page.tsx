@@ -7,11 +7,13 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { placeOrder, getShippingRates, getPaymentMethods } from './actions';
 import Image from 'next/image';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function CheckoutPage() {
     const { items, updateQuantity, removeItem, total, clearCart } = useCart();
     const { data: session } = useSession();
     const router = useRouter();
+    const { formatPrice } = useCurrency();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [documentType, setDocumentType] = useState<'RECEIPT' | 'INVOICE'>('RECEIPT');
 
@@ -131,7 +133,7 @@ export default function CheckoutPage() {
                                                     })()}
                                                 </div>
                                             )}
-                                            <p className="text-amber-500 font-black text-sm">{item.price.toFixed(2)} zł</p>
+                                            <p className="text-amber-500 font-black text-sm">{formatPrice(item.price)}</p>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">-</button>
@@ -147,15 +149,15 @@ export default function CheckoutPage() {
                             <div className="mt-6 pt-4 border-t border-white/10 flex flex-col gap-2 text-xl font-black text-amber-50">
                                 <div className="flex justify-between text-sm text-amber-50/60">
                                     <span>Produkty</span>
-                                    <span>{total.toFixed(2)} zł</span>
+                                    <span>{formatPrice(total)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-amber-50/60">
                                     <span>Dostawa ({shippingMethods.find(m => m.id === selectedShipping)?.name || '...'})</span>
-                                    <span>{shippingCost.toFixed(2)} zł</span>
+                                    <span>{formatPrice(shippingCost)}</span>
                                 </div>
                                 <div className="flex justify-between border-t border-white/10 pt-2 mt-2 text-2xl text-amber-500">
                                     <span>Razem</span>
-                                    <span>{finalTotal.toFixed(2)} zł</span>
+                                    <span>{formatPrice(finalTotal)}</span>
                                 </div>
                             </div>
                         </Card>
@@ -288,7 +290,7 @@ export default function CheckoutPage() {
                                                     />
                                                     <span className="font-medium text-gray-700">{method.name}</span>
                                                 </div>
-                                                <span className="font-bold text-gray-900">{method.price.toFixed(2)} zł</span>
+                                                <span className="font-bold text-gray-900">{formatPrice(method.price)}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -327,7 +329,7 @@ export default function CheckoutPage() {
                                     className="w-full bg-amber-500 hover:bg-amber-600 text-black py-4 text-lg font-black uppercase tracking-widest mt-6 shadow-lg hover:shadow-amber-500/20 transition-all rounded-full"
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? 'Przetwarzanie...' : `Zamawiam i Płacę (${finalTotal.toFixed(2)} zł)`}
+                                    {isSubmitting ? 'Przetwarzanie...' : `Zamawiam i Płacę (${formatPrice(finalTotal)})`}
                                 </Button>
                                 <p className="text-[10px] text-center text-gray-400 mt-4 uppercase tracking-widest leading-loose">
                                     Klikając &quot;Zamawiam i Płacę&quot; akceptujesz regulamin sklepu.

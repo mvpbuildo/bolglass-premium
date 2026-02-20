@@ -5,6 +5,7 @@ import { Button } from '@bolglass/ui';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { ShoppingCart } from 'lucide-react';
+import { useCurrency } from '@/hooks/useCurrency';
 
 type ProductProps = {
     id: string;
@@ -19,6 +20,7 @@ type ProductProps = {
 
 export default function ProductCard({ product }: { product: ProductProps }) {
     const { addItem } = useCart();
+    const { formatPrice } = useCurrency();
 
     const handleAddToCart = () => {
         const effectivePrice = product.price * (1 - (product.discountPercent || 0) / 100);
@@ -64,10 +66,10 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                             <>
                                 <div className="flex items-center gap-2">
                                     <span className="text-2xl font-black text-red-500 tracking-tighter">
-                                        {(product.price * (1 - product.discountPercent / 100)).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                                        {formatPrice(product.price * (1 - product.discountPercent / 100))}
                                     </span>
                                     <span className="text-sm text-gray-400 line-through decoration-red-500/50">
-                                        {product.price.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                                        {formatPrice(product.price)}
                                     </span>
                                 </div>
                                 <span className="text-[10px] text-red-400/80 font-medium uppercase tracking-tight">Promocja -{product.discountPercent}%</span>
@@ -75,7 +77,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         ) : (
                             <>
                                 <span className="text-2xl font-black text-white tracking-tighter">
-                                    {product.price.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
+                                    {formatPrice(product.price)}
                                 </span>
                                 <span className="text-[10px] text-white/20 font-medium uppercase tracking-tight">Cena Brutto</span>
                             </>
