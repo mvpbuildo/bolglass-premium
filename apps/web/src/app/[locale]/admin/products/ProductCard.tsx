@@ -5,6 +5,7 @@ import { Button, Card } from '@bolglass/ui';
 import { Product } from '@prisma/client';
 import { deleteProduct, updateProductDiscount } from './actions';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
     product: Product;
@@ -28,9 +29,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     const handleDiscountUpdate = async (newDiscount: number) => {
         setIsUpdating(true);
         const result = await updateProductDiscount(product.id, newDiscount);
-        setIsUpdating(false);
         if (result.error) {
-            alert(result.error);
+            toast.error(result.error);
+        } else {
+            toast.success('Zaktualizowano rabat');
         }
     };
 
@@ -39,8 +41,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             setIsDeleting(true);
             const result = await deleteProduct(product.id);
             if (result.error) {
-                alert(result.error);
+                toast.error(result.error);
                 setIsDeleting(false);
+            } else {
+                toast.success('Produkt został usunięty');
             }
         }
     };

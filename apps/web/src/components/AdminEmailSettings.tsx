@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button, Input, Card } from '@bolglass/ui';
 import { getAdminEmailSettings, updateAdminEmailSettings } from '../app/[locale]/actions';
 import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
+import { toast } from 'sonner';
 
 export default function AdminEmailSettings() {
     const [settings, setSettings] = useState<Record<string, string>>({});
@@ -28,13 +29,13 @@ export default function AdminEmailSettings() {
         try {
             const result = await updateAdminEmailSettings(settings);
             if (result.success) {
-                alert('Zapisano szablony wiadomości!');
+                toast.success('Zapisano szablony wiadomości!');
             } else {
-                alert('Błąd: ' + result.error);
+                toast.error('Błąd: ' + result.error);
             }
         } catch (error) {
             console.error('Failed to save email settings:', error);
-            alert('Wystąpił błąd podczas zapisywania.');
+            toast.error('Wystąpił błąd podczas zapisywania.');
         } finally {
             setSaving(false);
         }

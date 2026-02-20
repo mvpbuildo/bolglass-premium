@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
 import { getSystemSettings, updateSystemSetting } from '@/app/[locale]/actions';
 import { Bot, Key, Sparkles, Save, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminAiSettings() {
     const [settings, setSettings] = useState({
@@ -32,10 +33,10 @@ export default function AdminAiSettings() {
         try {
             await updateSystemSetting('openai_api_key', settings.openai_api_key);
             await updateSystemSetting('ai_translation_prompt', settings.ai_translation_prompt);
-            alert('Ustawienia AI zostały zapisane!');
+            toast.success('Ustawienia AI zostały zapisane!');
         } catch (error) {
             console.error('Failed to save AI settings:', error);
-            alert('Wystąpił błąd podczas zapisywania.');
+            toast.error('Wystąpił błąd podczas zapisywania.');
         } finally {
             setSaving(false);
         }

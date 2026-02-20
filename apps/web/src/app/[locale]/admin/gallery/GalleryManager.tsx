@@ -12,16 +12,9 @@ import {
     deleteGalleryAlbum
 } from './actions';
 import { Card, Button } from '@bolglass/ui';
+import { toast } from 'sonner';
 import { GalleryItem, GalleryAlbum } from '@/types/gallery';
-import {
-    VideoIcon,
-    PlusIcon,
-    TrashIcon,
-    HomeIcon,
-    Loader2,
-    FolderIcon,
-    ArrowLeft
-} from 'lucide-react';
+import { Trash2 as TrashIcon, Edit, Plus as PlusIcon, FolderPlus, Image as ImageIcon, Video as VideoIcon, Home as HomeIcon, Folder as FolderIcon, Loader2, Save, X } from 'lucide-react';
 import Image from 'next/image';
 
 export default function GalleryManager() {
@@ -87,13 +80,16 @@ export default function GalleryManager() {
             setNewItem({ title: '', description: '', type: 'IMAGE', category: 'GENERAL', displayHome: false, albumId: '' });
             fetchData();
         } else {
-            alert('Przesyłanie nieudane: ' + (result.error || 'Nieznany błąd'));
+            toast.error('Przesyłanie nieudane: ' + (result.error || 'Nieznany błąd'));
         }
         setUploading(false);
     };
 
     const handleCreateAlbum = async () => {
-        if (!newAlbum.title) return alert('Tytuł albumu jest wymagany');
+        if (!newAlbum.title) {
+            toast.error('Tytuł albumu jest wymagany');
+            return;
+        }
         const result = await createGalleryAlbum(newAlbum);
         if (result.success) {
             setIsAddingAlbum(false);

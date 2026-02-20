@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@bolglass/database';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
@@ -12,7 +12,7 @@ import { auth } from '@/auth';
 
 import { CheckoutService } from '@/services/CheckoutService';
 
-export async function placeOrder(formData: FormData, cartItemsJson: string, total: number) {
+export async function placeOrder(formData: FormData, cartItemsJson: string) {
     const session = await auth();
     const userId = session?.user?.id;
     const items = JSON.parse(cartItemsJson);
@@ -242,7 +242,7 @@ export async function getAdminSlots() {
                 .filter(b => b.start <= slotTime && b.end > slotTime)
                 .reduce((sum, b) => sum + b.people, 0);
 
-            const { bookings: _bookings, ...slotData } = slot;
+            const { bookings: _, ...slotData } = slot;
             return {
                 ...slotData,
                 // Capacity is 92 fixed for calculation, or slot.capacity if we want to honor overrides?
@@ -469,8 +469,8 @@ export async function generateMonthSlots(year: number, month: number) {
 
             for (let hour = startHour; hour <= endHour; hour++) {
                 for (let min = 0; min < 60; min += 15) {
-                    // Don't generate slots after 16:00
-                    if (hour === endHour && min > 0) continue;
+                    // Don't generate slots at or after 16:00
+                    if (hour >= endHour) continue;
 
                     // Use the helper to get the correct UTC timestamp for Warsaw Time
                     const slotDate = getWarsawStart(dateStr, hour, min);

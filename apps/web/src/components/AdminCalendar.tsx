@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
-import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, updateSlotPrice, generateMonthSlots, updateSlotCapacity, getBookingsByDate } from '../app/[locale]/actions';
+import { getAdminSlots, getGlobalBlocks, setGlobalBlock, removeGlobalBlock, generateMonthSlots, getBookingsByDate } from '../app/[locale]/actions';
+import { toast } from 'sonner';
 
 export default function AdminCalendar() {
     const [viewDate, setViewDate] = useState(new Date());
@@ -158,14 +159,14 @@ export default function AdminCalendar() {
     const prevMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
 
     const handleGenerateSlots = async () => {
-        if (confirm(`Czy na pewno chcesz wygenerować sloty (8:00-17:00) dla miesiąca ${currentMonthStr}?`)) {
+        if (confirm(`Czy na pewno chcesz wygenerować sloty (8:00-16:00) dla miesiąca ${currentMonthStr}?\n(Ostatnia rezerwacja: Warsztaty 14:30, Zwiedzanie 15:30)`)) {
             setLoading(true);
             const res = await generateMonthSlots(viewDate.getFullYear(), viewDate.getMonth());
             if (res.success) {
-                alert('Sloty zostały wygenerowane pomyślnie!');
+                toast.success('Sloty zostały wygenerowane pomyślnie!');
                 fetchData();
             } else {
-                alert('Błąd podczas generowania slotów: ' + res.error);
+                toast.error('Błąd podczas generowania slotów: ' + res.error);
                 setLoading(false);
             }
         }

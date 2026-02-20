@@ -4,6 +4,7 @@ import { Card, Button } from '@bolglass/ui';
 import { toggleUserRole, deleteUser } from './actions';
 import { Shield, ShieldAlert, Trash2, Mail, Key } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface UserCardProps {
     user: any;
@@ -17,8 +18,9 @@ export default function UserCard({ user, isCurrentUser }: UserCardProps) {
         try {
             setLoading('role');
             await toggleUserRole(user.id, user.role);
+            toast.success('Rola użytkownika została zmieniona');
         } catch (error: any) {
-            alert(error.message || 'Błąd podczas zmiany roli');
+            toast.error(error.message || 'Błąd podczas zmiany roli');
         } finally {
             setLoading(null);
         }
@@ -29,8 +31,9 @@ export default function UserCard({ user, isCurrentUser }: UserCardProps) {
             try {
                 setLoading('delete');
                 await deleteUser(user.id);
+                toast.success('Użytkownik został usunięty');
             } catch (error: any) {
-                alert(error.message || 'Błąd podczas usuwania użytkownika');
+                toast.error(error.message || 'Błąd podczas usuwania użytkownika');
             } finally {
                 setLoading(null);
             }

@@ -125,7 +125,16 @@ export async function getAvailableStartTimes(dateStr: string, type: BookingType,
     // We need to determine the End Limit (16:00 Warsaw)
     const closingTime = getWarsawStart(dateStr, CLOSING_HOUR, 0);
     // Adjust closing time by removing duration
-    const latestStartTime = new Date(closingTime.getTime() - requestedDuration * 60000);
+    let latestStartTime = new Date(closingTime.getTime() - requestedDuration * 60000);
+
+    // Business rule: Last workshop at 14:30, last sightseeing at 15:30
+    if (type === 'WORKSHOP') {
+        const workshopLimit = getWarsawStart(dateStr, 14, 30);
+        if (latestStartTime > workshopLimit) latestStartTime = workshopLimit;
+    } else if (type === 'SIGHTSEEING') {
+        const sightseeingLimit = getWarsawStart(dateStr, 15, 30);
+        if (latestStartTime > sightseeingLimit) latestStartTime = sightseeingLimit;
+    }
 
     while (currentTime <= latestStartTime) {
         const potentialStart = new Date(currentTime);
@@ -156,10 +165,9 @@ function checkResourceOverlap(newStart: Date, newEnd: Date, newPeople: number, e
     // Filter relevant bookings that overlap with our window at all
     const relevantBookings = existingBookings.filter(b => {
         const bStart = new Date(b.date);
-        const bDuration = DURATION_MINUTES[b.type as BookingType] || 30; // Default safety
+        const bDuration = DURATION_MINUTES[b.type as BookingType] || 30;
         const bEnd = new Date(bStart.getTime() + bDuration * 60000);
 
-        // Overlap logic: StartA < EndB && StartB < EndA
         return newStart < bEnd && bStart < newEnd;
     });
 

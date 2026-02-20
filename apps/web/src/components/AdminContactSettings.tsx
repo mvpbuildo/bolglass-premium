@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Card } from '@bolglass/ui';
 import { getSystemSettings, updateSystemSetting } from '../app/[locale]/actions';
-import { motion } from 'framer-motion';
-import { Facebook, Instagram, Mail, Phone, MapPin, Globe, Image as ImageIcon, Upload, X } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Image as ImageIcon, Upload, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminContactSettings() {
     const [settings, setSettings] = useState({
@@ -41,10 +41,10 @@ export default function AdminContactSettings() {
                 updateSystemSetting(key, value)
             );
             await Promise.all(updates);
-            alert('Zapisano ustawienia kontaktu!');
+            toast.success('Zapisano ustawienia kontaktu!');
         } catch (error) {
             console.error('Failed to save settings:', error);
-            alert('Wystąpił błąd podczas zapisywania.');
+            toast.error('Wystąpił błąd podczas zapisywania.');
         } finally {
             setSaving(false);
         }
@@ -165,11 +165,11 @@ export default function AdminContactSettings() {
                                                         if (res.success && res.url) {
                                                             setSettings({ ...settings, contact_logo: res.url });
                                                         } else {
-                                                            alert('Błąd przesyłania: ' + res.error);
+                                                            toast.error('Błąd przesyłania: ' + res.error);
                                                         }
                                                     } catch (err) {
                                                         console.error(err);
-                                                        alert('Wystąpił błąd podczas przesyłania pliku.');
+                                                        toast.error('Wystąpił błąd podczas przesyłania pliku.');
                                                     }
                                                 }
                                             }}

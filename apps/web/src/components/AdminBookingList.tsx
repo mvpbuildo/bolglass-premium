@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Card } from '@bolglass/ui';
 import { getAllBookings, deleteBooking, updateBookingAdmin, createBooking, getAdminSlots, sendBookingReminder } from '../app/[locale]/actions';
+import { toast } from 'sonner';
 
 export default function AdminBookingList() {
     const [bookings, setBookings] = useState<any[]>([]);
@@ -22,22 +23,24 @@ export default function AdminBookingList() {
     };
 
     const savePeople = async (id: string) => {
-        if (editPeopleValue < 1) return alert('Liczba osób musi być min. 1');
+        if (editPeopleValue < 1) {
+            toast.error('Liczba osób musi być min. 1');
+            return;
+        }
         // import dynamically or use pre-imported? actions are imported at top.
         // We need updateBookingPeople in imports first.
         const { updateBookingPeople } = await import('../app/[locale]/actions'); // Dynamic import if not in top
         const res = await updateBookingPeople(id, editPeopleValue);
-
         if (res.success) {
             fetchBookings();
             setEditingId(null);
+            toast.success('Zaktualizowano liczbę osób');
         } else {
-            alert('Błąd: ' + res.error);
+            toast.error('Błąd: ' + res.error);
         }
     };
 
     // Manual Form States
-    const [slots, setSlots] = useState<any[]>([]);
     const [formData, setFormData] = useState({ date: '', time: '', name: '', email: '', people: '1', type: 'SIGHTSEEING', isGroup: false, institutionName: '', institutionAddress: '' });
 
     // Filtering & Sorting States
@@ -49,9 +52,8 @@ export default function AdminBookingList() {
 
     const fetchBookings = async () => {
         setLoading(true);
-        const [bData, sData] = await Promise.all([getAllBookings(), getAdminSlots()]);
+        const [bData] = await Promise.all([getAllBookings(), getAdminSlots()]);
         setBookings(bData);
-        setSlots(sData);
         setLoading(false);
     };
 
@@ -62,13 +64,16 @@ export default function AdminBookingList() {
     const handleSendReminder = async (id: string) => {
         const res = await sendBookingReminder(id);
         if (res.success) {
-            alert('Przypomnienie wysłane (symulacja)!');
+            toast.success('Przypomnienie wysłane (symulacja)!');
             fetchBookings();
         }
     };
 
     const handleAddManual = async () => {
-        if (!formData.date || !formData.time || !formData.name || !formData.email) return alert('Wypełnij wymagane pola (Data, Godzina, Imię, Email)!');
+        if (!formData.date || !formData.time || !formData.name || !formData.email) {
+            toast.error('Wypełnij wymagane pola (Data, Godzina, Imię, Email)!');
+            return;
+        }
 
         // Construct Date object including time (assume local time input matches server expectation or handle timezone if strict)
         // Since createBooking expects a date string or object, and we fixed backend to be robust...
@@ -87,8 +92,9 @@ export default function AdminBookingList() {
             setIsAdding(false);
             setFormData({ date: '', time: '', name: '', email: '', people: '1', type: 'SIGHTSEEING', isGroup: false, institutionName: '', institutionAddress: '' });
             fetchBookings();
+            toast.success('Rezerwacja dodana pomyślnie!');
         } else {
-            alert('Błąd: ' + res.error);
+            toast.error('Błąd: ' + res.error);
         }
     };
 

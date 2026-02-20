@@ -6,6 +6,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Providers } from "@/components/Providers";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import { Toaster } from 'sonner';
 
 const inter = Inter({
     variable: "--font-inter",
@@ -58,6 +59,7 @@ export default async function LocaleLayout({
                         <MainLayoutSpacer />
                         {children}
                         <Footer />
+                        <Toaster position="top-right" richColors />
                     </Providers>
                 </NextIntlClientProvider>
             </body>

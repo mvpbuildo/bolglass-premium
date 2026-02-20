@@ -3,6 +3,7 @@
 import { useRouter } from '@/i18n/navigation';
 import { Card } from '@bolglass/ui';
 import { useState, ChangeEvent } from 'react';
+import { toast } from 'sonner';
 import { createProduct } from './actions';
 import Image from 'next/image';
 
@@ -58,7 +59,7 @@ export default function NewProductForm() {
     const handleTranslate = async (targetLocale: 'en' | 'de') => {
         const sourceText = translations.pl.description || translations.pl.name;
         if (!sourceText) {
-            alert('Wpisz najpierw tekst w języku polskim.');
+            toast.error('Wpisz najpierw tekst w języku polskim.');
             return;
         }
 
@@ -87,7 +88,7 @@ export default function NewProductForm() {
             }
         } catch (err: unknown) {
             const error = err as { message?: string };
-            alert(error.message || 'Błąd podczas tłumaczenia.');
+            toast.error(error.message || 'Błąd podczas tłumaczenia.');
         } finally {
             setIsTranslating(null);
         }

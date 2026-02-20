@@ -2,8 +2,9 @@
 
 import { Card, Button } from '@bolglass/ui';
 import { deleteFile } from './actions';
-import { Trash2, File, Image as ImageIcon, Download, ExternalLink } from 'lucide-react';
+import { Trash2, FileText, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 interface FileGridProps {
@@ -18,8 +19,9 @@ export default function FileGrid({ files }: FileGridProps) {
             try {
                 setIsDeleting(fileName);
                 await deleteFile(fileName);
+                toast.success('Plik został usunięty');
             } catch (error: any) {
-                alert(error.message || 'Błąd podczas usuwania pliku');
+                toast.error(error.message || 'Błąd podczas usuwania pliku');
             } finally {
                 setIsDeleting(null);
             }
@@ -50,7 +52,7 @@ export default function FileGrid({ files }: FileGridProps) {
                                 </div>
                             </>
                         ) : (
-                            <File className="w-12 h-12 text-gray-300" />
+                            <FileText className="w-12 h-12 text-gray-300" />
                         )}
                         <div className="absolute top-2 right-2 flex gap-1">
                             <Button

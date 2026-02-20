@@ -10,6 +10,7 @@ import { Product } from '@prisma/client';
 import { compressImage } from '@/utils/imageCompression';
 import { translateText } from '@/app/[locale]/admin/translations/actions';
 import { Sparkles, Globe, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 type ProductWithTranslations = Product & {
     translations: {
@@ -86,7 +87,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
     const handleTranslate = async (targetLocale: 'en' | 'de') => {
         const sourceText = translations.pl.description || translations.pl.name;
         if (!sourceText) {
-            alert('Wpisz najpierw tekst w języku polskim.');
+            toast.error('Wpisz najpierw tekst w języku polskim.');
             return;
         }
 
@@ -117,7 +118,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
             }
         } catch (err: unknown) {
             const error = err as { message?: string };
-            alert(error.message || 'Błąd podczas tłumaczenia.');
+            toast.error(error.message || 'Błąd podczas tłumaczenia.');
         } finally {
             setIsTranslating(null);
         }

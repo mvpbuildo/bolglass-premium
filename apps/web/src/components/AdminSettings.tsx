@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button, Input, Card } from '@bolglass/ui';
 import { getSystemSettings, updateSystemSetting } from '../app/[locale]/actions';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function AdminSettings() {
     const [prices, setPrices] = useState({ sightseeing: '', workshop: '' });
@@ -29,10 +30,10 @@ export default function AdminSettings() {
                 updateSystemSetting('price_sightseeing', prices.sightseeing),
                 updateSystemSetting('price_workshop', prices.workshop)
             ]);
-            alert('Zapisano zmiany!');
+            toast.success('Zapisano zmiany!');
         } catch (error) {
             console.error('Failed to save settings:', error);
-            alert('Wystąpił błąd podczas zapisywania.');
+            toast.error('Wystąpił błąd podczas zapisywania.');
         } finally {
             setSaving(false);
         }

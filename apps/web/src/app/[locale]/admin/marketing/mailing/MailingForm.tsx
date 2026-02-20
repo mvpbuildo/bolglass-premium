@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useState, useRef } from 'react';
 import { Card, Button } from '@bolglass/ui';
+import { toast } from 'sonner'; // Added toast import
 import { sendMailing } from './actions';
 import 'react-quill-new/dist/quill.snow.css';
 
@@ -66,11 +67,11 @@ export default function MailingForm() {
                         const range = quillRef.current?.getEditor().getSelection();
                         quillRef.current?.getEditor().insertEmbed(range ? range.index : 0, 'image', fullUrl);
                     } else {
-                        alert('Błąd przesyłania zdjęcia.');
+                        toast.error('Błąd przesyłania zdjęcia.'); // Changed alert to toast
                     }
                 } catch (e) {
                     console.error('Upload failed', e);
-                    alert('Błąd przesyłania zdjęcia.');
+                    toast.error('Błąd przesyłania zdjęcia.'); // Changed alert to toast
                 }
             }
         };
@@ -117,7 +118,11 @@ export default function MailingForm() {
         setIsSending(false);
 
         if (res.success) {
-            alert('Wiadomości zostały wysłane!');
+            toast.success('Wiadomości zostały wysłane!'); // Changed alert to toast
+            setSubject('');
+            setContent('');
+        } else {
+            toast.error('Błąd: ' + res.error); // Added toast for error
         }
     };
 
@@ -163,6 +168,7 @@ export default function MailingForm() {
                             <div>
                                 <label className="block text-sm font-bold mb-1 text-gray-900">Język Odbiorców</label>
                                 <select
+                                    title="Wybierz język odbiorców"
                                     value={targetLanguage}
                                     onChange={(e) => setTargetLanguage(e.target.value)}
                                     className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900"
@@ -177,6 +183,7 @@ export default function MailingForm() {
                             <div>
                                 <label className="block text-sm font-bold mb-1 text-gray-900">Grupa</label>
                                 <select
+                                    title="Wybierz grupę odbiorców"
                                     value={recipientType}
                                     onChange={(e) => setRecipientType(e.target.value)}
                                     className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900"
@@ -228,6 +235,7 @@ export default function MailingForm() {
                                     <label className="text-xs font-bold block text-gray-900">Użytkownik</label>
                                     <input
                                         type="text"
+                                        title="Nazwa użytkownika SMTP"
                                         value={smtpConfig.user}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, user: e.target.value })}
                                         className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
@@ -237,6 +245,7 @@ export default function MailingForm() {
                                     <label className="text-xs font-bold block text-gray-900">Hasło</label>
                                     <input
                                         type="password"
+                                        title="Hasło SMTP"
                                         value={smtpConfig.password}
                                         onChange={(e) => setSmtpConfig({ ...smtpConfig, password: e.target.value })}
                                         className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm"
