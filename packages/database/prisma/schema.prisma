@@ -216,6 +216,8 @@ model Order {
   email           String         // Contact email (required even for guests)
   status          String         @default("PENDING") // PENDING, PAID, PROCESSING, SHIPPED, DELIVERED, CANCELLED
   total           Float
+  currency        String         @default("PLN")
+  exchangeRate    Float?         // Rate at the time of purchase
   
   // Payment
   paymentStatus   String         @default("UNPAID") // UNPAID, PAID, FAILED

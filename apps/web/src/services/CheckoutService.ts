@@ -64,7 +64,33 @@ export class CheckoutService {
             const shippingCost = selectedRate ? selectedRate.price : 0;
             const shippingMethodName = selectedRate ? selectedRate.name : 'Nieznany';
 
-            const finalTotal = calculatedItemsTotal + shippingCost;
+            // --- Send Confirmation Email ---
+            const locale = formData.get('locale') as string || 'pl';
+            const currency = ['en', 'de'].includes(locale) ? 'EUR' : 'PLN';
+
+            // --- Server-Side Conversion (if EUR) ---
+            let finalTotal = calculatedItemsTotal + shippingCost;
+            let currentExchangeRate: number | null = null;
+
+            if (currency === 'EUR') {
+                try {
+                    console.log(">>> [CheckoutService] Fetching exchange rate for EUR");
+                    // We can't easily fetch from our own local API /api/currency during a server action in some envs
+                    // Let's call the NBP API directly as a backup or first choice for reliability on server
+                    const rateRes = await fetch('https://api.nbp.pl/api/exchangerates/rates/A/EUR/?format=json');
+                    if (rateRes.ok) {
+                        const rateData = await rateRes.json();
+                        currentExchangeRate = rateData?.rates?.[0]?.mid;
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch rate on server, using fallback 4.25", err);
+                }
+
+                if (!currentExchangeRate) currentExchangeRate = 4.25; // Fallback
+
+                // Convert EVERYTHING to EUR for the order record
+                finalTotal = Math.ceil(finalTotal / currentExchangeRate);
+            }
 
             const invoiceData = documentType === 'INVOICE' ? {
                 nip,
@@ -80,8 +106,10 @@ export class CheckoutService {
                     status: "PENDING",
                     paymentStatus: "UNPAID",
                     total: finalTotal,
+                    currency: currency,
+                    exchangeRate: currentExchangeRate,
                     shippingMethod: shippingMethodName,
-                    shippingCost: shippingCost,
+                    shippingCost: currency === 'EUR' && currentExchangeRate ? Math.ceil(shippingCost / currentExchangeRate) : shippingCost,
                     paymentProvider: paymentProvider.key,
                     documentType,
                     invoiceData: invoiceData as any,
@@ -96,7 +124,7 @@ export class CheckoutService {
                         create: trustedItems.map(item => ({
                             productId: item.productId,
                             name: item.name,
-                            price: item.price,
+                            price: currency === 'EUR' && currentExchangeRate ? Math.ceil(item.price / currentExchangeRate) : item.price,
                             quantity: item.quantity,
                         }))
                     }
@@ -109,7 +137,7 @@ export class CheckoutService {
                 const result = await paymentProvider.createTransaction({
                     id: order.id,
                     total: finalTotal,
-                    currency: 'PLN',
+                    currency: currency, // Now dynamic!
                     email: email,
                     description: `Zamówienie #${order.id.substring(0, 8)}`
                 });
@@ -138,8 +166,6 @@ export class CheckoutService {
                 }
             }
 
-            // --- Send Confirmation Email ---
-            const locale = formData.get('locale') as string || 'pl';
             console.log(`>>> [CheckoutService] Attempting to import mail service, locale: ${locale}`);
             const { sendOrderConfirmationEmail } = await import('@/lib/mail');
             console.log(">>> [CheckoutService] Calling sendOrderConfirmationEmail...");

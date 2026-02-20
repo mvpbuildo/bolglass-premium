@@ -58,7 +58,7 @@ export default function ClientOrderCard({ order }: ClientOrderCardProps) {
                     <div className="space-y-1">
                         <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{t('total')}</p>
                         <p className="text-xl font-black text-gray-900 leading-none">
-                            {order.total.toFixed(2)} <span className="text-xs font-medium text-gray-500">PLN</span>
+                            {order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} <span className="text-xs font-medium text-gray-500">{order.currency || 'PLN'}</span>
                         </p>
                     </div>
                     <div className="text-right">

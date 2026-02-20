@@ -38,7 +38,7 @@ export default function AdminOrderCard({ order }: OrderCardProps) {
             <div className="p-4 flex-grow space-y-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-900 dark:text-gray-100 font-bold">
-                        <span className="text-lg">{order.total.toFixed(2)} PLN</span>
+                        <span className="text-lg">{order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} {order.currency || 'PLN'}</span>
                     </div>
                     <div className="text-xs text-gray-400 flex items-center gap-1">
                         <Clock className="w-3 h-3" />

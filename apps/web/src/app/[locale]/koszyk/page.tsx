@@ -67,7 +67,7 @@ export default function CheckoutPage() {
             formData.append('shippingMethod', selectedShipping);
             formData.append('paymentMethod', selectedPayment);
 
-            const result = await placeOrder(formData, JSON.stringify(items), finalTotal);
+            const result = await placeOrder(formData, JSON.stringify(items));
             if (result.success) {
                 clearCart();
                 router.push(result.paymentUrl || `/sklep/zamowienie/${result.orderId}`);

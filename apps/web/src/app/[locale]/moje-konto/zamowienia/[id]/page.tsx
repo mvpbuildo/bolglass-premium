@@ -128,7 +128,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                             </TableCell>
                                             <TableCell className="text-center">{item.quantity}</TableCell>
                                             <TableCell className="text-right font-medium">
-                                                {(item.price * item.quantity).toFixed(2)} PLN
+                                                {order.currency === 'EUR' ? Math.ceil(item.price * item.quantity) : (item.price * item.quantity).toFixed(2)} {order.currency}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -140,7 +140,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     <div className="p-6 bg-gray-50/50">
                         <div className="flex justify-between items-center text-lg">
                             <span className="font-bold text-gray-900">{t('totalLabel')}</span>
-                            <span className="font-black text-red-600">{order.total.toFixed(2)} PLN</span>
+                            <span className="font-black text-red-600">{order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} {order.currency || 'PLN'}</span>
                         </div>
                     </div>
                 </Card>

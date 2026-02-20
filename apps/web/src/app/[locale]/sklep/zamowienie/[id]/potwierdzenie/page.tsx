@@ -37,7 +37,9 @@ export default async function OrderConfirmationPage(props: { params: Promise<{ i
 
 
                 <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg text-left space-y-2 text-gray-900 dark:text-gray-100">
-                    <p><strong>{t('total')}:</strong> {order.total.toFixed(2)} PLN</p>
+                    <p>
+                        <strong>{t('total')}:</strong> {order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} {order.currency}
+                    </p>
                     <p><strong>{t('status')}:</strong> {t(`statuses.${order.status}`)}</p>
                     <p><strong>{t('paymentMethod')}:</strong> {t.has(`paymentMethods.${order.paymentProvider}`) ? t(`paymentMethods.${order.paymentProvider}`) : order.paymentProvider}</p>
                 </div>

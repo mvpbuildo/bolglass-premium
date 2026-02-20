@@ -31,12 +31,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Load from localStorage on mount (only once)
+    // Load from localStorage on mount
     useEffect(() => {
         const saved = localStorage.getItem('bolglass_cart');
         if (saved) {
             try {
-                setItems(JSON.parse(saved));
+                const parsed = JSON.parse(saved);
+                if (parsed && Array.isArray(parsed)) {
+                    setItems(parsed);
+                }
             } catch (e) {
                 console.error("Failed to parse cart", e);
             }
