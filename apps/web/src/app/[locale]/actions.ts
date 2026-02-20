@@ -539,3 +539,22 @@ export async function trackVisit() {
         return { success: false };
     }
 }
+
+export async function deleteCurrentUserAccount() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        await prisma.user.delete({
+            where: { id: session.user.id }
+        });
+
+        revalidatePath('/', 'layout');
+        return { success: true };
+    } catch (error: any) {
+        console.error("Account deletion failed:", error);
+        return { success: false, error: error.message };
+    }
+}
