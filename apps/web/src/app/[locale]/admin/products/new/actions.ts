@@ -4,6 +4,7 @@ import { prisma } from '@bolglass/database';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { revalidateTag, revalidatePath } from 'next/cache';
+import { existsSync } from 'fs';
 
 export async function createProduct(formData: FormData) {
     console.log("createProduct action started");
