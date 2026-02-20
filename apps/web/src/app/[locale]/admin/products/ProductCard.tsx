@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { Button, Card } from '@bolglass/ui';
 import { Product } from '@prisma/client';
 import { deleteProduct, updateProductDiscount } from './actions';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ProductCardProps {
     product: Product;
@@ -14,6 +14,16 @@ export default function ProductCard({ product }: ProductCardProps) {
     const [discount, setDiscount] = useState(product.discountPercent || 0);
     const [isUpdating, setIsUpdating] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [eurRate, setEurRate] = useState<number | null>(null);
+
+    useEffect(() => {
+        fetch('/api/currency')
+            .then(r => r.json())
+            .then((d: { rate: number }) => setEurRate(d.rate))
+            .catch(() => setEurRate(4.25));
+    }, []);
+
+    const eurPrice = eurRate ? Math.ceil(product.price * (1 - discount / 100) / eurRate) : null;
 
     const handleDiscountUpdate = async (newDiscount: number) => {
         setIsUpdating(true);
@@ -67,6 +77,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                             <span className={`font-mono font-bold whitespace-nowrap ${discount > 0 ? 'text-red-600' : 'text-green-600'}`}>
                                 {discountedPrice.toFixed(2)} PLN
                             </span>
+                            {eurPrice !== null && (
+                                <span className="text-[11px] font-bold text-blue-600 mt-0.5">
+                                    ≈ {eurPrice} EUR
+                                </span>
+                            )}
                         </div>
                         <div className="flex items-center gap-1">
                             <label className="text-[10px] text-gray-500 uppercase font-bold">Rabat %</label>

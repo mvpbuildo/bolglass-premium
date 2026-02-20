@@ -68,7 +68,6 @@ export default async function Footer() {
                             <li><Link href="/galeria" className="hover:text-amber-500 transition-colors">{t('gallery')}</Link></li>
                             <li><Link href="/sklep" className="hover:text-amber-500 transition-colors">{t('shop')}</Link></li>
                             <li><Link href="/#booking" className="hover:text-amber-500 transition-colors">{t('workshops')}</Link></li>
-                            <li><Link href="/#b2b" className="hover:text-amber-500 transition-colors">{t('b2b')}</Link></li>
                         </ul>
                     </div>
 
