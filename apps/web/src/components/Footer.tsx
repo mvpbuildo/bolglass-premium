@@ -107,9 +107,9 @@ export default async function Footer() {
                         © {new Date().getFullYear()} Bolglass Sp. z o.o. {t('footer.copyright')}
                     </p>
                     <div className="flex items-center gap-4 grayscale opacity-30">
-                        <Image src="/payments/payu.png" alt="PayU" width={40} height={20} className="object-contain" />
-                        <Image src="/payments/visa.png" alt="Visa" width={40} height={20} className="object-contain" />
-                        <Image src="/payments/mastercard.png" alt="Mastercard" width={40} height={20} className="object-contain" />
+                        <Image src="/payments/payu.svg" alt="PayU" width={40} height={20} className="object-contain" />
+                        <Image src="/payments/visa.svg" alt="Visa" width={40} height={20} className="object-contain" />
+                        <Image src="/payments/mastercard.svg" alt="Mastercard" width={40} height={20} className="object-contain" />
                     </div>
                 </div>
             </div>
