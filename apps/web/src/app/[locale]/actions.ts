@@ -1,165 +1,27 @@
 'use server';
 
 import { prisma } from '@bolglass/database';
-import { revalidatePath } from 'next/cache';
-import { sendBookingConfirmation } from '@/lib/mail';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 import { writeFile, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join } from 'path';
 import { auth } from '@/auth';
-import { paymentProvider, shippingProvider } from '@/lib/modules/store-context';
 
 // --- System Settings API ---
+
+import { CheckoutService } from '@/services/CheckoutService';
 
 export async function placeOrder(formData: FormData, cartItemsJson: string, total: number) {
     const session = await auth();
     const userId = session?.user?.id;
-
-    const email = formData.get('email') as string;
-    const name = formData.get('name') as string;
-    const address = formData.get('address') as string;
-    const city = formData.get('city') as string;
-    const zip = formData.get('zip') as string;
-    const phone = formData.get('phone') as string;
-
-    // Shipping & Payment Selections (Frontend must send these, or we default)
-    const shippingMethodKey = formData.get('shippingMethod') as string || 'courier';
-    const paymentMethodKey = formData.get('paymentMethod') as string || 'transfer';
-
-    // VAT Invoice fields
-    const documentType = formData.get('documentType') as string || 'RECEIPT';
-    const nip = formData.get('nip') as string;
-    const companyName = formData.get('companyName') as string;
-    const companyAddress = formData.get('companyAddress') as string;
-
     const items = JSON.parse(cartItemsJson);
 
-    if (!items || items.length === 0) {
-        throw new Error("Cart is empty");
-    }
-
-    // --- Server-Side Validation ---
-    const productIds = items.map((i: any) => i.id);
-    const dbProducts = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, price: true, name: true }
+    return await CheckoutService.placeOrder({
+        formData,
+        cartItems: items,
+        userId
     });
-
-    let calculatedItemsTotal = 0;
-    const trustedItems: any[] = [];
-
-    for (const item of items) {
-        const dbProduct = dbProducts.find(p => p.id === item.id);
-
-        if (!dbProduct) {
-            throw new Error(`Product not found: ${item.name} (${item.id})`);
-        }
-
-        const itemTotal = dbProduct.price * item.quantity;
-        calculatedItemsTotal += itemTotal;
-
-        trustedItems.push({
-            productId: dbProduct.id,
-            name: dbProduct.name,
-            price: dbProduct.price,
-            quantity: item.quantity
-        });
-    }
-
-    // --- Shipping Calculation (Universal Adapter) ---
-    // We calculate rates based on trusted items and address
-    // In a real scenario, we might call the provider to get the cost for the *selected* method specifically.
-    // Here we get all rates and find the selected one.
-    const rates = await shippingProvider.calculateRates(trustedItems, { city, zip });
-    const selectedRate = rates.find(r => r.id === shippingMethodKey) || rates[0]; // Default to first if invalid
-    const shippingCost = selectedRate ? selectedRate.price : 0;
-    const shippingMethodName = selectedRate ? selectedRate.name : 'Unknown';
-
-    const finalTotal = calculatedItemsTotal + shippingCost;
-
-    const invoiceData = documentType === 'INVOICE' ? {
-        nip,
-        companyName,
-        companyAddress
-    } : null;
-
-    // --- Create Order (Universal) ---
-    const order = await prisma.order.create({
-        data: {
-            userId: userId || null,
-            email: email,
-            status: "PENDING",
-            paymentStatus: "UNPAID",
-            total: finalTotal,
-
-            // Store provider info
-            shippingMethod: shippingMethodName,
-            shippingCost: shippingCost,
-            // paymentProvider: paymentProvider.key, // Schema might need update for this field?
-            // Checking schema: paymentProvider String? // "PAYU", "P24", "MANUAL"
-            paymentProvider: paymentProvider.key,
-
-            documentType,
-            invoiceData: invoiceData as any,
-            shippingAddress: {
-                name,
-                street: address,
-                city,
-                zip,
-                phone
-            },
-            items: {
-                create: trustedItems.map(item => ({
-                    productId: item.productId,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                }))
-            }
-        }
-    });
-
-    // --- Payment Initialization (Universal Adapter) ---
-    let paymentResult = { success: true, paymentUrl: `/sklep/zamowienie/${order.id}/potwierdzenie` };
-    try {
-        const result = await paymentProvider.createTransaction({
-            id: order.id,
-            total: finalTotal,
-            currency: 'PLN',
-            email: email,
-            description: `Zamówienie #${order.id.substring(0, 8)}`
-        });
-
-        if (result.success && result.paymentUrl) {
-            paymentResult.paymentUrl = result.paymentUrl;
-        }
-    } catch (error) {
-        console.error("Payment initialization failed:", error);
-        // Soft fail: Order created, but auto-redirect failed. User can retry from order page.
-    }
-
-    // Persistence: Update User Profile if logged in
-    if (userId && documentType === 'INVOICE') {
-        try {
-            await prisma.user.update({
-                where: { id: userId },
-                data: {
-                    isCompany: true,
-                    companyName: companyName,
-                    nip: nip,
-                    companyStreet: companyAddress,
-                }
-            });
-        } catch (err) {
-            console.error("Failed to update user profile with company data:", err);
-        }
-    }
-
-    return {
-        orderId: order.id,
-        success: true,
-        paymentUrl: paymentResult.paymentUrl
-    };
 }
 
 export async function getAdminEmailSettings() {
@@ -432,100 +294,10 @@ export async function getBookingsByDate(dateStr: string) {
     }
 }
 
-export async function createBooking(formData: {
-    slotId?: string;
-    date?: string | Date;
-    name: string;
-    email: string;
-    people: number;
-    type: string; // 'SIGHTSEEING' | 'WORKSHOP'
-    isGroup?: boolean;
-    institutionName?: string;
-    institutionAddress?: string;
-}, isAdminOverride = false) {
-    console.log('--- SERVER ACTION: createBooking ---', { formData, isAdminOverride });
-    try {
-        let bookingDate: Date;
-        let slotId = formData.slotId;
+import { BookingService } from '@/services/BookingService';
 
-        // 1. Determine Date and Slot
-        if (slotId) {
-            const slot = await prisma.slot.findUnique({ where: { id: slotId } });
-            if (!slot) throw new Error('Slot not found');
-            bookingDate = slot.date;
-        } else if (formData.date) {
-            bookingDate = new Date(formData.date);
-            // Try to find matching slot
-            const slot = await prisma.slot.findUnique({ where: { date: bookingDate } });
-            if (slot) {
-                slotId = slot.id;
-            } else {
-                // If slot doesn't exist (e.g. generated yet?), we could create it or error.
-                // For robustness, let's create it on the fly if legal time
-                // Or just error. Let's error for now to enforce generation.
-                // Actually, if we want robust 15-min support, we should probably ensure it exists.
-                // But let's assume generateMonthSlots was run.
-                throw new Error('Wybrany termin nie ma zdefiniowanego slotu w systemie. Skontaktuj się z administratorem.');
-            }
-        } else {
-            throw new Error('Missing date or slotId');
-        }
-
-        // 2. Validate Resource Availability (The "Tetris" Check)
-        if (!isAdminOverride) {
-            // Import dynamically to avoid circular deps if any (though imports are top level)
-            const { isBookingValid } = await import('@/lib/booking-engine');
-            const validation = await isBookingValid(bookingDate, formData.type as BookingType, formData.people);
-
-            if (!validation.valid) {
-                throw new Error(validation.error || 'Termin niedostępny.');
-            }
-        }
-
-        // 3. Fetch Pricing
-        const key = formData.type === 'WORKSHOP' ? 'price_workshop' : 'price_sightseeing';
-        const setting = await prisma.systemSetting.findUnique({ where: { key } });
-
-        let finalPrice = 150;
-        if (formData.type === 'WORKSHOP') finalPrice = 60;
-        else if (formData.type === 'SIGHTSEEING') finalPrice = 35;
-
-        if (setting) {
-            finalPrice = parseInt(setting.value);
-        }
-
-        // Check if slot has override price
-        if (slotId) {
-            const slot = await prisma.slot.findUnique({ where: { id: slotId } });
-            if (slot?.price) finalPrice = slot.price;
-        }
-
-        const booking = await prisma.booking.create({
-            data: {
-                name: formData.name,
-                email: formData.email,
-                people: formData.people,
-                date: bookingDate,
-                slotId: slotId, // Can be null? Schema says slot Slot? So yes. But we try to link.
-                type: formData.type,
-                status: 'CONFIRMED',
-                priceBase: finalPrice,
-                isGroup: formData.isGroup || false,
-                institutionName: formData.institutionName,
-                institutionAddress: formData.institutionAddress
-            },
-        });
-
-        revalidatePath('/', 'layout');
-
-        // Trigger email confirmation asynchronously
-        sendBookingConfirmation(booking).catch(err => console.error('Immediate confirmation send failed:', err));
-
-        return { success: true, booking };
-    } catch (error: any) {
-        console.error('CRITICAL ERROR in createBooking:', error);
-        return { success: false, error: error.message };
-    }
+export async function createBooking(formData: any, isAdminOverride = false) {
+    return await BookingService.createBooking(formData, isAdminOverride);
 }
 
 export async function getAllBookings() {
@@ -562,34 +334,11 @@ export async function updateBookingAdmin(id: string, data: { status?: string, ad
 }
 
 export async function deleteBooking(id: string) {
-    try {
-        await prisma.booking.delete({
-            where: { id }
-        });
-        revalidatePath('/', 'layout');
-        return { success: true };
-    } catch (error: any) {
-        console.error('Error deleting booking:', error);
-        return { success: false, error: error.message };
-    }
+    return await BookingService.deleteBooking(id);
 }
 
 export async function updateBookingPeople(id: string, people: number) {
-    try {
-        const booking = await prisma.booking.update({
-            where: { id },
-            data: { people }
-        });
-        revalidatePath('/', 'layout');
-
-        // Send email asynchronously
-        const { sendBookingUpdateEmail } = await import('@/lib/mail');
-        sendBookingUpdateEmail(booking).catch(err => console.error('Failed to send update email:', err));
-
-        return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
+    return await BookingService.updateBookingPeople(id, people);
 }
 
 
@@ -608,22 +357,7 @@ export async function updateSlotCapacity(id: string, capacity: number) {
 }
 
 export async function sendBookingReminder(id: string) {
-    try {
-        const booking = await prisma.booking.findUnique({ where: { id } });
-        if (!booking) throw new Error('Booking not found');
-
-        const { sendBookingReminderEmail } = await import('@/lib/mail');
-        await sendBookingReminderEmail(booking);
-
-        await prisma.booking.update({
-            where: { id },
-            data: { reminderSentAt: new Date() }
-        });
-
-        return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
+    return await BookingService.sendReminder(id);
 }
 
 export async function updateSlotPrice(slotId: string, price: number | null) {
@@ -765,7 +499,7 @@ export async function uploadContactLogo(formData: FormData) {
         const buffer = Buffer.from(bytes);
 
         // Robust path handling
-        const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+        const isWebPackage = process.cwd().endsWith('web') || existsSync(join(process.cwd(), 'public'));
         const uploadDir = isWebPackage
             ? join(process.cwd(), 'public', 'uploads')
             : join(process.cwd(), 'apps', 'web', 'public', 'uploads');
