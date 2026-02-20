@@ -3,7 +3,6 @@ import { prisma } from '@bolglass/database';
 import { EMAIL_SETTING_KEYS } from './mail-constants';
 
 export async function getTransporter() {
-    // @ts-ignore
     const settings = await prisma.systemSetting.findMany({
         where: {
             key: {
@@ -268,7 +267,6 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
 
         const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
 
-        // @ts-ignore
         const settings = await prisma.systemSetting.findMany({
             where: {
                 key: { in: [subjectKey, bodyKey, fromKey] }
