@@ -40,7 +40,7 @@ export default function ConfiguratorBanner() {
                 </p>
 
                 <div className="pt-4 flex flex-col sm:flex-row gap-4">
-                    <Link href="/sklep/konfigurator">
+                    <Link href="/#studio-3d">
                         <Button
                             className="bg-amber-500 hover:bg-amber-600 text-black font-black px-10 py-7 text-sm rounded-full tracking-widest uppercase transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(245,158,11,0.3)] flex gap-3 items-center"
                         >
