@@ -150,7 +150,7 @@ export default function BaubleConfigurator() {
     if (!config) return <div className="h-[90vh] bg-neutral-950 flex items-center justify-center text-white">Ładowanie konfiguratora...</div>;
 
     const selectedSize = config.sizes.find(s => s.id === selectedSizeId) || config.sizes[0];
-    const selectedColor = config.colors.find(c => c.hex === color);
+    const selectedColor = config.colors.find(c => c.hex === color) || config.colors[0];
 
     // Pricing Logic
     const currentPrice = config ? calculateBaublePrice({
