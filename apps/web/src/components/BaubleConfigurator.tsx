@@ -9,6 +9,7 @@ import { useCart } from '@/context/CartContext';
 import { compressDataURL } from '@/utils/imageCompression';
 import { toast } from 'sonner';
 import { getConfiguratorSettings, type BaubleConfig } from '@/app/[locale]/admin/settings/3d/actions';
+import { calculateBaublePrice } from '@/services/pricing';
 import { useParams } from 'next/navigation';
 
 type MultilingualLabel = {
