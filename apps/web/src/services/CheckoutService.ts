@@ -19,7 +19,6 @@ export class CheckoutService {
 
             // Shipping & Payment Selections
             const shippingMethodKey = formData.get('shippingMethod') as string || 'courier';
-            const paymentMethodKey = formData.get('paymentMethod') as string || 'transfer';
 
             // VAT Invoice fields
             const documentType = formData.get('documentType') as string || 'RECEIPT';
@@ -32,14 +31,14 @@ export class CheckoutService {
             }
 
             // --- Server-Side Validation ---
-            const productIds = cartItems.map((i: any) => i.id);
+            const productIds = cartItems.map((i: { id: string }) => i.id);
             const dbProducts = await prisma.product.findMany({
                 where: { id: { in: productIds } },
                 select: { id: true, price: true, name: true }
             });
 
             let calculatedItemsTotal = 0;
-            const trustedItems: any[] = [];
+            const trustedItems: { productId: string; name: string; price: number; quantity: number }[] = [];
 
             for (const item of cartItems) {
                 const dbProduct = dbProducts.find(p => p.id === item.id);
@@ -143,9 +142,10 @@ export class CheckoutService {
                 success: true,
                 paymentUrl
             };
-        } catch (error: any) {
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
             console.error('Error in placeOrder:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: message };
         }
     }
 }

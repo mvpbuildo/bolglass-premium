@@ -78,9 +78,10 @@ export class BookingService {
             sendBookingConfirmation(booking).catch(err => console.error('Confirmation send failed:', err));
 
             return { success: true, booking };
-        } catch (error: any) {
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
             console.error('Error in createBooking:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: message };
         }
     }
 
@@ -93,9 +94,10 @@ export class BookingService {
             revalidatePath('/', 'layout');
             sendBookingUpdateEmail(booking).catch(err => console.error('Update email failed:', err));
             return { success: true };
-        } catch (error: any) {
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
             console.error('Error in updateBookingPeople:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: message };
         }
     }
 
@@ -110,9 +112,10 @@ export class BookingService {
                 data: { reminderSentAt: new Date() }
             });
             return { success: true };
-        } catch (error: any) {
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
             console.error('Error in sendReminder:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: message };
         }
     }
 
@@ -121,9 +124,10 @@ export class BookingService {
             await prisma.booking.delete({ where: { id } });
             revalidatePath('/', 'layout');
             return { success: true };
-        } catch (error: any) {
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
             console.error('Error in deleteBooking:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: message };
         }
     }
 }

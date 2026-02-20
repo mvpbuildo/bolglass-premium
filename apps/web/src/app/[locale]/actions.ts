@@ -294,9 +294,9 @@ export async function getBookingsByDate(dateStr: string) {
     }
 }
 
-import { BookingService } from '@/services/BookingService';
+import { BookingService, BookingInput } from '@/services/BookingService';
 
-export async function createBooking(formData: any, isAdminOverride = false) {
+export async function createBooking(formData: BookingInput, isAdminOverride = false) {
     return await BookingService.createBooking(formData, isAdminOverride);
 }
 
