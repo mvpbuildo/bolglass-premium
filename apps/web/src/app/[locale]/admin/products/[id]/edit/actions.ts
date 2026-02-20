@@ -4,6 +4,7 @@ import { prisma } from '@bolglass/database';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { existsSync } from 'fs';
 
 export async function updateProduct(id: string, formData: FormData) {
     try {
@@ -43,7 +44,7 @@ export async function updateProduct(id: string, formData: FormData) {
 
         // Robust path handling for Monorepo + Docker
         // Check if we are already in apps/web (standard Next.js start) or root (Turbo dev)
-        const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+        const isWebPackage = process.cwd().endsWith('web') || existsSync(join(process.cwd(), 'public'));
 
         const uploadDir = isWebPackage
             ? join(process.cwd(), 'public', 'uploads')
@@ -96,7 +97,7 @@ export async function updateProduct(id: string, formData: FormData) {
             }
         });
 
-        revalidateTag('products');
+        revalidateTag('products', 'max');
         revalidatePath('/admin/products', 'page');
         revalidatePath(`/admin/products/${id}`, 'page');
 

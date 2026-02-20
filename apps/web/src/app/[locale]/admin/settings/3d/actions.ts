@@ -74,7 +74,7 @@ export async function updateConfiguratorSettings(config: BaubleConfig) {
         create: { key: CONFIG_KEY, value: JSON.stringify(config) }
     });
 
-    revalidateTag('bauble-config');
+    revalidateTag('bauble-config', 'max');
     revalidatePath('/[locale]/admin/settings/3d', 'page');
     revalidatePath('/[locale]', 'layout'); // Revalidate potential cached pages using config
 }

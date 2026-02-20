@@ -2,6 +2,7 @@
 
 import { prisma } from '@bolglass/database';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { existsSync } from 'fs';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
 // import { writeFile } from 'fs/promises'; // Not used in this version but kept for ref
@@ -86,7 +87,7 @@ export async function createProduct(formData: FormData) {
             }
         });
 
-        revalidateTag('products');
+        revalidateTag('products', 'max');
         revalidatePath('/admin/products', 'page');
         return { success: true };
 
@@ -171,7 +172,7 @@ export async function updateProduct(id: string, formData: FormData) {
             }
         });
 
-        revalidateTag('products');
+        revalidateTag('products', 'max');
         revalidatePath('/admin/products', 'page');
         revalidatePath(`/sklep/produkt`, 'page');
         return { success: true };
@@ -196,7 +197,7 @@ export async function deleteProduct(id: string) {
         // Delete images from filesystem
         if (product.images && product.images.length > 0) {
             // Robust path handling
-            const isWebPackage = process.cwd().endsWith('web') || require('fs').existsSync(join(process.cwd(), 'public'));
+            const isWebPackage = process.cwd().endsWith('web') || existsSync(join(process.cwd(), 'public'));
 
             const uploadDir = isWebPackage
                 ? join(process.cwd(), 'public')
@@ -220,7 +221,7 @@ export async function deleteProduct(id: string) {
             where: { id }
         });
 
-        revalidateTag('products');
+        revalidateTag('products', 'max');
         revalidatePath('/admin/products', 'page');
         return { success: true };
     } catch (error) {
@@ -235,7 +236,7 @@ export async function updateProductDiscount(id: string, discountPercent: number)
             where: { id },
             data: { discountPercent }
         });
-        revalidateTag('products');
+        revalidateTag('products', 'max');
         revalidatePath('/admin/products', 'page');
         revalidatePath(`/sklep/produkt`, 'page');
         return { success: true };
