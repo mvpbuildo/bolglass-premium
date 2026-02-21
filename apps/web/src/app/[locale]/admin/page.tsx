@@ -74,6 +74,7 @@ export default async function AdminDashboardPage() {
             color: 'border-purple-100 bg-purple-50/30',
             bg: 'bg-purple-600',
             links: [
+                { name: 'Kody Rabatowe', path: '/admin/marketing/rabaty', icon: <Tag className="w-4 h-4" /> },
                 { name: 'Mailing', path: '/admin/marketing/mailing', icon: <ShoppingCart className="w-4 h-4" /> },
                 { name: 'Analityka', path: '/admin/marketing/analityka', icon: <TrendingUp className="w-4 h-4" /> },
             ]

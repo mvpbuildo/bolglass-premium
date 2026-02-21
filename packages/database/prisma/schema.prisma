@@ -232,6 +232,12 @@ model Order {
   shippingCost    Float          @default(0)
   shippingAddress Json?          // JSON: { name, street, city, zip, phone, lockerId }
   
+  // Rabaty
+  couponId        String?
+  coupon          Coupon?        @relation(fields: [couponId], references: [id])
+  discountAmount  Float          @default(0)
+  originalTotal   Float?         // Cena bazowa przed rabatami i ew. obniżkami Turnstile
+
   items           OrderItem[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -348,4 +354,31 @@ model AnalyticsDay {
   views     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// --- Discount System ---
+
+model Coupon {
+  id                    String      @id @default(cuid())
+  code                  String      @unique // Wielkie litery np. START2026
+  type                  String      // PERCENTAGE, FIXED_CART, FREE_SHIPPING
+  value                 Float       
+  
+  // Limity użyć i ważność
+  minAmount             Float?      
+  maxUses               Int?        
+  uses                  Int         @default(0) 
+  startDate             DateTime?   
+  endDate               DateTime?   
+  oncePerUser           Boolean     @default(false)
+  isActive              Boolean     @default(true)
+  
+  // Opcje targetowania 
+  excludePromotions     Boolean     @default(false) 
+  applicableCategoryIds String[]    // Tylko dla wyszczególnionych kategorii koszyka
+  applicableProductIds  String[]    // Tylko na wybrane produkty 
+  
+  orders                Order[]     
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 }

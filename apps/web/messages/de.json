@@ -234,6 +234,10 @@
         "orderAndPay": "Bestellen und Bezahlen",
         "acceptTerms": "Mit dem Klick auf \"{buttonText}\" akzeptieren Sie die Ladenbedingungen.",
         "errorPlacingOrder": "Beim Aufgeben der Bestellung ist ein Fehler aufgetreten.",
+        "discountCode": "Rabattcode",
+        "apply": "Anwenden",
+        "discount": "Rabatt",
+        "couponServiceError": "Fehler bei der Gutscheinüberprüfung.",
         "methods": {
             "shipping": {
                 "pickup": "Selbstabholung (Werkstatt)",

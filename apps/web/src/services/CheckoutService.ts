@@ -5,10 +5,11 @@ export interface OrderInput {
     formData: FormData;
     cartItems: { id: string; quantity: number; name: string }[];
     userId?: string;
+    couponCode?: string;
 }
 
 export class CheckoutService {
-    static async placeOrder({ formData, cartItems, userId }: OrderInput) {
+    static async placeOrder({ formData, cartItems, userId, couponCode }: OrderInput) {
         console.log(">>> [CheckoutService] Entering placeOrder");
         try {
             const email = formData.get('email') as string;
@@ -68,6 +69,25 @@ export class CheckoutService {
             const locale = formData.get('locale') as string || 'pl';
             const currency = ['en', 'de'].includes(locale) ? 'EUR' : 'PLN';
 
+            // --- Validation and Discount Assignment ---
+            let originalItemsTotal = calculatedItemsTotal;
+            let discountAmount = 0;
+            let appliedCoupon = null;
+
+            if (couponCode) {
+                const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });
+                if (coupon && coupon.isActive) {
+                    if (coupon.type === 'PERCENTAGE') {
+                        discountAmount = originalItemsTotal * (coupon.value / 100);
+                    } else if (coupon.type === 'FIXED_CART') {
+                        discountAmount = coupon.value;
+                    }
+                    if (discountAmount > calculatedItemsTotal) discountAmount = calculatedItemsTotal;
+                    calculatedItemsTotal -= discountAmount;
+                    appliedCoupon = coupon;
+                }
+            }
+
             // --- Server-Side Conversion (if EUR) ---
             let finalTotal = calculatedItemsTotal + shippingCost;
             let currentExchangeRate: number | null = null;
@@ -113,6 +133,9 @@ export class CheckoutService {
                     paymentProvider: paymentProvider.key,
                     documentType,
                     invoiceData: invoiceData as any,
+                    couponId: appliedCoupon ? appliedCoupon.id : null,
+                    discountAmount: currency === 'EUR' && currentExchangeRate ? Math.ceil(discountAmount / currentExchangeRate) : discountAmount,
+                    originalTotal: currency === 'EUR' && currentExchangeRate ? Math.ceil(originalItemsTotal / currentExchangeRate) : originalItemsTotal,
                     shippingAddress: {
                         name,
                         street: address,
@@ -147,6 +170,18 @@ export class CheckoutService {
                 }
             } catch (error) {
                 console.error("Payment initialization failed:", error);
+            }
+
+            // --- Coupon Usaage Recording ---
+            if (appliedCoupon) {
+                try {
+                    await prisma.coupon.update({
+                        where: { id: appliedCoupon.id },
+                        data: { uses: { increment: 1 } }
+                    });
+                } catch (err) {
+                    console.error("Failed to increment coupon uses:", err);
+                }
             }
 
             // --- Profile Update ---

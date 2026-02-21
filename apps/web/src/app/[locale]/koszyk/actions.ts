@@ -12,6 +12,7 @@ export async function placeOrder(formData: FormData, cartItemsJson: string) {
     const cartItems = JSON.parse(cartItemsJson);
 
     const turnstileToken = formData.get('turnstileToken') as string | undefined;
+    const couponCode = formData.get('couponCode') as string | undefined;
     const isHuman = await verifyTurnstileToken(turnstileToken);
 
     if (!isHuman) {
@@ -21,7 +22,8 @@ export async function placeOrder(formData: FormData, cartItemsJson: string) {
     return CheckoutService.placeOrder({
         formData,
         cartItems,
-        userId
+        userId,
+        couponCode
     });
 }
 

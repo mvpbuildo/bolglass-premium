@@ -234,6 +234,10 @@
     "orderAndPay": "Zamawiam i Płacę",
     "acceptTerms": "Klikając \"{buttonText}\" akceptujesz regulamin sklepu.",
     "errorPlacingOrder": "Wystąpił błąd podczas składania zamówienia.",
+    "discountCode": "Kod Rabatowy",
+    "apply": "Zastosuj",
+    "discount": "Zniżka",
+    "couponServiceError": "Przepraszamy, walidacja kodu zawiodła.",
     "methods": {
       "shipping": {
         "pickup": "Odbiór Osobisty (Warsztat)",

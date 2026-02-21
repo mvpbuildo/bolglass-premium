@@ -234,6 +234,10 @@
         "orderAndPay": "Order and Pay",
         "acceptTerms": "By clicking \"{buttonText}\" you accept the store terms.",
         "errorPlacingOrder": "An error occurred while placing the order.",
+        "discountCode": "Discount Code",
+        "apply": "Apply",
+        "discount": "Discount",
+        "couponServiceError": "Coupon validation service error.",
         "methods": {
             "shipping": {
                 "pickup": "Local Pickup (Workshop)",

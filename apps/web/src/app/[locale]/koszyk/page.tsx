@@ -24,6 +24,13 @@ export default function CheckoutPage() {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     const isTurnstileEnabled = Boolean(siteKey && siteKey.length > 5);
 
+    // Coupon State
+    const [couponCodeInput, setCouponCodeInput] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<{ id: string, code: string, type: string, value: number } | null>(null);
+    const [couponError, setCouponError] = useState('');
+    const [couponSuccess, setCouponSuccess] = useState('');
+    const [isVerifyingCoupon, setIsVerifyingCoupon] = useState(false);
+
     // Universal Adapter State
     const [shippingMethods, setShippingMethods] = useState<any[]>([]);
     const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
@@ -61,7 +68,45 @@ export default function CheckoutPage() {
         }
     }, [selectedShipping, shippingMethods]);
 
-    const finalTotal = total + shippingCost;
+    // Calculate visual discount
+    let discountAmount = 0;
+    if (appliedCoupon) {
+        if (appliedCoupon.type === 'PERCENTAGE') {
+            discountAmount = total * (appliedCoupon.value / 100);
+        } else if (appliedCoupon.type === 'FIXED_CART') {
+            discountAmount = appliedCoupon.value;
+        }
+        if (discountAmount > total) discountAmount = total;
+    }
+
+    const finalTotal = total + shippingCost - discountAmount;
+
+    // Apply Coupon Logic Handler
+    const handleApplyCoupon = async () => {
+        if (!couponCodeInput.trim()) return;
+        setIsVerifyingCoupon(true);
+        setCouponError('');
+        setCouponSuccess('');
+        try {
+            const res = await fetch('/api/coupons/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: couponCodeInput, cartTotal: total })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setAppliedCoupon(data.coupon);
+                setCouponSuccess(data.message);
+            } else {
+                setAppliedCoupon(null);
+                setCouponError(data.message);
+            }
+        } catch (err) {
+            setCouponError(t('couponServiceError') ?? 'Validation failed.');
+        } finally {
+            setIsVerifyingCoupon(false);
+        }
+    };
 
     async function handleSubmit(formData: FormData) {
         setIsSubmitting(true);
@@ -155,6 +200,41 @@ export default function CheckoutPage() {
                                 ))}
                             </div>
                             <div className="mt-6 pt-4 border-t border-white/10 flex flex-col gap-2 text-xl font-black text-amber-50">
+
+                                <div className="mt-2 mb-4">
+                                    <label className="text-xs uppercase tracking-[0.2em] text-white/50 block mb-2">{t('discountCode') ?? 'Kod Rabatowy'}</label>
+                                    <div className="flex gap-2 relative">
+                                        <input
+                                            type="text"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 uppercase focus:ring-1 focus:ring-amber-500 outline-none"
+                                            placeholder="BOLGLASS..."
+                                            value={couponCodeInput}
+                                            onChange={(e) => setCouponCodeInput(e.target.value)}
+                                            disabled={isVerifyingCoupon || !!appliedCoupon}
+                                        />
+                                        {!appliedCoupon ? (
+                                            <button
+                                                type="button"
+                                                onClick={handleApplyCoupon}
+                                                disabled={isVerifyingCoupon || !couponCodeInput}
+                                                className="bg-amber-500 hover:bg-amber-400 text-black px-6 rounded-xl text-sm font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                                            >
+                                                {isVerifyingCoupon ? '...' : (t('apply') ?? 'Użyj')}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => { setAppliedCoupon(null); setCouponCodeInput(''); setCouponSuccess(''); }}
+                                                className="bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-red-400 px-6 rounded-xl text-sm font-bold transition-colors"
+                                            >
+                                                {t('remove') ?? 'Usuń'}
+                                            </button>
+                                        )}
+                                    </div>
+                                    {couponError && <p className="text-red-400 text-xs font-bold mt-2 animate-pulse">{couponError}</p>}
+                                    {couponSuccess && <p className="text-green-400 text-xs font-bold mt-2">✔ {couponSuccess}</p>}
+                                </div>
+
                                 <div className="flex justify-between text-sm text-amber-50/60">
                                     <span>{t('products')}</span>
                                     <span>{formatPrice(total)}</span>
@@ -163,6 +243,12 @@ export default function CheckoutPage() {
                                     <span>{t('shipping')} ({selectedShipping ? t(`methods.shipping.${selectedShipping}`) : '...'})</span>
                                     <span>{formatPrice(shippingCost)}</span>
                                 </div>
+                                {appliedCoupon && (
+                                    <div className="flex justify-between text-sm text-green-400 font-bold">
+                                        <span>{t('discount') ?? 'Rabat'} ({appliedCoupon.code})</span>
+                                        <span>-{formatPrice(discountAmount)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between border-t border-white/10 pt-2 mt-2 text-2xl text-amber-500">
                                     <span>{t('total')}</span>
                                     <span>{formatPrice(finalTotal)}</span>
@@ -184,6 +270,9 @@ export default function CheckoutPage() {
 
                             <form action={handleSubmit} className="space-y-4">
                                 <input type="hidden" name="locale" value={locale} />
+                                {appliedCoupon && (
+                                    <input type="hidden" name="couponCode" value={appliedCoupon.code} />
+                                )}
                                 <div className="grid grid-cols-2 gap-4 mb-6">
                                     <button
                                         type="button"
