@@ -79,3 +79,18 @@ export async function sendTestTelegramMessage(chatId: string): Promise<{ success
         return { success: false, error: 'Wystąpił nieoczekiwany błąd.' };
     }
 }
+
+export async function toggleTelegramPermission(id: string, field: 'receivesOrders' | 'receivesBookings' | 'receivesLogistics', value: boolean): Promise<void> {
+    const session = await auth();
+    if (session?.user?.role !== 'ADMIN') throw new Error('Unauthorized');
+
+    try {
+        await prisma.telegramSubscriber.update({
+            where: { id },
+            data: { [field]: value }
+        });
+        revalidatePath('/admin/settings/telegram');
+    } catch (e) {
+        console.error(`Failed to toggle Telegram permission ${field}:`, e);
+    }
+}

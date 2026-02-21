@@ -3,7 +3,8 @@ import { Card } from '@bolglass/ui';
 import { addTelegramSubscriber, deleteTelegramSubscriber } from './actions';
 import TokenForm from './TokenForm';
 import TestSubscriberButton from './TestSubscriberButton';
-import { Bell, UserPlus, Trash2, MessagesSquare, CheckCircle, XCircle, Package } from 'lucide-react';
+import PermissionToggle from './PermissionToggle';
+import { Bell, UserPlus, Trash2, MessagesSquare, Package, ShoppingCart, Calendar } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
@@ -129,19 +130,31 @@ export default async function TelegramSettingsPage() {
                                                 <h3 className="font-bold text-gray-900">{sub.name}</h3>
                                                 <p className="text-sm text-gray-500">ID: <code className="bg-gray-100 px-1 rounded">{sub.chatId}</code> {sub.roleDescription ? `• ${sub.roleDescription}` : ''}</p>
 
-                                                <div className="flex gap-4 mt-2">
-                                                    <span className={`text-xs font-bold flex items-center gap-1 ${sub.receivesOrders ? 'text-green-600' : 'text-gray-400'}`}>
-                                                        {sub.receivesOrders ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                                                        Sklep
-                                                    </span>
-                                                    <span className={`text-xs font-bold flex items-center gap-1 ${sub.receivesBookings ? 'text-green-600' : 'text-gray-400'}`}>
-                                                        {sub.receivesBookings ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                                                        Warsztaty
-                                                    </span>
-                                                    <span className={`text-xs font-bold flex items-center gap-1 ${sub.receivesLogistics ? 'text-blue-600' : 'text-gray-400'}`}>
-                                                        {sub.receivesLogistics ? <Package className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                                                        Logistyka
-                                                    </span>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    <PermissionToggle
+                                                        id={sub.id}
+                                                        field="receivesOrders"
+                                                        initialValue={sub.receivesOrders}
+                                                        label="Sklep"
+                                                        icon={<ShoppingCart className="w-3 h-3" />}
+                                                        activeColor="text-emerald-600"
+                                                    />
+                                                    <PermissionToggle
+                                                        id={sub.id}
+                                                        field="receivesBookings"
+                                                        initialValue={sub.receivesBookings}
+                                                        label="Warsztaty"
+                                                        icon={<Calendar className="w-3 h-3" />}
+                                                        activeColor="text-amber-600"
+                                                    />
+                                                    <PermissionToggle
+                                                        id={sub.id}
+                                                        field="receivesLogistics"
+                                                        initialValue={sub.receivesLogistics}
+                                                        label="Logistyka"
+                                                        icon={<Package className="w-3 h-3" />}
+                                                        activeColor="text-blue-600"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
