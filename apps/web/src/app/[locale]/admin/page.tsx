@@ -16,7 +16,8 @@ import {
     Phone,
     TrendingUp,
     Bot,
-    Mail // Added Mail icon import
+    Mail,
+    Bell
 } from 'lucide-react';
 import { prisma } from '@bolglass/database';
 import { format } from 'date-fns';
@@ -101,6 +102,7 @@ export default async function AdminDashboardPage() {
             links: [
                 { name: 'Użytkownicy', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
                 { name: 'Sztuczna Inteligencja', path: '/admin/system/settings', icon: <Bot className="w-4 h-4" /> },
+                { name: 'Powiadomienia Telegram', path: '/admin/settings/telegram', icon: <Bell className="w-4 h-4" /> },
                 { name: 'Ustawienia', path: '/admin/system/settings', icon: <Settings className="w-4 h-4" /> },
             ]
         },

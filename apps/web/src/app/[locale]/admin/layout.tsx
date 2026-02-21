@@ -1,4 +1,5 @@
 import AdminNavigation from '@/components/AdminNavigation';
+import LiveNotifications from '@/components/admin/LiveNotifications';
 
 export default function AdminLayout({
     children
@@ -11,6 +12,7 @@ export default function AdminLayout({
                 <AdminNavigation />
                 {children}
             </div>
+            <LiveNotifications />
         </div>
     );
 }

@@ -207,6 +207,10 @@ export class CheckoutService {
             await sendOrderConfirmationEmail(order, locale).catch(err => console.error("CRITICAL: Email send failed:", err));
             console.log(">>> [CheckoutService] sendOrderConfirmationEmail call finished (awaited)");
 
+            // Podpięcie równoległego powiadomienia na czat Telegrama do właściciela i pracowników
+            const { broadcastNewOrder } = await import('@/lib/telegram');
+            broadcastNewOrder(order).catch(err => console.error("CRITICAL: Telegram broadcast failed:", err));
+
             return {
                 orderId: order.id,
                 success: true,

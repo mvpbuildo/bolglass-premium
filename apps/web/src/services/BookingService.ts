@@ -77,6 +77,10 @@ export class BookingService {
             revalidatePath('/', 'layout');
             sendBookingConfirmation(booking).catch(err => console.error('Confirmation send failed:', err));
 
+            // Telegram Broadcast
+            const { broadcastNewBooking } = await import('@/lib/telegram');
+            broadcastNewBooking(booking).catch(err => console.error('CRITICAL: Telegram broadcast failed:', err));
+
             return { success: true, booking };
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
