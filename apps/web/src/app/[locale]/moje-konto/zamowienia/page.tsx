@@ -33,8 +33,8 @@ export default async function OrderHistoryPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-                <p className="text-gray-500 text-sm">{t('subtitle')}</p>
+                <h1 className="text-2xl font-bold text-amber-50">{t('title')}</h1>
+                <p className="text-amber-200/40 text-sm font-medium">{t('subtitle')}</p>
             </div>
 
             {orders.length === 0 ? (
