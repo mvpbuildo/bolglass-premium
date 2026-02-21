@@ -1,6 +1,6 @@
 'use client';
 
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { sendTestTelegramMessage } from './actions';
 import { SendHorizontal } from 'lucide-react';
 import { useState } from 'react';

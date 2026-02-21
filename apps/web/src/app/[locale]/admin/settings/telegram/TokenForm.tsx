@@ -1,6 +1,6 @@
 'use client';
 
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { updateTelegramToken } from './actions';
 import { useTransition } from 'react';
 
