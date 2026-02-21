@@ -61,3 +61,19 @@ export async function updateTelegramToken(formData: FormData): Promise<void> {
         console.error('Failed to update Telegram token:', e);
     }
 }
+
+export async function sendTestTelegramMessage(chatId: string): Promise<{ success: boolean; error?: string }> {
+    const session = await auth();
+    if (session?.user?.role !== 'ADMIN') throw new Error('Unauthorized');
+
+    try {
+        const { sendTelegramMessage } = await import('@/lib/telegram');
+        const success = await sendTelegramMessage(chatId, '🔔 <b>To jest wiadomość testowa z Twojego panelu Bolglass!</b>\n\nJeśli to widzisz, konfiguracja dla tego Chat ID jest poprawna.');
+
+        if (success) return { success: true };
+        return { success: false, error: 'Telegram API zwrócił błąd. Sprawdź czy Token Bota jest poprawny.' };
+    } catch (e) {
+        console.error('Failed to send test Telegram message:', e);
+        return { success: false, error: 'Wystąpił nieoczekiwany błąd.' };
+    }
+}

@@ -2,8 +2,8 @@ import { prisma } from '@bolglass/database';
 import { Card } from '@bolglass/ui';
 import { addTelegramSubscriber, deleteTelegramSubscriber } from './actions';
 import TokenForm from './TokenForm';
+import TestSubscriberButton from './TestSubscriberButton';
 import { Bell, UserPlus, Trash2, MessagesSquare, CheckCircle, XCircle } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
@@ -137,14 +137,18 @@ export default async function TelegramSettingsPage() {
                                             </div>
                                         </div>
 
-                                        <form action={async () => {
-                                            'use server';
-                                            await deleteTelegramSubscriber(sub.id);
-                                        }}>
-                                            <button type="submit" className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors border border-transparent hover:border-red-200" title="Usuń z listy powiadomień">
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
-                                        </form>
+                                        <div className="flex gap-2">
+                                            <TestSubscriberButton chatId={sub.chatId} />
+
+                                            <form action={async () => {
+                                                'use server';
+                                                await deleteTelegramSubscriber(sub.id);
+                                            }}>
+                                                <button type="submit" className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors border border-transparent hover:border-red-200" title="Usuń z listy powiadomień">
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 ))
                             )}
