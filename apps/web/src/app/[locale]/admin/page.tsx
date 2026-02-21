@@ -15,7 +15,8 @@ import {
     ArrowRight,
     Phone,
     TrendingUp,
-    Bot
+    Bot,
+    Mail // Added Mail icon import
 } from 'lucide-react';
 import { prisma } from '@bolglass/database';
 import { format } from 'date-fns';
@@ -75,7 +76,8 @@ export default async function AdminDashboardPage() {
             bg: 'bg-purple-600',
             links: [
                 { name: 'Kody Rabatowe', path: '/admin/marketing/rabaty', icon: <Tag className="w-4 h-4" /> },
-                { name: 'Mailing', path: '/admin/marketing/mailing', icon: <ShoppingCart className="w-4 h-4" /> },
+                { name: 'Porzucone Koszyki', path: '/admin/marketing/porzucone-koszyki', icon: <ShoppingCart className="w-4 h-4" /> },
+                { name: 'Mailing', path: '/admin/marketing/mailing', icon: <Mail className="w-4 h-4" /> },
                 { name: 'Analityka', path: '/admin/marketing/analityka', icon: <TrendingUp className="w-4 h-4" /> },
             ]
         },

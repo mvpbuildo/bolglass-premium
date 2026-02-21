@@ -238,6 +238,10 @@ model Order {
   discountAmount  Float          @default(0)
   originalTotal   Float?         // Cena bazowa przed rabatami i ew. obniżkami Turnstile
 
+  // Ratowanie porzuconych koszyków
+  abandonedEmailSentAt DateTime?     // Datownik wysyłki maila z przypomnieniem
+  isRecovered          Boolean       @default(false) // Flaga oznaczająca udane odzyskanie koszyka
+
   items           OrderItem[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

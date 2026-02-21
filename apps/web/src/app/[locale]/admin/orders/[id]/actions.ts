@@ -16,9 +16,24 @@ export async function updateOrderStatus(formData: FormData) {
 
     try {
         console.log(`Updating order ${id} status to ${status}`);
+
+        // Find if order was abandoned
+        const order = await prisma.order.findUnique({
+            where: { id },
+            select: { abandonedEmailSentAt: true, status: true, paymentStatus: true }
+        });
+
+        const isRecovering = order?.abandonedEmailSentAt &&
+            order.status !== 'COMPLETED' &&
+            order.paymentStatus !== 'PAID' &&
+            (status === 'PAID' || status === 'COMPLETED');
+
         await prisma.order.update({
             where: { id },
-            data: { status }
+            data: {
+                status,
+                ...(isRecovering ? { isRecovered: true } : {})
+            }
         });
 
         // Invalidate the specific page path across all locales

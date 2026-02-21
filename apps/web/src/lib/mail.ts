@@ -367,3 +367,80 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
         console.error('[MAIL] CRITICAL ERROR in sendOrderConfirmationEmail:', error);
     }
 }
+
+export async function sendAbandonedCartEmail(order: any, locale: string = 'pl') {
+    console.log(`--- [MAIL] Starting abandoned cart email for Order: ${order?.id}, Locale: ${locale} ---`);
+    try {
+        if (!order?.id || !order?.email) {
+            console.error('[MAIL] ERROR: No order ID or email provided to sendAbandonedCartEmail');
+            return;
+        }
+
+        let fullOrder = order;
+        if (!order.items || order.items.length === 0) {
+            fullOrder = await prisma.order.findUnique({
+                where: { id: order.id },
+                include: { items: true }
+            });
+        }
+
+        if (!fullOrder) return;
+
+        const transporter = await getTransporter();
+        if (!transporter) return;
+
+        // Using order confirmation settings dynamically, falling back to static strings for abandoned features
+        const fromKey = EMAIL_SETTING_KEYS.SMTP_FROM;
+        const settings = await prisma.systemSetting.findMany({
+            where: { key: { in: [fromKey] } }
+        });
+        const config = Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
+        const from = config[fromKey] || config[EMAIL_SETTING_KEYS.SMTP_USER] || 'sklep@bolglass.pl';
+
+        const defaultSubjects: Record<string, string> = {
+            pl: 'Dokończ swoje zakupy w Bolglass - czekamy na Ciebie!',
+            en: 'Complete your purchase at Bolglass - we are waiting for you!',
+            de: 'Schließen Sie Ihren Einkauf bei Bolglass ab – wir warten auf Sie!'
+        };
+
+        // Link bezpośrednio do kontynuacji płatności (koszyk jest zatwierdzony w PENDING)
+        // Zakładamy, że serwer używa NEXT_PUBLIC_BASE_URL (jeżeli nie ma to wpisujemy ręcznie domenę)
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sklep.bolglass.pl';
+        const checkoutUrl = `${baseUrl}/${locale}/sklep/zamowienie/${fullOrder.id}/potwierdzenie`;
+
+        const defaultBodies: Record<string, string> = {
+            pl: `Dzień dobry!\nZauważyliśmy, że masz nieopłacone pozycje w koszyku w naszym sklepie. Jeśli masz jakieś pytania lub problemy z płatnością, jesteśmy do Twojej dyspozycji.\n\nAby sfinalizować zakupy, kliknij w poniższy link:\n${checkoutUrl}\n\nTwoje wybrane produkty wciąż na Ciebie czekają!`,
+            en: `Hello!\nWe noticed you left some items in your cart. If you have any questions or faced issues with payment, we are here to help.\n\nTo complete your purchase, click the link below:\n${checkoutUrl}\n\nYour selected items are still waiting for you!`,
+            de: `Hallo!\nWir haben festgestellt, dass Sie noch Artikel im Warenkorb haben. Wenn Sie Fragen haben oder Probleme mit der Zahlung aufgetreten sind, stehen wir Ihnen zur Verfügung.\n\nUm Ihren Einkauf abzuschließen, klicken Sie auf den folgenden Link:\n${checkoutUrl}\n\nIhre ausgewählten Artikel warten noch auf Sie!`
+        };
+
+        const subject = defaultSubjects[locale] || defaultSubjects.pl;
+        const body = defaultBodies[locale] || defaultBodies.pl;
+
+        const html = `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">
+                <h2 style="color: #222222; margin-bottom: 20px;">Dokończ swoje zamówienie / Complete your order</h2>
+                <div style="white-space: pre-wrap; line-height: 1.6; color: #444444; font-size: 15px;">${body}</div>
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="${checkoutUrl}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                        Dokończ Płatność / Complete Payment
+                    </a>
+                </div>
+                <hr style="margin: 40px 0 20px 0; border: 0; border-top: 1px solid #eaeaea;" />
+                <p style="font-size: 11px; color: #aaaaaa; text-align: center;">Wiadomość wysłana automatycznie przez system Bolglass.</p>
+            </div>
+        `;
+
+        const info = await transporter.sendMail({
+            from: `"Bolglass" <${from}>`,
+            to: fullOrder.email,
+            subject: subject,
+            text: body,
+            html: html
+        });
+
+        console.log(`[MAIL] Abandoned cart email SUCCESSFULLY sent to ${fullOrder.email}. Response: ${info.response}`);
+    } catch (error: unknown) {
+        console.error('[MAIL] CRITICAL ERROR in sendAbandonedCartEmail:', error);
+    }
+}
