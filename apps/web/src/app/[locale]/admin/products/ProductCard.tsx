@@ -82,8 +82,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                                 {discountedPrice.toFixed(2)} PLN
                             </span>
                             {eurPrice !== null && (
-                                <span className="text-[11px] font-bold text-blue-600 mt-0.5">
-                                    ≈ {eurPrice} EUR
+                                <span className="text-sm font-bold text-blue-600 mt-0.5">
+                                    {eurPrice} EUR
                                 </span>
                             )}
                         </div>
