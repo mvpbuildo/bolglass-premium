@@ -14,6 +14,7 @@ export default function ShopLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [turnstileToken, setTurnstileToken] = useState<string>('');
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    const isTurnstileEnabled = Boolean(siteKey && siteKey.length > 5);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -87,10 +88,10 @@ export default function ShopLoginPage() {
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
                         />
                     </div>
-                    {siteKey && (
+                    {isTurnstileEnabled && (
                         <div className="flex justify-center my-4">
                             <Turnstile
-                                siteKey={siteKey}
+                                siteKey={siteKey!}
                                 onSuccess={setTurnstileToken}
                                 onError={() => setError(t('errorUnexpected') ?? 'Weryfikacja nie powiodła się.')}
                             />
@@ -98,7 +99,7 @@ export default function ShopLoginPage() {
                     )}
                     <Button
                         type="submit"
-                        disabled={isLoading || (!!siteKey && !turnstileToken)}
+                        disabled={isLoading || (isTurnstileEnabled && !turnstileToken)}
                         className="w-full py-4 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg transition-all disabled:opacity-50"
                     >
                         {isLoading ? t('submitting') : t('submit')}

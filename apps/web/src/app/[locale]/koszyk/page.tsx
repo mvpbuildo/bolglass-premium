@@ -22,6 +22,7 @@ export default function CheckoutPage() {
     const [documentType, setDocumentType] = useState<'RECEIPT' | 'INVOICE'>('RECEIPT');
     const [turnstileToken, setTurnstileToken] = useState<string>('');
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    const isTurnstileEnabled = Boolean(siteKey && siteKey.length > 5);
 
     // Universal Adapter State
     const [shippingMethods, setShippingMethods] = useState<any[]>([]);
@@ -335,10 +336,10 @@ export default function CheckoutPage() {
                                     </div>
                                 )}
 
-                                {siteKey && (
+                                {isTurnstileEnabled && (
                                     <div className="flex justify-center my-6">
                                         <Turnstile
-                                            siteKey={siteKey}
+                                            siteKey={siteKey!}
                                             onSuccess={setTurnstileToken}
                                             onError={() => alert('Błąd weryfikacji antyspamowej. Odśwież stronę.')}
                                         />
@@ -348,7 +349,7 @@ export default function CheckoutPage() {
                                 <Button
                                     type="submit"
                                     className="w-full bg-amber-500 hover:bg-amber-600 text-black py-4 text-lg font-black uppercase tracking-widest mt-6 shadow-lg hover:shadow-amber-500/20 transition-all rounded-full"
-                                    disabled={isSubmitting || (!!siteKey && !turnstileToken)}
+                                    disabled={isSubmitting || (isTurnstileEnabled && !turnstileToken)}
                                 >
                                     {isSubmitting ? t('processing') : `${t('orderAndPay')} (${formatPrice(finalTotal)})`}
                                 </Button>
