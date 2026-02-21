@@ -56,7 +56,7 @@ export async function updateTelegramToken(formData: FormData): Promise<void> {
             create: { key: 'telegram_bot_token', value: token },
             update: { value: token }
         });
-        revalidatePath('/admin/settings/telegram');
+        revalidatePath('/', 'layout');
     } catch (e) {
         console.error('Failed to update Telegram token:', e);
     }
