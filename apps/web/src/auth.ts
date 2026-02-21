@@ -5,6 +5,7 @@ import authConfig from "./auth.config"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { verifyTurnstileToken } from "@/lib/turnstile"
+import { loginRateLimiter } from "@/lib/rate-limit"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -19,6 +20,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 turnstileToken: { label: "Turnstile Token", type: "text" }
             },
             authorize: async (credentials) => {
+                const email = credentials?.email as string | undefined;
+                if (!email) return null;
+
+                // 1. Zabezpieczenie Rate Limit na wejściu oparte o email
+                // Ze względu na uwarunkowania brzegowe Server Actions, jeżeli nie mamy tu dostępu do czystego IP (Headers),
+                // uderzenia limitujemy per nazwa konta (Email), co i tak chroni docelowych użytkowników przed słownikami.
+                // Jeżeli Twoja platforma Hostująca wspiera X-Forwarded-For transparentnie w `req.headers`,
+                // można to rozszerzyć o IP (np. const ip = req?.headers?.get("x-forwarded-for")).
+                const limitCheck = loginRateLimiter.consume(`login_attempt_${email.toLowerCase()}`);
+                if (!limitCheck.success) {
+                    throw new Error("RateLimitExceeded");
+                }
+
                 const turnstileToken = credentials?.turnstileToken as string | undefined;
 
                 const isHuman = await verifyTurnstileToken(turnstileToken);
@@ -35,13 +49,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     where: { email: credentials.email as string }
                 });
 
-                if (!user || !(user as any).password) {
+                if (!user || !(user as { password?: string }).password) {
                     return null;
                 }
 
                 const passwordsMatch = await bcrypt.compare(
                     credentials.password as string,
-                    (user as any).password
+                    (user as { password?: string }).password as string
                 );
 
                 if (passwordsMatch) {
@@ -56,7 +70,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ...authConfig.callbacks,
         async jwt({ token, user, account }) {
             if (user) {
-                token.role = (user as any).role
+                token.role = (user as { role?: string }).role
             }
             if (account) {
                 token.provider = account.provider

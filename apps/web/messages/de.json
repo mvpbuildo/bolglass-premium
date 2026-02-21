@@ -127,6 +127,7 @@
             "noAccount": "Noch kein Konto?",
             "registerLink": "Konto erstellen",
             "errorInvalid": "Ungültige E-Mail oder ungültiges Passwort.",
+            "errorRateLimit": "Zu viele fehlgeschlagene Versuche. Kontozugang für die nächste Viertelstunde blockiert.",
             "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten."
         },
         "register": {

@@ -127,6 +127,7 @@
       "noAccount": "Nie masz jeszcze konta?",
       "registerLink": "Załóż konto teraz",
       "errorInvalid": "Błędny e-mail lub hasło.",
+      "errorRateLimit": "Zbyt wiele błędnych prób. Utracono dostęp do konta na najbliższy kwadrans.",
       "errorUnexpected": "Wystąpił nieoczekiwany błąd."
     },
     "register": {

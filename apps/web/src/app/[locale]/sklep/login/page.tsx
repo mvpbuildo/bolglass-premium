@@ -33,7 +33,11 @@ export default function ShopLoginPage() {
             });
 
             if (res?.error) {
-                setError(t('errorInvalid'));
+                if (res.error.includes("RateLimitExceeded") || res.error === "RateLimitExceeded") {
+                    setError(t('errorRateLimit') ?? "Zbyt wiele błędnych prób. Spróbuj za kwadrans.");
+                } else {
+                    setError(t('errorInvalid'));
+                }
             } else {
                 window.location.href = "/sklep";
             }

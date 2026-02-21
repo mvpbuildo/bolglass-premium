@@ -127,6 +127,7 @@
             "noAccount": "Don't have an account yet?",
             "registerLink": "Create an account",
             "errorInvalid": "Invalid email or password.",
+            "errorRateLimit": "Too many failed attempts. Account access blocked for the next 15 minutes.",
             "errorUnexpected": "An unexpected error occurred."
         },
         "register": {

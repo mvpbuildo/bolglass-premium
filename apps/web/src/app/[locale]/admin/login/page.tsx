@@ -30,7 +30,11 @@ export default function LoginPage() {
             });
 
             if (res?.error) {
-                setError("Błędny e-mail lub hasło.");
+                if (res.error.includes("RateLimitExceeded") || res.error === "RateLimitExceeded") {
+                    setError("Przekroczono limit prób. Konto zostało zablokowane na 15 minut.");
+                } else {
+                    setError("Błędny e-mail lub hasło.");
+                }
             } else {
                 window.location.href = "/admin";
             }
