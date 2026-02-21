@@ -19,6 +19,7 @@ export default async function AdminDiscountsPage() {
     const totalAnalytics = await prisma.order.groupBy({
         by: ['currency'],
         _sum: { discountAmount: true },
+        _count: { _all: true },
         where: { couponId: { not: null }, status: { not: 'CANCELLED' } }
     });
 
@@ -27,18 +28,30 @@ export default async function AdminDiscountsPage() {
         EUR: totalAnalytics.find(a => a.currency === 'EUR')?._sum.discountAmount || 0,
     };
 
+    const totalUsesByCurrency = {
+        PLN: totalAnalytics.find(a => a.currency === 'PLN')?._count._all || 0,
+        EUR: totalAnalytics.find(a => a.currency === 'EUR')?._count._all || 0,
+    };
+
     const couponsAnalytics = await prisma.order.groupBy({
         by: ['couponId', 'currency'],
         _sum: { discountAmount: true },
+        _count: { _all: true },
         where: { couponId: { not: null }, status: { not: 'CANCELLED' } }
     });
 
-    const couponStats = new Map<string, { PLN: number, EUR: number }>();
+    const couponStats = new Map<string, { PLN: number, EUR: number, usesPLN: number, usesEUR: number }>();
     couponsAnalytics.forEach(c => {
         if (!c.couponId) return;
-        const current = couponStats.get(c.couponId) || { PLN: 0, EUR: 0 };
-        if (c.currency === 'PLN') current.PLN += c._sum.discountAmount || 0;
-        if (c.currency === 'EUR') current.EUR += c._sum.discountAmount || 0;
+        const current = couponStats.get(c.couponId) || { PLN: 0, EUR: 0, usesPLN: 0, usesEUR: 0 };
+        if (c.currency === 'PLN') {
+            current.PLN += c._sum.discountAmount || 0;
+            current.usesPLN += c._count._all || 0;
+        }
+        if (c.currency === 'EUR') {
+            current.EUR += c._sum.discountAmount || 0;
+            current.usesEUR += c._count._all || 0;
+        }
         couponStats.set(c.couponId, current);
     });
 
@@ -55,6 +68,7 @@ export default async function AdminDiscountsPage() {
                 coupons={coupons.map(c => ({ id: c.id, code: c.code, uses: c.uses }))}
                 couponStats={Object.fromEntries(couponStats)}
                 totalDiscountAmount={totalDiscountAmount}
+                totalUsesByCurrency={totalUsesByCurrency}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

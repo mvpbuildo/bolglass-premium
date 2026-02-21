@@ -9,11 +9,12 @@ interface CouponAnalyticsProps {
         code: string;
         uses: number;
     }[];
-    couponStats: Record<string, { PLN: number; EUR: number }>;
+    couponStats: Record<string, { PLN: number; EUR: number; usesPLN: number; usesEUR: number }>;
     totalDiscountAmount: { PLN: number; EUR: number };
+    totalUsesByCurrency: { PLN: number; EUR: number };
 }
 
-export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscountAmount }: CouponAnalyticsProps) {
+export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscountAmount, totalUsesByCurrency }: CouponAnalyticsProps) {
     const [selectedCouponId, setSelectedCouponId] = useState<string>('all');
 
     const totalUses = coupons.reduce((acc, curr) => acc + curr.uses, 0);
@@ -26,9 +27,13 @@ export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscou
         ? totalDiscountAmount.EUR
         : (couponStats[selectedCouponId]?.EUR || 0);
 
-    const displayUses = selectedCouponId === 'all'
-        ? totalUses
-        : (coupons.find(c => c.id === selectedCouponId)?.uses || 0);
+    const displayUsesPLN = selectedCouponId === 'all'
+        ? totalUsesByCurrency.PLN
+        : (couponStats[selectedCouponId]?.usesPLN || 0);
+
+    const displayUsesEUR = selectedCouponId === 'all'
+        ? totalUsesByCurrency.EUR
+        : (couponStats[selectedCouponId]?.usesEUR || 0);
 
     return (
         <div className="space-y-4 mb-8">
@@ -56,9 +61,14 @@ export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscou
                 </Card>
                 <Card className="p-6 bg-blue-50/30 border-blue-100 transition-all duration-300">
                     <h3 className="text-sm font-bold text-blue-800 uppercase tracking-widest mb-1">Wykorzystane Kupony (Suma Użyć)</h3>
-                    <p className="text-3xl font-black text-blue-600">
-                        {displayUses} <span className="text-sm font-bold text-blue-600/50">szt.</span>
-                    </p>
+                    <div className="flex flex-col">
+                        <p className="text-3xl font-black text-blue-600">
+                            {displayUsesPLN} <span className="text-sm font-bold text-blue-600/50">użyć (PLN checkout)</span>
+                        </p>
+                        <p className="text-lg font-bold text-blue-500/80">
+                            {displayUsesEUR} <span className="text-xs font-bold text-blue-500/50">użyć (EUR checkout)</span>
+                        </p>
+                    </div>
                 </Card>
             </div>
         </div>
