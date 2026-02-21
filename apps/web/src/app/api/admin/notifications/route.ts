@@ -20,8 +20,7 @@ export async function GET(request: Request) {
     try {
         const newOrdersCount = await prisma.order.count({
             where: {
-                paymentStatus: 'PAID',
-                updatedAt: { gt: sinceDate }
+                createdAt: { gt: sinceDate }
             }
         });
 
