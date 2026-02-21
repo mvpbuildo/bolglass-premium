@@ -27,7 +27,7 @@ export async function GET(request: Request) {
 
         const newBookingsCount = await prisma.booking.count({
             where: {
-                status: 'PAID',
+                status: 'CONFIRMED',
                 createdAt: { gt: sinceDate }
             }
         });

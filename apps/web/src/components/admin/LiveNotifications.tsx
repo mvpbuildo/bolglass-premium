@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
+import { Package, Calendar } from 'lucide-react';
 
 export default function LiveNotifications() {
     const lastCheckTime = useRef<Date>(new Date());
@@ -28,16 +29,18 @@ export default function LiveNotifications() {
                 const data = await response.json();
 
                 if (data.orders > 0) {
-                    toast.success(`Nowe zamówienia w sklepie: ${data.orders}! Sprawdź zakładkę Zamówienia.`, {
-                        duration: 6000,
-                        icon: '📦',
+                    toast.success(`Nowe zamówienia: ${data.orders}`, {
+                        description: 'Sprawdź zakładkę Zamówienia w panelu.',
+                        icon: <Package className="w-5 h-5 text-emerald-500" />,
+                        duration: 8000
                     });
                 }
 
                 if (data.bookings > 0) {
-                    toast.success(`Nowe rezerwacje kalendarzowe: ${data.bookings}! Sprawdź terminarz.`, {
-                        duration: 6000,
-                        icon: '📅',
+                    toast.info(`Nowe rezerwacje: ${data.bookings}`, {
+                        description: 'Sprawdź terminarz warsztatów.',
+                        icon: <Calendar className="w-5 h-5 text-blue-500" />,
+                        duration: 8000
                     });
                 }
 
