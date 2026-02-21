@@ -79,7 +79,13 @@ export class BookingService {
 
             // Telegram Broadcast
             const { broadcastNewBooking } = await import('@/lib/telegram');
-            broadcastNewBooking(booking).catch(err => console.error('CRITICAL: Telegram broadcast failed:', err));
+            broadcastNewBooking({
+                id: booking.id,
+                name: booking.name,
+                date: booking.date.toLocaleDateString('pl-PL'),
+                type: booking.type,
+                people: booking.people
+            }).catch(err => console.error('CRITICAL: Telegram broadcast failed:', err));
 
             return { success: true, booking };
         } catch (error) {

@@ -209,7 +209,13 @@ export class CheckoutService {
 
             // Podpięcie równoległego powiadomienia na czat Telegrama do właściciela i pracowników
             const { broadcastNewOrder } = await import('@/lib/telegram');
-            broadcastNewOrder(order).catch(err => console.error("CRITICAL: Telegram broadcast failed:", err));
+            broadcastNewOrder({
+                id: order.id,
+                total: order.total,
+                currency: order.currency,
+                items: trustedItems,
+                discountAmount: order.discountAmount
+            }).catch(err => console.error("CRITICAL: Telegram broadcast failed:", err));
 
             return {
                 orderId: order.id,
