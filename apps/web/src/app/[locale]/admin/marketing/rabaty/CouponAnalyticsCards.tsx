@@ -9,8 +9,8 @@ interface CouponAnalyticsProps {
         code: string;
         uses: number;
     }[];
-    couponStats: Record<string, number>;
-    totalDiscountAmount: number;
+    couponStats: Record<string, { PLN: number; EUR: number }>;
+    totalDiscountAmount: { PLN: number; EUR: number };
 }
 
 export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscountAmount }: CouponAnalyticsProps) {
@@ -18,9 +18,13 @@ export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscou
 
     const totalUses = coupons.reduce((acc, curr) => acc + curr.uses, 0);
 
-    const displayDiscount = selectedCouponId === 'all'
-        ? totalDiscountAmount
-        : (couponStats[selectedCouponId] || 0);
+    const displayDiscountPLN = selectedCouponId === 'all'
+        ? totalDiscountAmount.PLN
+        : (couponStats[selectedCouponId]?.PLN || 0);
+
+    const displayDiscountEUR = selectedCouponId === 'all'
+        ? totalDiscountAmount.EUR
+        : (couponStats[selectedCouponId]?.EUR || 0);
 
     const displayUses = selectedCouponId === 'all'
         ? totalUses
@@ -45,7 +49,10 @@ export default function CouponAnalyticsCards({ coupons, couponStats, totalDiscou
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="p-6 bg-red-50/30 border-red-100 transition-all duration-300">
                     <h3 className="text-sm font-bold text-red-800 uppercase tracking-widest mb-1">Przekazany Rabat (Koszty Kampanii)</h3>
-                    <p className="text-3xl font-black text-red-600">{displayDiscount.toFixed(2)} PLN</p>
+                    <div className="flex flex-col">
+                        <p className="text-3xl font-black text-red-600">{displayDiscountPLN.toFixed(2)} PLN</p>
+                        <p className="text-lg font-bold text-red-500/80">{displayDiscountEUR.toFixed(2)} EUR</p>
+                    </div>
                 </Card>
                 <Card className="p-6 bg-blue-50/30 border-blue-100 transition-all duration-300">
                     <h3 className="text-sm font-bold text-blue-800 uppercase tracking-widest mb-1">Wykorzystane Kupony (Suma Użyć)</h3>

@@ -16,20 +16,31 @@ export default async function AdminDiscountsPage() {
         orderBy: { createdAt: 'desc' }
     });
 
-    const analytics = await prisma.order.aggregate({
+    const totalAnalytics = await prisma.order.groupBy({
+        by: ['currency'],
         _sum: { discountAmount: true },
         where: { couponId: { not: null }, status: { not: 'CANCELLED' } }
     });
 
-    const totalDiscountAmount = analytics._sum.discountAmount || 0;
+    const totalDiscountAmount = {
+        PLN: totalAnalytics.find(a => a.currency === 'PLN')?._sum.discountAmount || 0,
+        EUR: totalAnalytics.find(a => a.currency === 'EUR')?._sum.discountAmount || 0,
+    };
 
     const couponsAnalytics = await prisma.order.groupBy({
-        by: ['couponId'],
+        by: ['couponId', 'currency'],
         _sum: { discountAmount: true },
         where: { couponId: { not: null }, status: { not: 'CANCELLED' } }
     });
 
-    const couponStats = new Map(couponsAnalytics.map(c => [c.couponId as string, c._sum.discountAmount || 0]));
+    const couponStats = new Map<string, { PLN: number, EUR: number }>();
+    couponsAnalytics.forEach(c => {
+        if (!c.couponId) return;
+        const current = couponStats.get(c.couponId) || { PLN: 0, EUR: 0 };
+        if (c.currency === 'PLN') current.PLN += c._sum.discountAmount || 0;
+        if (c.currency === 'EUR') current.EUR += c._sum.discountAmount || 0;
+        couponStats.set(c.couponId, current);
+    });
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
@@ -78,9 +89,12 @@ export default async function AdminDiscountsPage() {
                                                 Wykorzystano: {coupon.uses} / {coupon.maxUses || 'BEZ LIMITU'}.
                                                 {coupon.excludePromotions ? " (Z wykluczeniem przecenionych)" : ""}
                                             </p>
-                                            <p className="text-xs text-blue-600 font-bold mt-1">
-                                                Wygenerowano Zniżek: {(couponStats.get(coupon.id) || 0).toFixed(2)} PLN
-                                            </p>
+                                            <div className="text-xs text-blue-600 font-bold mt-1">
+                                                Wygenerowano Zniżek:
+                                                <span className="ml-1">{(couponStats.get(coupon.id)?.PLN || 0).toFixed(2)} PLN</span>
+                                                <span className="mx-1">/</span>
+                                                <span>{(couponStats.get(coupon.id)?.EUR || 0).toFixed(2)} EUR</span>
+                                            </div>
                                         </div>
                                         <div className="mt-3 sm:mt-0 flex gap-2">
                                             {/* Tutaj moglaby byc obsluga wylaczania, na etapie MVP po prostu usuniecie umozliwi czyszczenie smieci */}
