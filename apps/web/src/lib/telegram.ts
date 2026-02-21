@@ -37,34 +37,64 @@ export async function sendTelegramMessage(chatId: string, text: string, parseMod
     }
 }
 
-export async function broadcastNewOrder(orderData: { id: string; total: number; currency: string; items: { name: string; quantity: number }[]; discountAmount: number }) {
+export async function broadcastNewOrder(orderData: {
+    id: string;
+    total: number;
+    currency: string;
+    items: { name: string; quantity: number }[];
+    discountAmount: number;
+    shippingMethod?: string;
+    shippingAddress?: any;
+}) {
     try {
         const subscribers = await prisma.telegramSubscriber.findMany({
-            where: { receivesOrders: true }
+            where: {
+                OR: [
+                    { receivesOrders: true },
+                    { receivesLogistics: true }
+                ]
+            }
         });
 
         if (subscribers.length === 0) return;
 
         const itemsList = orderData.items.map(item => `📦 ${item.quantity}x ${item.name}`).join('\n');
+        const addressInfo = orderData.shippingAddress ?
+            `📍 <b>Adres:</b> ${orderData.shippingAddress.name}, ${orderData.shippingAddress.street}, ${orderData.shippingAddress.city} (${orderData.shippingAddress.phone || 'brak tel.'})` :
+            '📍 <b>Adres:</b> Brak danych (Odbiór?)';
 
-        // Wiadomość dla "Szefa" - pełna wersja z kwotą
+        // Wiadomość PEŁNA (Administracja)
         const messageFull = `
 <b>🎉 Nowe Zamówienie! (#${orderData.id.slice(-6).toUpperCase()})</b>
 
 💰 <b>Kwota:</b> ${orderData.total.toFixed(2)} ${orderData.currency}
 📉 <b>Rabat:</b> ${orderData.discountAmount.toFixed(2)} ${orderData.currency}
+🚚 <b>Dostawa:</b> ${orderData.shippingMethod || 'Standard'}
 
-Zarządzana zawartość:
+${addressInfo}
+
+<b>Zawartość:</b>
 ${itemsList}
 
-<i>Przejdź do panelu, by poznać szczegóły płatności i dostawy.</i>`;
+<i>Przejdź do panelu, by sprawdzić status płatności.</i>`;
 
-        // Różnicowanie ról można by zrealizować w oparciu o pole "roleDescription".
-        // W tym prototypie decyduję, że wszyscy z aktywnym 'receivesOrders' dostają to samo. Zostawiam zanonimizowany template do bazy.
+        // Wiadomość LOGISTYCZNA (Tylko dane do wysyłki)
+        const messageLogistics = `
+<b>📦 Nowa Wysyłka! (#${orderData.id.slice(-6).toUpperCase()})</b>
 
-        const sendPromises = subscribers.map(sub =>
-            sendTelegramMessage(sub.chatId, messageFull)
-        );
+🚚 <b>Metoda:</b> ${orderData.shippingMethod || 'Standard'}
+${addressInfo}
+
+<b>Asortyment do spakowania:</b>
+${itemsList}
+
+<i>Logistyka Bolglass - Miłego pakowania! 🛠</i>`;
+
+        const sendPromises = subscribers.map(sub => {
+            // Jeśli ma tylko uprawnienia logistyczne - wysyłamy okrojoną wersję
+            const text = (sub.receivesLogistics && !sub.receivesOrders) ? messageLogistics : messageFull;
+            return sendTelegramMessage(sub.chatId, text);
+        });
 
         await Promise.all(sendPromises);
     } catch (e) {

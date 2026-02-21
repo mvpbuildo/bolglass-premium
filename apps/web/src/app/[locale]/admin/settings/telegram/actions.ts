@@ -13,6 +13,7 @@ export async function addTelegramSubscriber(formData: FormData) {
     const roleDescription = formData.get('roleDescription') as string;
     const receivesOrders = formData.get('receivesOrders') === 'true';
     const receivesBookings = formData.get('receivesBookings') === 'true';
+    const receivesLogistics = formData.get('receivesLogistics') === 'true';
 
     if (!chatId || !name) throw new Error('ID Czatu i Nazwa są wymagane');
 
@@ -23,7 +24,8 @@ export async function addTelegramSubscriber(formData: FormData) {
                 name,
                 roleDescription,
                 receivesOrders,
-                receivesBookings
+                receivesBookings,
+                receivesLogistics
             }
         });
         revalidatePath('/admin/settings/telegram');

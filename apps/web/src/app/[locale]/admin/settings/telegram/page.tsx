@@ -3,7 +3,7 @@ import { Card } from '@bolglass/ui';
 import { addTelegramSubscriber, deleteTelegramSubscriber } from './actions';
 import TokenForm from './TokenForm';
 import TestSubscriberButton from './TestSubscriberButton';
-import { Bell, UserPlus, Trash2, MessagesSquare, CheckCircle, XCircle } from 'lucide-react';
+import { Bell, UserPlus, Trash2, MessagesSquare, CheckCircle, XCircle, Package } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
@@ -86,9 +86,14 @@ export default async function TelegramSettingsPage() {
                                     <span className="text-sm text-gray-700">Sklep (Zaksięgowane Zamówienia)</span>
                                 </label>
 
-                                <label className="flex items-center gap-3 cursor-pointer">
+                                <label className="flex items-center gap-3 mb-2 cursor-pointer">
                                     <input type="checkbox" name="receivesBookings" value="true" defaultChecked className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
                                     <span className="text-sm text-gray-700">Kalendarz (Nowe Rezerwacje)</span>
+                                </label>
+
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="receivesLogistics" value="true" className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                                    <span className="text-sm text-gray-700 font-bold text-blue-600">Logistyka (Tylko wysyłka i asortyment)</span>
                                 </label>
                             </div>
 
@@ -132,6 +137,10 @@ export default async function TelegramSettingsPage() {
                                                     <span className={`text-xs font-bold flex items-center gap-1 ${sub.receivesBookings ? 'text-green-600' : 'text-gray-400'}`}>
                                                         {sub.receivesBookings ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                                         Warsztaty
+                                                    </span>
+                                                    <span className={`text-xs font-bold flex items-center gap-1 ${sub.receivesLogistics ? 'text-blue-600' : 'text-gray-400'}`}>
+                                                        {sub.receivesLogistics ? <Package className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                                        Logistyka
                                                     </span>
                                                 </div>
                                             </div>

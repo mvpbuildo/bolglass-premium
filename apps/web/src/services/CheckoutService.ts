@@ -214,7 +214,9 @@ export class CheckoutService {
                 total: order.total,
                 currency: order.currency,
                 items: trustedItems,
-                discountAmount: order.discountAmount
+                discountAmount: order.discountAmount,
+                shippingMethod: order.shippingMethod,
+                shippingAddress: order.shippingAddress
             }).catch(err => console.error("CRITICAL: Telegram broadcast failed:", err));
 
             return {
