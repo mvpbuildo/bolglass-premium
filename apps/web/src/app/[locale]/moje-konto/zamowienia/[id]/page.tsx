@@ -59,7 +59,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="space-y-6">
             <div className="flex items-center gap-4">
                 <Link href="/moje-konto/zamowienia">
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-900 hover:bg-gray-100 hover:text-red-600">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2 text-amber-50 hover:bg-white/10 hover:text-amber-500">
                         <ChevronLeft className="w-4 h-4" />
                         {t('backToList')}
                     </Button>
@@ -68,11 +68,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        <Package className="w-7 h-7 text-red-600" />
+                    <h1 className="text-2xl font-bold text-amber-50 flex items-center gap-3">
+                        <Package className="w-7 h-7 text-amber-500" />
                         {t('order')} #{order.id.substring(0, 8)}
                     </h1>
-                    <p className="text-gray-500 text-sm">{t('placedAt')} {format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</p>
+                    <p className="text-amber-200/40 text-sm font-medium">{t('placedAt')} {format(new Date(order.createdAt), 'dd.MM.yyyy HH:mm')}</p>
                 </div>
                 <div className={`px-4 py-2 rounded-full text-sm font-bold w-fit ${getStatusColor(order.status)}`}>
                     {getStatusLabel(order.status)}
@@ -87,10 +87,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
-                                    <TableRow>
-                                        <TableHead>{t('product')}</TableHead>
-                                        <TableHead className="text-center">{t('quantity')}</TableHead>
-                                        <TableHead className="text-right">{t('unitPrice')}</TableHead>
+                                    <TableRow className="border-gray-200">
+                                        <TableHead className="text-gray-900 font-black uppercase text-[10px] tracking-widest">{t('product')}</TableHead>
+                                        <TableHead className="text-center text-gray-900 font-black uppercase text-[10px] tracking-widest">{t('quantity')}</TableHead>
+                                        <TableHead className="text-right text-gray-900 font-black uppercase text-[10px] tracking-widest">{t('unitPrice')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -137,10 +137,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                         </div>
                     </div>
 
-                    <div className="p-6 bg-gray-50/50">
+                    <div className="p-6 bg-gray-50/50 border-t border-gray-100">
                         <div className="flex justify-between items-center text-lg">
                             <span className="font-bold text-gray-900">{t('totalLabel')}</span>
-                            <span className="font-black text-red-600">{order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} {order.currency || 'PLN'}</span>
+                            <span className="font-black text-red-600 text-2xl">{order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} {order.currency || 'PLN'}</span>
                         </div>
                     </div>
                 </Card>
@@ -153,18 +153,18 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                             <CreditCard className="w-5 h-5 text-red-600" />
                             {t('payment')}
                         </div>
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">{t('method')}:</span>
-                                <span className="font-medium">
+                        <div className="space-y-3 text-sm">
+                            <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span className="text-gray-500 font-medium">{t('method')}:</span>
+                                <span className="font-bold text-gray-900">
                                     {t.has(`paymentMethods.${order.paymentProvider}`)
                                         ? t(`paymentMethods.${order.paymentProvider}`)
                                         : (order.paymentProvider || t('unknown'))}
                                 </span>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">{t('paymentStatus')}:</span>
-                                <span className={`font-bold ${order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-500 font-medium">{t('paymentStatus')}:</span>
+                                <span className={`font-black uppercase text-[10px] px-2 py-0.5 rounded-md ${order.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                     {order.paymentStatus === 'PAID' ? t('paid') : t('waiting')}
                                 </span>
                             </div>
@@ -178,17 +178,19 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                             {t('shipping')}
                         </div>
                         <div className="space-y-4 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">{t('method')}:</span>
-                                <span className="font-medium">{order.shippingMethod}</span>
+                            <div className="flex justify-between items-center border-b border-gray-50 pb-2">
+                                <span className="text-gray-500 font-medium">{t('method')}:</span>
+                                <span className="font-bold text-gray-900">{order.shippingMethod}</span>
                             </div>
-                            <div className="space-y-1">
-                                <span className="text-gray-500 block">{t('shippingAddress')}:</span>
-                                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 italic text-gray-700">
-                                    <p className="font-bold not-italic">{shippingAddress.name}</p>
-                                    <p>{shippingAddress.street}</p>
-                                    <p>{shippingAddress.zip} {shippingAddress.city}</p>
-                                    <p className="mt-2 text-xs">Tel: {shippingAddress.phone}</p>
+                            <div className="space-y-2">
+                                <span className="text-gray-400 font-black uppercase text-[10px] tracking-widest block">{t('shippingAddress')}:</span>
+                                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 italic text-gray-700 shadow-inner">
+                                    <p className="font-black not-italic text-gray-900 mb-1">{shippingAddress.name}</p>
+                                    <p className="font-medium">{shippingAddress.street}</p>
+                                    <p className="font-medium">{shippingAddress.zip} {shippingAddress.city}</p>
+                                    <div className="mt-3 pt-2 border-t border-gray-200/50 flex items-center gap-2 text-[11px] font-bold text-gray-500 not-italic">
+                                        <span className="text-gray-400">TEL:</span> {shippingAddress.phone}
+                                    </div>
                                 </div>
                             </div>
                         </div>
