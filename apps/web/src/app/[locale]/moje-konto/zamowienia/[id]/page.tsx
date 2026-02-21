@@ -127,8 +127,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                                     )}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-center">{item.quantity}</TableCell>
-                                            <TableCell className="text-right font-medium">
+                                            <TableCell className="text-center text-gray-900">{item.quantity}</TableCell>
+                                            <TableCell className="text-right font-medium text-gray-900">
                                                 {order.currency === 'EUR' ? Math.ceil(item.price * item.quantity) : (item.price * item.quantity).toFixed(2)} {order.currency}
                                             </TableCell>
                                         </TableRow>

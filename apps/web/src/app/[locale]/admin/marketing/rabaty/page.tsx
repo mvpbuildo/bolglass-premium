@@ -3,6 +3,7 @@ import { prisma } from '@bolglass/database';
 import { redirect } from 'next/navigation';
 import { Card } from '@bolglass/ui';
 import CouponForm from './CouponForm';
+import CouponAnalyticsCards from './CouponAnalyticsCards';
 import { deleteCoupon } from './actions';
 
 export default async function AdminDiscountsPage() {
@@ -39,18 +40,11 @@ export default async function AdminDiscountsPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <Card className="p-6 bg-red-50/30 border-red-100">
-                    <h3 className="text-sm font-bold text-red-800 uppercase tracking-widest mb-1">Przekazany Rabat (Koszty Kampanii)</h3>
-                    <p className="text-3xl font-black text-red-600">{totalDiscountAmount.toFixed(2)} PLN</p>
-                </Card>
-                <Card className="p-6 bg-blue-50/30 border-blue-100">
-                    <h3 className="text-sm font-bold text-blue-800 uppercase tracking-widest mb-1">Wykorzystane Kupony (Suma Użyć)</h3>
-                    <p className="text-3xl font-black text-blue-600">
-                        {coupons.reduce((acc, curr) => acc + curr.uses, 0)} <span className="text-sm font-bold text-blue-600/50">szt.</span>
-                    </p>
-                </Card>
-            </div>
+            <CouponAnalyticsCards
+                coupons={coupons.map(c => ({ id: c.id, code: c.code, uses: c.uses }))}
+                couponStats={Object.fromEntries(couponStats)}
+                totalDiscountAmount={totalDiscountAmount}
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1">
