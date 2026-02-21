@@ -18,7 +18,8 @@ async function getOrder(id: string, userId: string) {
                 include: {
                     product: true
                 }
-            }
+            },
+            coupon: true
         }
     });
 }
@@ -138,8 +139,14 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     </div>
 
                     <div className="p-6 bg-gray-50/50 border-t border-gray-100">
+                        {order.coupon && order.discountAmount > 0 && (
+                            <div className="flex justify-between items-center text-sm font-bold text-green-600 mb-2">
+                                <span>{t('discountCode') || 'Kod Rabatowy'} ({order.coupon.code})</span>
+                                <span>-{order.currency === 'EUR' ? Math.ceil(order.discountAmount) : order.discountAmount.toFixed(2)} {order.currency || 'PLN'}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between items-center text-lg">
-                            <span className="font-bold text-gray-900">{t('totalLabel')}</span>
+                            <span className="font-bold text-gray-900">{t('totalLabel') || 'Razem'}</span>
                             <span className="font-black text-red-600 text-2xl">{order.currency === 'EUR' ? Math.ceil(order.total) : order.total.toFixed(2)} {order.currency || 'PLN'}</span>
                         </div>
                     </div>

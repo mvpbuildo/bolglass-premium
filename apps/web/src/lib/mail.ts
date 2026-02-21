@@ -261,11 +261,11 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
 
         // Ensure we have items (Prisma create doesn't include them by default)
         let fullOrder = order;
-        if (!order.items || order.items.length === 0) {
-            console.log(`[MAIL] Order items missing or empty, fetching from DB for: ${order.id}`);
+        if (!order.items || order.items.length === 0 || order.couponId && !order.coupon) {
+            console.log(`[MAIL] Order items or coupon missing, fetching from DB for: ${order.id}`);
             fullOrder = await prisma.order.findUnique({
                 where: { id: order.id },
-                include: { items: true }
+                include: { items: true, coupon: true }
             });
         }
 
@@ -318,7 +318,13 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
         const from = config[fromKey] || config[EMAIL_SETTING_KEYS.SMTP_USER];
 
         const currency = fullOrder.currency || 'PLN';
-        const itemsList = (fullOrder.items || []).map((item: any) => `- ${item.name} (x${item.quantity}) - ${currency === 'EUR' ? Math.ceil(item.price) : item.price.toFixed(2)} ${currency}`).join('\n');
+        let itemsList = (fullOrder.items || []).map((item: any) => `- ${item.name} (x${item.quantity}) - ${currency === 'EUR' ? Math.ceil(item.price) : item.price.toFixed(2)} ${currency}`).join('\n');
+
+        if (fullOrder.coupon && fullOrder.discountAmount > 0) {
+            const discountLiteral = locale === 'en' ? 'Discount applied' : locale === 'de' ? 'Angewandter Rabatt' : 'Naliczony rabat';
+            const discAmt = currency === 'EUR' ? Math.ceil(fullOrder.discountAmount) : fullOrder.discountAmount.toFixed(2);
+            itemsList += `\n\n--- ${discountLiteral} (${fullOrder.coupon.code}): -${discAmt} ${currency}`;
+        }
 
         const replacements: Record<string, string> = {
             '{{id}}': fullOrder.id.substring(0, 8),
