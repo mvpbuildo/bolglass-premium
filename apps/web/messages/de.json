@@ -332,7 +332,9 @@
             "shipping": "Versand",
             "shippingAddress": "Lieferadresse",
             "placedAt": "Aufgegeben am",
-            "inscription": "Inschrift"
+            "inscription": "Inschrift",
+            "discountCode": "Rabattcode",
+            "discount": "Ersparnis"
         },
         "orderDetail": {
             "back": "Zurück zu Bestellungen",

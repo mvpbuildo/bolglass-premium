@@ -22,6 +22,14 @@ export default async function AdminDiscountsPage() {
 
     const totalDiscountAmount = analytics._sum.discountAmount || 0;
 
+    const couponsAnalytics = await prisma.order.groupBy({
+        by: ['couponId'],
+        _sum: { discountAmount: true },
+        where: { couponId: { not: null }, status: { not: 'CANCELLED' } }
+    });
+
+    const couponStats = new Map(couponsAnalytics.map(c => [c.couponId as string, c._sum.discountAmount || 0]));
+
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
             <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -75,6 +83,9 @@ export default async function AdminDiscountsPage() {
                                             <p className="text-xs text-gray-400 mt-1">
                                                 Wykorzystano: {coupon.uses} / {coupon.maxUses || 'BEZ LIMITU'}.
                                                 {coupon.excludePromotions ? " (Z wykluczeniem przecenionych)" : ""}
+                                            </p>
+                                            <p className="text-xs text-blue-600 font-bold mt-1">
+                                                Wygenerowano Zniżek: {(couponStats.get(coupon.id) || 0).toFixed(2)} PLN
                                             </p>
                                         </div>
                                         <div className="mt-3 sm:mt-0 flex gap-2">

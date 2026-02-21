@@ -332,7 +332,9 @@
             "shipping": "Shipping",
             "shippingAddress": "Shipping address",
             "placedAt": "Placed at",
-            "inscription": "Inscription"
+            "inscription": "Inscription",
+            "discountCode": "Discount Code",
+            "discount": "Savings"
         },
         "orderDetail": {
             "back": "Back to orders",

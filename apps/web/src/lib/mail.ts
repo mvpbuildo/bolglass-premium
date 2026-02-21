@@ -321,7 +321,12 @@ export async function sendOrderConfirmationEmail(order: any, locale: string = 'p
         let itemsList = (fullOrder.items || []).map((item: any) => `- ${item.name} (x${item.quantity}) - ${currency === 'EUR' ? Math.ceil(item.price) : item.price.toFixed(2)} ${currency}`).join('\n');
 
         if (fullOrder.coupon && fullOrder.discountAmount > 0) {
-            const discountLiteral = locale === 'en' ? 'Discount applied' : locale === 'de' ? 'Angewandter Rabatt' : 'Naliczony rabat';
+            const labelsData = {
+                en: 'Discount Code',
+                de: 'Rabattcode',
+                pl: 'Kod Rabatowy'
+            };
+            const discountLiteral = labelsData[locale as keyof typeof labelsData] || labelsData.pl;
             const discAmt = currency === 'EUR' ? Math.ceil(fullOrder.discountAmount) : fullOrder.discountAmount.toFixed(2);
             itemsList += `\n\n--- ${discountLiteral} (${fullOrder.coupon.code}): -${discAmt} ${currency}`;
         }

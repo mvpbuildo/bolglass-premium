@@ -332,7 +332,9 @@
       "shipping": "Dostawa",
       "shippingAddress": "Adres dostawy",
       "placedAt": "Złożone",
-      "inscription": "Napis"
+      "inscription": "Napis",
+      "discountCode": "Kod zniżkowy",
+      "discount": "Oszczędność"
     },
     "orderDetail": {
       "back": "Wróć do zamówień",
