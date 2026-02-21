@@ -3,21 +3,34 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Card } from '@bolglass/ui';
 import { getAdminEmailSettings, updateAdminEmailSettings } from '../app/[locale]/actions';
+import { getApiStatuses, type ApiStatusData } from '../app/[locale]/admin/settings/shop/status-actions';
 import { EMAIL_SETTING_KEYS } from '@/lib/mail-constants';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, ShieldAlert, Coins, Sparkles, MessageSquare } from 'lucide-react';
 
 export default function AdminShopSettings() {
     const [settings, setSettings] = useState<Record<string, string>>({});
+    const [apiStatus, setApiStatus] = useState<ApiStatusData | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        async function fetchSettings() {
-            const data = await getAdminEmailSettings();
-            setSettings(data);
-            setLoading(false);
+        async function fetchData() {
+            try {
+                const [data, statuses] = await Promise.all([
+                    getAdminEmailSettings(),
+                    getApiStatuses()
+                ]);
+                setSettings(data);
+                setApiStatus(statuses);
+            } catch (error) {
+                console.error('Failed to fetch shop settings/status:', error);
+            } finally {
+                setLoading(false);
+            }
         }
-        fetchSettings();
+        fetchData();
     }, []);
 
     const handleChange = (key: string, value: string) => {
@@ -51,6 +64,70 @@ export default function AdminShopSettings() {
 
     return (
         <div className="space-y-8">
+            {/* API STATUS SECTION */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="p-6 bg-white shadow-xl border border-gray-100 overflow-hidden relative">
+                    <div className="flex justify-between items-start relative z-10">
+                        <div>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2 px-1">Integracja AI</p>
+                            <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-purple-500" />
+                                OpenAI Translation
+                            </h3>
+                        </div>
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                            <motion.div
+                                animate={{ opacity: [1, 0.4, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className={`w-3 h-3 rounded-full shadow-[0_0_8px] ${apiStatus?.ai.active ? 'bg-green-500 shadow-green-500/50' : 'bg-red-500 shadow-red-500/50'}`}
+                            />
+                            <span className={`text-[10px] font-black uppercase tracking-wider ${apiStatus?.ai.active ? 'text-green-600' : 'text-red-600'}`}>
+                                {apiStatus?.ai.active ? 'Aktywne' : 'Nieaktywne'}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 font-medium">
+                        <MessageSquare className="w-4 h-4" />
+                        Automatyczne tłumaczenia 3D & Produktów
+                    </div>
+                </Card>
+
+                <Card className="p-6 bg-white shadow-xl border border-gray-100 overflow-hidden relative">
+                    <div className="flex justify-between items-start relative z-10">
+                        <div>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2 px-1">Kursy Walut</p>
+                            <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                                <Coins className="w-5 h-5 text-amber-500" />
+                                Narodowy Bank Polski
+                            </h3>
+                        </div>
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                            <motion.div
+                                animate={{ opacity: [1, 0.4, 1] }}
+                                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                                className={`w-3 h-3 rounded-full shadow-[0_0_8px] ${apiStatus?.nbp.active ? 'bg-green-500 shadow-green-500/50' : 'bg-red-500 shadow-red-500/50'}`}
+                            />
+                            <span className={`text-[10px] font-black uppercase tracking-wider ${apiStatus?.nbp.active ? 'text-green-600' : 'text-red-600'}`}>
+                                {apiStatus?.nbp.active ? 'Połączono' : 'Błąd'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {apiStatus?.nbp.active && (
+                        <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-end">
+                            <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Aktualny Kurs EUR</p>
+                                <p className="text-2xl font-black text-amber-600 leading-none">1 EUR = {apiStatus.nbp.rate.toFixed(4)} PLN</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Ostatnia Aktualizacja</p>
+                                <p className="text-[11px] font-bold text-gray-600">{new Date(apiStatus.nbp.updatedAt).toLocaleDateString()} {new Date(apiStatus.nbp.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                            </div>
+                        </div>
+                    )}
+                </Card>
+            </div>
+
             <Card className="p-8 bg-white shadow-xl border border-gray-100">
                 <h2 className="text-2xl font-black mb-6 text-gray-900 flex items-center gap-2">
                     📧 Konfiguracja SMTP
