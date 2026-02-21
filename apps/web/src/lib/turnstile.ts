@@ -1,10 +1,13 @@
 export async function verifyTurnstileToken(token: string | null | undefined): Promise<boolean> {
-    if (!token) return false;
-
     const secret = process.env.TURNSTILE_SECRET_KEY;
     if (!secret) {
         console.warn('TURNSTILE_SECRET_KEY is not defined. Skipping verification (devmode).');
         return true; // Domyślnie przepuszczamy, jeżeli klient nie ma jeszcze skonfigurowanego środowiska
+    }
+
+    if (!token) {
+        console.warn('Turnstile Token is empty, but TURNSTILE_SECRET_KEY is defined. Blocking request.');
+        return false;
     }
 
     try {
