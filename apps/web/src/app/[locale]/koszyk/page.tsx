@@ -9,6 +9,7 @@ import { placeOrder, getShippingRates, getPaymentMethods } from './actions';
 import Image from 'next/image';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useTranslations, useLocale } from 'next-intl';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function CheckoutPage() {
     const locale = useLocale();
@@ -19,6 +20,8 @@ export default function CheckoutPage() {
     const t = useTranslations('Cart');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [documentType, setDocumentType] = useState<'RECEIPT' | 'INVOICE'>('RECEIPT');
+    const [turnstileToken, setTurnstileToken] = useState<string>('');
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
     // Universal Adapter State
     const [shippingMethods, setShippingMethods] = useState<any[]>([]);
@@ -66,6 +69,7 @@ export default function CheckoutPage() {
             formData.append('documentType', documentType);
             formData.append('shippingMethod', selectedShipping);
             formData.append('paymentMethod', selectedPayment);
+            formData.append('turnstileToken', turnstileToken);
 
             const result = await placeOrder(formData, JSON.stringify(items));
             if (result.success) {
@@ -331,10 +335,20 @@ export default function CheckoutPage() {
                                     </div>
                                 )}
 
+                                {siteKey && (
+                                    <div className="flex justify-center my-6">
+                                        <Turnstile
+                                            siteKey={siteKey}
+                                            onSuccess={setTurnstileToken}
+                                            onError={() => alert('Błąd weryfikacji antyspamowej. Odśwież stronę.')}
+                                        />
+                                    </div>
+                                )}
+
                                 <Button
                                     type="submit"
                                     className="w-full bg-amber-500 hover:bg-amber-600 text-black py-4 text-lg font-black uppercase tracking-widest mt-6 shadow-lg hover:shadow-amber-500/20 transition-all rounded-full"
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || (!!siteKey && !turnstileToken)}
                                 >
                                     {isSubmitting ? t('processing') : `${t('orderAndPay')} (${formatPrice(finalTotal)})`}
                                 </Button>

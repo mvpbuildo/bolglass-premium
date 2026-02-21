@@ -4,11 +4,19 @@ import { CheckoutService } from '@/services/CheckoutService';
 import { auth } from '@/auth';
 import { prisma } from '@bolglass/database';
 import { shippingProvider } from '@/lib/modules/store-context';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 
 export async function placeOrder(formData: FormData, cartItemsJson: string) {
     const session = await auth();
     const userId = session?.user?.id;
     const cartItems = JSON.parse(cartItemsJson);
+
+    const turnstileToken = formData.get('turnstileToken') as string | undefined;
+    const isHuman = await verifyTurnstileToken(turnstileToken);
+
+    if (!isHuman) {
+        throw new Error('Automatyczna weryfikacja bezpieczeństwa (Cloudflare Turnstile) nie powiodła się. Jesteś robotem?');
+    }
 
     return CheckoutService.placeOrder({
         formData,

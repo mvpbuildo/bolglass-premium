@@ -4,6 +4,7 @@ import { prisma } from "@bolglass/database"
 import authConfig from "./auth.config"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
+import { verifyTurnstileToken } from "@/lib/turnstile"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -15,8 +16,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Hasło", type: "password" },
+                turnstileToken: { label: "Turnstile Token", type: "text" }
             },
             authorize: async (credentials) => {
+                const turnstileToken = credentials?.turnstileToken as string | undefined;
+
+                const isHuman = await verifyTurnstileToken(turnstileToken);
+                if (!isHuman) {
+                    console.error("Turnstile verification failed inside NextAuth");
+                    return null;
+                }
+
                 if (!credentials?.email || !credentials?.password) {
                     return null;
                 }

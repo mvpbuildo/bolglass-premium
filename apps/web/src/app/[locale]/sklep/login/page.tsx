@@ -6,11 +6,14 @@ import { Card } from "@bolglass/ui";
 import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import { useTranslations } from 'next-intl';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function ShopLoginPage() {
     const t = useTranslations('Auth.login');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [turnstileToken, setTurnstileToken] = useState<string>('');
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -25,6 +28,7 @@ export default function ShopLoginPage() {
             const res = await signIn("credentials", {
                 email,
                 password,
+                turnstileToken,
                 redirect: false,
             });
 
@@ -79,9 +83,18 @@ export default function ShopLoginPage() {
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none"
                         />
                     </div>
+                    {siteKey && (
+                        <div className="flex justify-center my-4">
+                            <Turnstile
+                                siteKey={siteKey}
+                                onSuccess={setTurnstileToken}
+                                onError={() => setError(t('errorUnexpected') ?? 'Weryfikacja nie powiodła się.')}
+                            />
+                        </div>
+                    )}
                     <Button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoading || (!!siteKey && !turnstileToken)}
                         className="w-full py-4 text-lg font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg transition-all disabled:opacity-50"
                     >
                         {isLoading ? t('submitting') : t('submit')}
