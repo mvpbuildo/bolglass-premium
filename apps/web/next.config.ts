@@ -15,9 +15,9 @@ const nextConfig = {
   },
   experimental: {
     // Renamed from middlewareClientMaxBodySize
-    proxyClientMaxBodySize: '100mb',
+    proxyClientMaxBodySize: '10mb',
     serverActions: {
-      bodySizeLimit: '100mb',
+      bodySizeLimit: '10mb',
     },
   },
 };

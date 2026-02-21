@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         }
 
         const isVideo = allowedVideoTypes.includes(file.type);
-        const maxSize = isVideo ? 50 * 1024 * 1024 : 5 * 1024 * 1024; // 50MB for video, 5MB for images
+        const maxSize = isVideo ? 10 * 1024 * 1024 : 5 * 1024 * 1024; // 10MB for video, 5MB for images
 
         if (file.size > maxSize) {
             return NextResponse.json({
